@@ -1,0 +1,54 @@
+.av-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.av-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: rgba(18, 18, 26, 0.97);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.4rem;
+  min-width: 160px;
+  z-index: 200;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: av-fadein 0.15s ease;
+}
+
+@keyframes av-fadein {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.av-item {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #ddd;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.av-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.av-item-logout {
+  color: #ff6b6b;
+}
+
+.av-item-logout:hover {
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff8080;
+}

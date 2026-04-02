@@ -1,0 +1,158 @@
+.gm-page {
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.gm-wrapper {
+  position: relative;
+  z-index: 1;
+  padding: 84px 2rem 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.gm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.gm-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #e8d5a3;
+  margin: 0 0 0.2rem;
+}
+
+.gm-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0;
+}
+
+.gm-btn-registar {
+  padding: 0.75rem 1.8rem;
+  border-radius: 50px;
+  border: none;
+  background: #f5c518;
+  color: #111;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.gm-btn-registar:hover {
+  background: #ffd740;
+  transform: translateY(-2px);
+}
+
+.gm-card {
+  background: rgba(18, 18, 26, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.gm-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gm-table thead tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gm-table th {
+  text-align: left;
+  padding: 1rem 1.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  white-space: nowrap;
+}
+
+.gm-table td {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.88rem;
+}
+
+.gm-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.gm-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.gm-nome {
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.gm-muted {
+  color: #777;
+}
+
+.gm-estado {
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.gm-estado.online  { color: #43e97b; }
+.gm-estado.offline { color: #ff6b6b; }
+
+.gm-ganhos {
+  font-weight: 700;
+  color: #f5c518;
+}
+
+.gt-tipo {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.7rem;
+  border-radius: 50px;
+}
+
+.gt-tipo.eletrico {
+  background: rgba(79, 172, 254, 0.1);
+  color: #4facfe;
+  border: 1px solid rgba(79, 172, 254, 0.25);
+}
+
+.gt-tipo.combustao {
+  background: rgba(245, 166, 35, 0.1);
+  color: #f5a623;
+  border: 1px solid rgba(245, 166, 35, 0.25);
+}
+
+.gt-estado {
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.gt-estado.servico    { color: #43e97b; }
+.gt-estado.disponivel { color: #4facfe; }
+.gt-estado.inativo    { color: #ff6b6b; }
+
+@media (max-width: 900px) {
+  .gm-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

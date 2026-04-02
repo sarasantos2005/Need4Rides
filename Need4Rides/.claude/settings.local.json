@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find 'c:/Users/guilherme ribeiro/Desktop/projeto final/testar' -not -path */node_modules/* -type f)",
+      "Bash(npm --version)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(ls -la /Users/guilherme/Desktop/testar/client/src/pages/*.jsx)",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/login -H 'Content-Type: application/json' -d '{\"role\":\"cliente\",\"email\":\"cliente@need4rides.com\",\"password\":\"123456\"}')"
+    ]
+  }
+}

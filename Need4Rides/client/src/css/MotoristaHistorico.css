@@ -1,0 +1,273 @@
+/* ─── Page ──────────────────────────────────────────────── */
+.mhist-page {
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.mhist-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.74);
+  z-index: 0;
+}
+
+/* ─── Navbar ────────────────────────────────────────────── */
+.mhist-navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  height: 64px;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.mhist-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.mhist-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0; padding: 0;
+}
+
+.mhist-nav-links li { display: flex; align-items: center; }
+
+.mhist-nav-links a {
+  color: #ddd;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.mhist-nav-links a:hover,
+.mhist-nav-links a.active { color: #f5c518; }
+
+.mhist-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mhist-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
+}
+
+/* ─── Wrapper ───────────────────────────────────────────── */
+.mhist-wrapper {
+  position: relative;
+  z-index: 1;
+  padding: 84px 2rem 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/* ─── Header ────────────────────────────────────────────── */
+.mhist-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.mhist-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #e8d5a3;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.5px;
+}
+
+.mhist-sub {
+  font-size: 0.88rem;
+  color: #666;
+  margin: 0;
+}
+
+.mhist-back-btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ccc;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.mhist-back-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* ─── Stats ─────────────────────────────────────────────── */
+.mhist-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.mhist-stat {
+  background: rgba(18, 18, 26, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.1rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mhist-stat.accent { border-color: rgba(245, 197, 24, 0.35); }
+
+.mhist-stat-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.mhist-stat-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #f0f0f0;
+}
+
+.mhist-stat.accent .mhist-stat-value { color: #f5c518; }
+
+/* ─── Filtros ───────────────────────────────────────────── */
+.mhist-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.mhist-filter-btn {
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #888;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mhist-filter-btn.active {
+  background: #f5c518;
+  border-color: #f5c518;
+  color: #111;
+}
+
+.mhist-filter-btn:not(.active):hover {
+  background: rgba(255,255,255,0.1);
+  color: #ddd;
+}
+
+/* ─── Card / lista ──────────────────────────────────────── */
+.mhist-card {
+  background: rgba(18, 18, 26, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.6rem 1.8rem;
+  color: #fff;
+}
+
+.mhist-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.mhist-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-wrap: wrap;
+}
+
+.mhist-row:last-child { border-bottom: none; }
+
+.mhist-route {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  min-width: 200px;
+}
+
+.mhist-from, .mhist-to { font-weight: 700; color: #f0f0f0; }
+.mhist-arrow { color: #555; }
+
+.mhist-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.mhist-date { font-size: 0.8rem; color: #666; }
+
+.mhist-detail {
+  font-size: 0.78rem;
+  color: #888;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.18rem 0.6rem;
+  border-radius: 50px;
+}
+
+.mhist-status-badge {
+  background: rgba(67, 233, 123, 0.1);
+  color: #43e97b;
+  border: 1px solid rgba(67, 233, 123, 0.2);
+  padding: 0.2rem 0.65rem;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.mhist-price {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #f5c518;
+  min-width: 55px;
+  text-align: right;
+}
+
+/* ─── Responsive ────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .mhist-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .mhist-navbar { padding: 0 1.2rem; }
+  .mhist-wrapper { padding: 76px 1rem 2rem; }
+  .mhist-title { font-size: 1.5rem; }
+  .mhist-stats { grid-template-columns: 1fr 1fr; }
+}

@@ -1,0 +1,456 @@
+/* ─── Page ──────────────────────────────────────────────── */
+.viagem-page {
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.viagem-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 0;
+}
+
+/* ─── Navbar ────────────────────────────────────────────── */
+.viagem-navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  height: 64px;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.viagem-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
+
+.viagem-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.viagem-nav-links li { display: flex; align-items: center; }
+
+.viagem-nav-links a {
+  color: #ddd;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.viagem-nav-links a:hover,
+.viagem-nav-links a.active { color: #f5c518; }
+
+.viagem-login-btn {
+  background: transparent;
+  border: none;
+  color: #f5c518;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.viagem-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.viagem-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
+}
+
+/* ─── Wrapper ───────────────────────────────────────────── */
+.viagem-wrapper {
+  position: relative;
+  z-index: 1;
+  padding: 84px 1.5rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* ─── Status card ───────────────────────────────────────── */
+.viagem-status-card {
+  background: rgba(18, 18, 26, 0.85);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  padding: 1.6rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.viagem-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.viagem-status-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.viagem-status-badge {
+  padding: 0.25rem 0.9rem;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.viagem-status-badge.active {
+  background: rgba(245, 166, 35, 0.15);
+  border: 1.5px solid rgba(245, 197, 24, 0.45);
+  color: #f5c518;
+}
+
+.viagem-status-badge.done {
+  background: rgba(67, 233, 123, 0.12);
+  border: 1.5px solid rgba(67, 233, 123, 0.4);
+  color: #43e97b;
+}
+
+/* ─── Progress steps ────────────────────────────────────── */
+.viagem-progress {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.viagem-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  gap: 0.5rem;
+}
+
+.viagem-step-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #fff;
+  position: relative;
+  z-index: 1;
+  transition: all 0.4s;
+}
+
+.viagem-step-dot.filled {
+  background: linear-gradient(135deg, #f5a623, #f5c518);
+  border-color: #f5c518;
+  color: #111;
+  font-weight: 700;
+}
+
+.viagem-pulse {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #f5c518;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+}
+
+.viagem-step-label {
+  font-size: 0.72rem;
+  color: #666;
+  text-align: center;
+  max-width: 80px;
+  line-height: 1.3;
+}
+
+.viagem-step-label.current {
+  color: #f5c518;
+  font-weight: 600;
+}
+
+.viagem-step-line {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+}
+
+.viagem-step-line.filled {
+  background: linear-gradient(to right, #f5a623, #f5c518);
+}
+
+/* Dev stage buttons */
+.viagem-stage-btns {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.viagem-stage-btn {
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.05);
+  color: #888;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.viagem-stage-btn.active {
+  background: rgba(245,166,35,0.15);
+  border-color: rgba(245,197,24,0.4);
+  color: #f5c518;
+}
+
+/* ─── Bottom layout ─────────────────────────────────────── */
+.viagem-bottom {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 1.2rem;
+  align-items: stretch;
+}
+
+/* ─── Left column ───────────────────────────────────────── */
+.viagem-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* Info card */
+.viagem-info-card {
+  background: rgba(18, 18, 26, 0.85);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  padding: 1.4rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.viagem-route { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.viagem-point { display: flex; align-items: center; gap: 0.9rem; }
+
+.viagem-dot {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.viagem-dot.origin {
+  background: #f5a623;
+  box-shadow: 0 0 8px rgba(245,166,35,0.6);
+}
+
+.viagem-dot.dest {
+  background: #43e97b;
+  box-shadow: 0 0 8px rgba(67,233,123,0.6);
+}
+
+.viagem-point-label {
+  display: block;
+  font-size: 0.7rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.viagem-point-value {
+  display: block;
+  font-size: 0.9rem;
+  color: #f0f0f0;
+  font-weight: 500;
+}
+
+.viagem-route-line {
+  width: 2px; height: 18px;
+  background: rgba(255,255,255,0.1);
+  margin-left: 4px;
+}
+
+.viagem-eta-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(245,166,35,0.08);
+  border: 1px solid rgba(245,197,24,0.18);
+  border-radius: 12px;
+  padding: 0.7rem 1rem;
+}
+
+.viagem-eta-label {
+  font-size: 0.78rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.viagem-eta-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #f5c518;
+}
+
+/* Driver card */
+.viagem-driver-card {
+  background: rgba(18, 18, 26, 0.85);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  padding: 1.4rem 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.viagem-driver-avatar-ring {
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, #f5a623, #f5c518);
+  flex-shrink: 0;
+}
+
+.viagem-driver-avatar-ring img {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #14141c;
+}
+
+.viagem-driver-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.viagem-driver-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f0f0f0;
+}
+
+.viagem-driver-sub {
+  font-size: 0.78rem;
+  color: #888;
+}
+
+.viagem-driver-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #f5c518;
+  font-size: 0.8rem;
+}
+
+.viagem-driver-rating span {
+  color: #aaa;
+  font-weight: 600;
+}
+
+.viagem-call-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  border: 1.5px solid rgba(245,197,24,0.45);
+  background: rgba(245,166,35,0.1);
+  color: #f5c518;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.viagem-call-btn:hover {
+  background: rgba(245,166,35,0.22);
+}
+
+/* ─── Map placeholder ───────────────────────────────────── */
+.viagem-map-placeholder {
+  background: rgba(18, 18, 26, 0.85);
+  backdrop-filter: blur(18px);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed rgba(245, 197, 24, 0.2);
+  min-height: 0;
+}
+
+.viagem-map-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.viagem-map-icon {
+  width: 64px; height: 64px;
+  color: rgba(245, 197, 24, 0.4);
+}
+
+.viagem-map-icon svg {
+  width: 100%; height: 100%;
+}
+
+.viagem-map-inner span {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #666;
+}
+
+.viagem-map-inner p {
+  font-size: 0.82rem;
+  color: #444;
+  margin: 0;
+}
+
+/* ─── Responsive ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .viagem-bottom { grid-template-columns: 1fr; }
+  .viagem-navbar { padding: 0 1.2rem; gap: 1rem; }
+}

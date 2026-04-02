@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(mv src/pages/Login.css src/css/)",
+      "Bash(mv src/pages/Profile.css src/css/)",
+      "Bash(mv src/pages/Fatura.css src/css/)",
+      "Bash(mv src/pages/PedirTaxi.css src/css/)",
+      "Bash(mv src/pages/Viagem.css src/css/)",
+      "Bash(sed -i \"s|''\\\\./Home\\\\.css''|''../css/Home.css''|g\" Home.jsx)",
+      "Bash(sed -i \"s|''\\\\./Profile\\\\.css''|''../css/Profile.css''|g\" Profile.jsx)",
+      "Bash(sed -i \"s|''\\\\./Fatura\\\\.css''|''../css/Fatura.css''|g\" Fatura.jsx)",
+      "Bash(sed -i \"s|''\\\\./PedirTaxi\\\\.css''|''../css/PedirTaxi.css''|g\" PedirTaxi.jsx)",
+      "Bash(sed -i \"s|''\\\\./Viagem\\\\.css''|''../css/Viagem.css''|g\" Viagem.jsx)"
+    ]
+  }
+}

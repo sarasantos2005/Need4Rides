@@ -1,0 +1,396 @@
+/* ─── Page ──────────────────────────────────────────────── */
+.mreab-page {
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.mreab-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.74);
+  z-index: 0;
+}
+
+/* ─── Navbar ────────────────────────────────────────────── */
+.mreab-navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  height: 64px;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.mreab-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.mreab-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0; padding: 0;
+}
+
+.mreab-nav-links li { display: flex; align-items: center; }
+
+.mreab-nav-links a {
+  color: #ddd;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.mreab-nav-links a:hover,
+.mreab-nav-links a.active { color: #f5c518; }
+
+.mreab-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mreab-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
+}
+
+/* ─── Wrapper ───────────────────────────────────────────── */
+.mreab-wrapper {
+  position: relative;
+  z-index: 1;
+  padding: 84px 2rem 3rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/* ─── Header ────────────────────────────────────────────── */
+.mreab-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.mreab-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #e8d5a3;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.5px;
+}
+
+.mreab-sub {
+  font-size: 0.88rem;
+  color: #666;
+  margin: 0;
+}
+
+.mreab-veiculo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.3rem;
+}
+
+.mreab-veiculo-modelo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e0e0e0;
+}
+
+.mreab-veiculo-sep {
+  color: #444;
+  font-size: 0.4rem;
+}
+
+.mreab-veiculo-matricula {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #f5c518;
+  background: rgba(245, 197, 24, 0.1);
+  border: 1px solid rgba(245, 197, 24, 0.25);
+  border-radius: 4px;
+  padding: 0.05rem 0.45rem;
+  letter-spacing: 0.5px;
+}
+
+.mreab-back-btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ccc;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.mreab-back-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* ─── Content (2 cols) ──────────────────────────────────── */
+.mreab-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem;
+  align-items: start;
+}
+
+/* ─── Shared card ───────────────────────────────────────── */
+.mreab-card {
+  background: rgba(18, 18, 26, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.6rem 1.8rem;
+  color: #fff;
+}
+
+.mreab-card-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 0 0 1.4rem;
+}
+
+/* ─── Form ──────────────────────────────────────────────── */
+.mreab-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.mreab-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+.mreab-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.mreab-field label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.mreab-field input,
+.mreab-field textarea {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.78rem 1rem;
+  color: #f0f0f0;
+  font-size: 0.93rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.mreab-field input::placeholder,
+.mreab-field textarea::placeholder { color: #444; }
+
+.mreab-field input:focus,
+.mreab-field textarea:focus {
+  border-color: #f5a623;
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.mreab-field textarea { resize: vertical; min-height: 80px; }
+
+/* input with unit suffix */
+.mreab-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.mreab-input-wrap input {
+  padding-right: 2.4rem;
+}
+
+.mreab-input-wrap input.has-left {
+  padding-left: 2.2rem;
+  padding-right: 1rem;
+}
+
+.mreab-unit {
+  position: absolute;
+  right: 0.9rem;
+  color: #666;
+  font-size: 0.85rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.mreab-unit.left {
+  right: auto;
+  left: 0.9rem;
+}
+
+/* ─── Calc hint ─────────────────────────────────────────── */
+.mreab-calc {
+  font-size: 0.8rem;
+  color: #888;
+  background: rgba(245, 166, 35, 0.08);
+  border: 1px solid rgba(245, 197, 24, 0.15);
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+}
+
+.mreab-calc strong { color: #f5c518; }
+
+/* ─── Submit ────────────────────────────────────────────── */
+.mreab-btn-submit {
+  width: 100%;
+  padding: 0.88rem;
+  border-radius: 50px;
+  border: none;
+  background: linear-gradient(135deg, #f5a623, #f5c518);
+  color: #111;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 0.3rem;
+  transition: transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 18px rgba(245, 166, 35, 0.4);
+}
+
+.mreab-btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(245, 166, 35, 0.55);
+}
+
+.mreab-btn-submit:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ─── Success ───────────────────────────────────────────── */
+.mreab-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.mreab-success-icon {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5a623, #f5c518);
+  color: #111;
+  font-size: 1.6rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(245, 166, 35, 0.45);
+}
+
+.mreab-success p {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f0f0f0;
+  margin: 0;
+}
+
+/* ─── Histórico reab ────────────────────────────────────── */
+.mreab-hist-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.mreab-hist-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mreab-hist-row:last-child { border-bottom: none; }
+
+.mreab-hist-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.mreab-hist-posto {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.mreab-hist-date {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.mreab-hist-values {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-shrink: 0;
+}
+
+.mreab-hist-litros {
+  font-size: 0.85rem;
+  color: #888;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.18rem 0.7rem;
+  border-radius: 50px;
+}
+
+.mreab-hist-valor {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #f5c518;
+}
+
+/* ─── Responsive ────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .mreab-content { grid-template-columns: 1fr; }
+  .mreab-form-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .mreab-navbar { padding: 0 1.2rem; }
+  .mreab-wrapper { padding: 76px 1rem 2rem; }
+  .mreab-title { font-size: 1.5rem; }
+}

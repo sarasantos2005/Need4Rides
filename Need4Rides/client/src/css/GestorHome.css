@@ -1,0 +1,374 @@
+.gh-page {
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.gh-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.74);
+  z-index: 0;
+}
+
+/* ─── Navbar ────────────────────────────────────────────── */
+.gh-navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  height: 64px;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.gh-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.gh-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gh-nav-links li { display: flex; align-items: center; }
+
+.gh-nav-links a {
+  color: #ddd;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.gh-nav-links a:hover,
+.gh-nav-links a.active { color: #f5c518; }
+
+.gh-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gh-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
+}
+
+/* ─── Wrapper ───────────────────────────────────────────── */
+.gh-wrapper {
+  position: relative;
+  z-index: 1;
+  padding: 84px 2rem 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/* ─── Card ──────────────────────────────────────────────── */
+.gh-card {
+  background: rgba(18, 18, 26, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.6rem 1.8rem;
+  color: #fff;
+}
+
+.gh-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 0;
+}
+
+/* ─── Welcome ───────────────────────────────────────────── */
+.gh-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.gh-welcome-left {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.gh-welcome-avatar-ring {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  border: 3px solid #f5c518;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.gh-welcome-avatar-ring img {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.gh-welcome-sub {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0 0 0.15rem;
+}
+
+.gh-welcome-name {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.5px;
+}
+
+.gh-role-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.8rem;
+  border-radius: 50px;
+  background: rgba(245, 197, 24, 0.15);
+  color: #f5c518;
+  border: 1px solid rgba(245, 197, 24, 0.3);
+}
+
+.gh-logout-btn {
+  padding: 0.85rem 2.2rem;
+  border-radius: 50px;
+  border: 1.5px solid rgba(255, 107, 107, 0.4);
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.gh-logout-btn:hover {
+  background: rgba(255, 107, 107, 0.22);
+  transform: translateY(-2px);
+}
+
+/* ─── Stats ─────────────────────────────────────────────── */
+.gh-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.gh-stat-card {
+  background: rgba(18, 18, 26, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition: border-color 0.2s;
+}
+
+.gh-stat-card:hover { border-color: rgba(245, 197, 24, 0.3); }
+.gh-stat-card.accent { border-color: rgba(245, 197, 24, 0.35); }
+
+.gh-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.gh-stat-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #f0f0f0;
+}
+
+.gh-stat-card.accent .gh-stat-value { color: #f5c518; }
+
+/* ─── Middle row ────────────────────────────────────────── */
+.gh-middle-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem;
+}
+
+/* ─── Section header ────────────────────────────────────── */
+.gh-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin-bottom: 1.2rem;
+}
+
+.gh-badge {
+  background: #f5c518;
+  color: #111;
+  font-size: 0.72rem;
+  font-weight: 800;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Viagens ───────────────────────────────────────────── */
+.gh-viagens-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.gh-viagem-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-wrap: wrap;
+}
+
+.gh-viagem-row:last-child { border-bottom: none; }
+
+.gh-viagem-route {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.87rem;
+  color: #ddd;
+  font-weight: 500;
+  flex: 1;
+}
+
+.gh-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gh-dot.origin { background: #f5c518; }
+.gh-dot.dest   { background: #ff6b6b; }
+
+.gh-arrow { color: #555; font-size: 0.8rem; }
+
+.gh-viagem-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.gh-sep { color: #444; }
+
+.gh-status-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.7rem;
+  border-radius: 50px;
+  white-space: nowrap;
+}
+
+.gh-status-badge.active {
+  background: rgba(67, 233, 123, 0.1);
+  color: #43e97b;
+  border: 1px solid rgba(67, 233, 123, 0.25);
+}
+
+.gh-status-badge.waiting {
+  background: rgba(245, 197, 24, 0.1);
+  color: #f5c518;
+  border: 1px solid rgba(245, 197, 24, 0.25);
+}
+
+/* ─── Motoristas ────────────────────────────────────────── */
+.gh-motoristas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.gh-motorista-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 1rem;
+}
+
+.gh-motorista-row:last-child { border-bottom: none; }
+
+.gh-motorista-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.gh-motorista-nome {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e0e0e0;
+}
+
+.gh-motorista-estado {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.gh-motorista-estado.online  { color: #43e97b; }
+.gh-motorista-estado.offline { color: #ff6b6b; }
+
+.gh-motorista-stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.82rem;
+  color: #777;
+}
+
+.gh-motorista-ganhos {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f5c518;
+}
+
+/* ─── Responsive ────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .gh-stats-row  { grid-template-columns: repeat(2, 1fr); }
+  .gh-middle-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .gh-navbar  { padding: 0 1.2rem; }
+  .gh-wrapper { padding: 76px 1rem 2rem; }
+  .gh-welcome { gap: 1rem; }
+  .gh-logout-btn { width: 100%; }
+}

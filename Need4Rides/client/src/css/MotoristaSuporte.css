@@ -1,0 +1,401 @@
+/* ─── Page ──────────────────────────────────────────────── */
+.ms-page {
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.ms-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.74);
+  z-index: 0;
+}
+
+/* ─── Navbar ────────────────────────────────────────────── */
+.ms-navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  height: 64px;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.ms-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ms-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0; padding: 0;
+}
+
+.ms-nav-links li { display: flex; align-items: center; }
+
+.ms-nav-links a {
+  color: #ddd;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.ms-nav-links a:hover,
+.ms-nav-links a.active { color: #f5c518; }
+
+.ms-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ms-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
+}
+
+/* ─── Wrapper ───────────────────────────────────────────── */
+.ms-wrapper {
+  position: relative;
+  z-index: 1;
+  padding: 84px 2rem 3rem;
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/* ─── Header ────────────────────────────────────────────── */
+.ms-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ms-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #e8d5a3;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.5px;
+}
+
+.ms-sub {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+.ms-back-btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ccc;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.ms-back-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* ─── Search ────────────────────────────────────────────── */
+.ms-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: rgba(18, 18, 26, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50px;
+  padding: 0.75rem 1.2rem;
+  transition: border-color 0.2s;
+}
+
+.ms-search-wrap:focus-within {
+  border-color: rgba(245, 197, 24, 0.45);
+}
+
+.ms-search-icon { font-size: 1rem; flex-shrink: 0; }
+
+.ms-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #f0f0f0;
+  font-size: 0.93rem;
+  outline: none;
+}
+
+.ms-search-input::placeholder { color: #555; }
+
+.ms-search-clear {
+  background: transparent;
+  border: none;
+  color: #666;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.ms-search-clear:hover { color: #aaa; }
+
+/* ─── Tópicos grid ──────────────────────────────────────── */
+.ms-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.ms-topic-card {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  background: rgba(18, 18, 26, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.2rem 1.4rem;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+
+.ms-topic-card:hover {
+  border-color: rgba(245, 197, 24, 0.35);
+  background: rgba(18, 18, 26, 0.95);
+  transform: translateX(4px);
+}
+
+.ms-topic-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  width: 44px;
+  text-align: center;
+}
+
+.ms-topic-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ms-topic-titulo {
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: #f0f0f0;
+}
+
+.ms-topic-resumo {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.ms-topic-arrow {
+  font-size: 1.4rem;
+  color: #f5c518;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ─── Empty state ───────────────────────────────────────── */
+.ms-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #666;
+}
+
+.ms-empty p { font-size: 0.95rem; margin: 0 0 0.4rem; color: #888; }
+.ms-empty strong { color: #f0f0f0; }
+.ms-empty span { font-size: 0.82rem; }
+
+/* ─── Contacto ──────────────────────────────────────────── */
+.ms-contact-card {
+  background: rgba(245, 166, 35, 0.07);
+  border: 1px solid rgba(245, 197, 24, 0.2);
+  border-radius: 16px;
+  padding: 1.3rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ms-contact-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ms-contact-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f0f0f0;
+}
+
+.ms-contact-sub {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.ms-contact-actions {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.ms-contact-btn {
+  padding: 0.55rem 1.3rem;
+  border-radius: 50px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.ms-contact-btn.email {
+  background: rgba(245, 166, 35, 0.15);
+  color: #f5a623;
+  border: 1px solid rgba(245, 197, 24, 0.35);
+}
+
+.ms-contact-btn.email:hover {
+  background: rgba(245, 166, 35, 0.28);
+  transform: translateY(-1px);
+}
+
+.ms-contact-btn.phone {
+  background: rgba(67, 233, 123, 0.1);
+  color: #43e97b;
+  border: 1px solid rgba(67, 233, 123, 0.25);
+}
+
+.ms-contact-btn.phone:hover {
+  background: rgba(67, 233, 123, 0.2);
+  transform: translateY(-1px);
+}
+
+/* ─── Detalhe tópico ────────────────────────────────────── */
+.ms-detalhe {
+  background: rgba(18, 18, 26, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 1.8rem;
+}
+
+.ms-detalhe-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.ms-detalhe-icon { font-size: 2rem; flex-shrink: 0; }
+
+.ms-detalhe-titulo {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.25rem;
+}
+
+.ms-detalhe-resumo {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0;
+}
+
+/* ─── FAQ items ─────────────────────────────────────────── */
+.ms-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ms-faq-item {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.ms-faq-item.open {
+  border-color: rgba(245, 197, 24, 0.3);
+}
+
+.ms-faq-q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.ms-faq-q:hover { background: rgba(255, 255, 255, 0.07); }
+
+.ms-faq-q span:first-child {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  flex: 1;
+}
+
+.ms-faq-chevron {
+  font-size: 0.65rem;
+  color: #f5c518;
+  flex-shrink: 0;
+}
+
+.ms-faq-a {
+  padding: 0 1.2rem 1rem;
+  font-size: 0.85rem;
+  color: #888;
+  line-height: 1.7;
+  margin: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.75rem;
+}
+
+/* ─── Responsive ────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .ms-navbar { padding: 0 1.2rem; }
+  .ms-wrapper { padding: 76px 1rem 2rem; }
+  .ms-title { font-size: 1.5rem; }
+  .ms-contact-card { flex-direction: column; align-items: flex-start; }
+}

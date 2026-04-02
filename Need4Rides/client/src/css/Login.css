@@ -1,0 +1,290 @@
+/* ─── Page ──────────────────────────────────────────────── */
+.lp-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  padding: 1rem;
+  position: relative;
+}
+
+.lp-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.68);
+}
+
+/* ─── Card ──────────────────────────────────────────────── */
+.lp-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  background: rgba(245, 166, 35, 0.06);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(245, 197, 24, 0.25);
+  border-radius: 24px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+/* ─── Form (animated on mount) ─────────────────────────── */
+@keyframes lp-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.lp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 2.6rem 2.2rem 2.2rem;
+  animation: lp-slide-in 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Title ─────────────────────────────────────────────── */
+.lp-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.5px;
+}
+
+/* ─── Input ─────────────────────────────────────────────── */
+.lp-input-wrap {
+  position: relative;
+}
+
+.lp-input {
+  width: 100%;
+  padding: 0.85rem 3rem 0.85rem 1.2rem;
+  border-radius: 50px;
+  border: 1px solid rgba(245, 197, 24, 0.35);
+  background: rgba(245, 166, 35, 0.1);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 0.93rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  box-sizing: border-box;
+}
+
+.lp-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.lp-input:focus {
+  border-color: #f5c518;
+  background: rgba(245, 166, 35, 0.18);
+}
+
+.lp-select {
+  padding-right: 1.2rem;
+  cursor: pointer;
+  appearance: none;
+}
+
+.lp-select option {
+  background: #1a1a2e;
+  color: #fff;
+}
+
+.lp-icon {
+  position: absolute;
+  right: 1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.45);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.lp-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ─── Remember / Forgot row ─────────────────────────────── */
+.lp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.lp-remember {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.83rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.lp-remember input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #f5c518;
+  cursor: pointer;
+}
+
+.lp-forgot {
+  font-size: 0.83rem;
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.lp-forgot:hover {
+  color: #fff;
+}
+
+/* ─── Tabs (Gestor / Cliente / Motorista) ───────────────── */
+.lp-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  border-radius: 50px;
+  overflow: hidden;
+  border: 1px solid rgba(245, 197, 24, 0.35);
+}
+
+.lp-tab {
+  padding: 0.65rem 0;
+  border: none;
+  background: rgba(245, 166, 35, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.lp-tab:not(:last-child) {
+  border-right: 1px solid rgba(245, 197, 24, 0.25);
+}
+
+.lp-tab.active {
+  background: #f5c518;
+  color: #111;
+  font-weight: 700;
+}
+
+.lp-tab:not(.active):hover {
+  background: rgba(245, 166, 35, 0.18);
+  color: #fff;
+}
+
+/* ─── Role selector ─────────────────────────────────────── */
+.lp-role-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.lp-role-btn {
+  padding: 0.7rem;
+  border-radius: 50px;
+  border: 1px solid rgba(245, 197, 24, 0.35);
+  background: rgba(245, 166, 35, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.lp-role-btn.active {
+  background: #f5c518;
+  border-color: #f5c518;
+  color: #111;
+  font-weight: 700;
+}
+
+.lp-role-btn:not(.active):hover {
+  background: rgba(245, 166, 35, 0.18);
+  color: #fff;
+}
+
+/* ─── Error message ─────────────────────────────────────── */
+.lp-error {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #ff6b6b;
+  margin: 0;
+  padding: 0.4rem 0;
+}
+
+/* ─── Button ────────────────────────────────────────────── */
+.lp-btn {
+  width: 100%;
+  padding: 0.88rem;
+  border-radius: 50px;
+  border: none;
+  background: #f5c518;
+  color: #111;
+  font-size: 0.97rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-top: 0.2rem;
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+  box-shadow: 0 4px 20px rgba(245, 197, 24, 0.4);
+}
+
+.lp-btn:hover {
+  background: #ffd740;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(245, 197, 24, 0.55);
+}
+
+.lp-btn:active {
+  transform: translateY(0);
+}
+
+/* ─── Switch link ───────────────────────────────────────── */
+.lp-switch {
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.lp-switch span {
+  color: #f5c518;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+}
+
+.lp-switch span:hover {
+  color: #ffd740;
+}
+
+/* ─── Responsive ────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .lp-form {
+    padding: 2rem 1.5rem 1.8rem;
+  }
+
+  .lp-title {
+    font-size: 1.7rem;
+  }
+}
