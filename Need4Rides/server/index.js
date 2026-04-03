@@ -43,6 +43,10 @@ app.get('/', (req, res) => {
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/user', userRoutes);
 
+// Rotas de táxis
+const taxiRoutes = require('./routes/taxiRoutes');
+app.use('/api/taxi', taxiRoutes);
+
 // --- MELHORIA: Tratamento de Rotas Não Encontradas (404) ---
 app.use((req, res) => {
   res.status(404).json({ message: "Rota não encontrada." });
