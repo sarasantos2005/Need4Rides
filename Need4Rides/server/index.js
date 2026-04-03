@@ -14,6 +14,7 @@ const Reabastecimento = require("./models/reabastecimentoModel");
 const Taxi = require("./models/taxiModel");
 const Turno = require("./models/turnoModel");
 const Viagem = require("./models/viagemModel");
+const Preco = require("./models/precoModel");
 
 // Validação básica das variáveis de ambiente
 const PORT = Number(process.env.PORT) || 3000;
@@ -79,7 +80,8 @@ app.use((err, req, res, next) => {
       { name: 'Reabastecimentos', model: Reabastecimento },
       { name: 'Taxis', model: Taxi },
       { name: 'Turnos', model: Turno },
-      { name: 'Viagens', model: Viagem }
+      { name: 'Viagens', model: Viagem },
+      { name: 'Precos', model: Preco }
     ];
 
     console.log("A criar novas coleções...");

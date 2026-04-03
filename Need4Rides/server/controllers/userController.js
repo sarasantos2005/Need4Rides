@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const Turno = require("../models/turnoModel");
+const Preco = require('../models/precoModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -209,5 +210,29 @@ exports.update = async (req, res) => {
     res.status(200).json({ success: true, user: userAtualizado });
   } catch (error) {
     res.status(500).json({ success: false, message: "Erro ao atualizar." });
+  }
+};
+
+//US3 - Definir preço por minuto
+exports.definirPreco = async (req, res) => {
+  try {
+    const { nivel_conforto, valor_minuto, acrescimo_noturno } = req.body;
+
+    // RIA 20: Preços devem ser positivos
+    if (valor_minuto <= 0) {
+      return res.status(400).json({ message: "O preço por minuto deve ser positivo." });
+    }
+
+    const novoPreco = new Preco({
+      nivel_conforto,
+      valor_minuto,
+      acrescimo_noturno,
+      gestor: req.userId 
+    });
+
+    await novoPreco.save();
+    res.status(201).json({ message: "Preço atualizado com sucesso!", preco: novoPreco });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

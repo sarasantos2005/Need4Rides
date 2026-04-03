@@ -1,7 +1,7 @@
 const Viagem = require('../models/viagemModel');
 const Turno = require('../models/turnoModel');
 const Pessoa = require('../models/userModel');
-
+const Preco = require('../models/precoModel');
 
 //Registar viagem -> Depois do cliente pedir, o motorista aceitar e o cliente confirmar
 //US-8
@@ -52,7 +52,7 @@ exports.finalizarViagem = async (req, res) => {
     const km = calcularDistancia(viagem.morada_inicial_viagem.coordinates, [destino.long, destino.lat]);
     
     //RIA 20: Calclar preco com o nivel de conforto, e hora inicial e final
-    const preco = calcularPreco(viagem.nivel_conforto, viagem.hora_inicial_viagem, horaFim);
+    const preco = await calcularPreco(viagem.nivel_conforto, viagem.hora_inicial_viagem, horaFim);
 
     const viagemFinalizada = await Viagem.findByIdAndUpdate(
         viagem_Id,
@@ -305,25 +305,30 @@ function calcularDistancia(coordsInicio, coordsFim) {
 }
 
 //RIA 20
-function calcularPreco(nivelConforto, horaInicio, horaFim) {
-  const PRECO_BASICO = 0.50;  // 0.50€/min
-  const PRECO_LUXUOSO = 0.80; // 0.80€/min
-  const ACRESCIMO_NOTURNO = 1.20; // +20% (US3)
+async function calcularPreco(nivelConforto, horaInicio, horaFim) {
+  const configuracaoPreco = await Preco.findOne({ nivel_conforto: nivelConforto })
+                                        .sort({ data_definicao: -1 });
+
+  if (!configuracaoPreco) {
+    throw new Error("Tabela de preços não configurada pelo gestor.");
+  }
+
+  const precoBaseMinuto = configuracaoPreco.valor_minuto;
+  const taxaNoturna = configuracaoPreco.acrescimo_noturno;
 
   const duracaoMs = new Date(horaFim) - new Date(horaInicio);
   const minutos = duracaoMs / (1000 * 60);
 
-  // Escolha do preço base (RIA 16) 
-  let precoBase = nivelConforto === "Luxuoso" ? PRECO_LUXUOSO : PRECO_BASICO;
+  let precoBase = precoBaseMinuto;
 
-  // Verificar período noturno (21h às 6h) 
+  // Verificar período noturno (21h às 6h) - US3
   const hora = new Date(horaInicio).getHours();
   if (hora >= 21 || hora < 6) {
-    precoBase *= ACRESCIMO_NOTURNO;
+    precoBase *= taxaNoturna;
   }
 
   const total = minutos * precoBase;
-  return parseFloat(total.toFixed(2)); 
+  return parseFloat(total.toFixed(2));
 }
 
 //Tempo estimado de um lugar a outro -- Acho que dá pra fazer com o nominatim
