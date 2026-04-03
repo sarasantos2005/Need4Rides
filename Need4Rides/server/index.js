@@ -47,6 +47,24 @@ app.use('/api/user', userRoutes);
 const taxiRoutes = require('./routes/taxiRoutes');
 app.use('/api/taxi', taxiRoutes);
 
+// Rotas de turnos
+const turnoRoutes = require('./routes/turnoRoutes');
+app.use('/api/turno', turnoRoutes);
+
+// Rotas de viagens
+const viagemRoutes = require('./routes/viagemRoutes');  
+app.use('/api/viagem', viagemRoutes);
+
+// Rotas de faturas
+const faturaRoutes = require('./routes/faturaRoutes');  
+app.use('/api/fatura', faturaRoutes); 
+
+// Rotas de reabastecimentos
+const reabastecimentoRoutes = require('./routes/reabastecimentosRoutes');  
+app.use('/api/reabastecimento', reabastecimentoRoutes);
+
+
+
 // --- MELHORIA: Tratamento de Rotas Não Encontradas (404) ---
 app.use((req, res) => {
   res.status(404).json({ message: "Rota não encontrada." });
