@@ -64,7 +64,7 @@ const viagemSchema = new mongoose.Schema({
 
     cliente: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Pessoa', 
+        ref: 'User',
         required: true 
     },
 
