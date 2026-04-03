@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
 const JWT_SECRET = process.env.JWT_SECRET;
 const TOKEN_EXPIRATION = process.env.TOKEN_EXPIRATION;
+const regexCarta = /^[A-Z]{2}-\d{5} \d{1}$/; // Ex: ZA-12345 6
 
 // Criar cliente ou motorista
 //US2 / US17
