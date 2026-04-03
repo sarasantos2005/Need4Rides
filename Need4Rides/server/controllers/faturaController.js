@@ -22,3 +22,11 @@ exports.emitirFatura = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+//RIA21 : As faturas emitidas num dado ano vão do número 1 em diante.
+async function gerarProximoNumeroSequencial() {
+  const anoAtual = new Date().getFullYear();
+  const ultima = await Fatura.findOne({ ano: anoAtual }).sort({ n_sequencial: -1 });
+  
+  return ultima ? ultima.n_sequencial + 1 : 1;
+}
