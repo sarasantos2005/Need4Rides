@@ -313,22 +313,50 @@ async function calcularPreco(nivelConforto, horaInicio, horaFim) {
     throw new Error("Tabela de preços não configurada pelo gestor.");
   }
 
-  const precoBaseMinuto = configuracaoPreco.valor_minuto;
-  const taxaNoturna = configuracaoPreco.acrescimo_noturno;
+  return calcularPrecoViagem(
+    new Date(horaInicio),
+    new Date(horaFim),
+    configuracaoPreco.valor_minuto,
+    configuracaoPreco.acrescimo_noturno
+  );
+}
 
-  const duracaoMs = new Date(horaFim) - new Date(horaInicio);
-  const minutos = duracaoMs / (1000 * 60);
+function calcularPrecoViagem(inicio, fim, precoMinuto, agravamento) {
+  const multiplicadorNoturno = 1 + agravamento / 100;
+  let preco = 0;
+  let cursor = new Date(inicio);
 
-  let precoBase = precoBaseMinuto;
+  while (cursor < fim) {
+    const proximaMudanca = proximaMudancaTarifa(cursor);
+    const fimSegmento = proximaMudanca < fim ? proximaMudanca : fim;
 
-  // Verificar período noturno (21h às 6h) - US3
-  const hora = new Date(horaInicio).getHours();
-  if (hora >= 21 || hora < 6) {
-    precoBase *= taxaNoturna;
+    const hora = cursor.getHours();
+    const eNoturno = hora >= 21 || hora < 6;
+    const multiplicador = eNoturno ? multiplicadorNoturno : 1.0;
+
+    const minutosSegmento = (fimSegmento - cursor) / 60000;
+    preco += minutosSegmento * precoMinuto * multiplicador;
+
+    cursor = fimSegmento;
   }
 
-  const total = minutos * precoBase;
-  return parseFloat(total.toFixed(2));
+  return parseFloat(preco.toFixed(2));
+}
+
+function proximaMudancaTarifa(data) {
+  const d = new Date(data);
+  const hora = d.getHours();
+
+  if (hora >= 21) {
+    d.setDate(d.getDate() + 1);
+    d.setHours(6, 0, 0, 0);
+  } else if (hora < 6) {
+    d.setHours(6, 0, 0, 0);
+  } else {
+    d.setHours(21, 0, 0, 0);
+  }
+
+  return d;
 }
 
 //Tempo estimado de um lugar a outro -- Acho que dá pra fazer com o nominatim
