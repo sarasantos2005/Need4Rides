@@ -7,18 +7,34 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const TOKEN_EXPIRATION = process.env.TOKEN_EXPIRATION;
 
 // Criar cliente ou motorista
+//US2 / US17
 exports.create = async (req, res) => {
   try {
-    const { tipo, nome, genero, nif, senha_acesso_web, ano_nascimento, motorista } = req.body;
+    const { tipo, nome, genero, nif, senha_acesso_web, ano_nascimento, motorista, localizacao } = req.body;
+
+    //RIA 12: NIF com 9 digitos
+    if (!/^\d{9}$/.test(nif)) {
+      return res.status(400).json({ success: false, message: "NIF deve ter exatamente 9 dígitos." });
+    }
 
     const existing = await User.findOne({ nif });
     if (existing) {
       return res.status(409).json({ success: false, message: "NIF já registado." });
     }
 
+    //RIA 4: Motorista >= 18 anos
     const anoAtual = new Date().getFullYear();
     if (tipo === 'motorista' && (anoAtual - ano_nascimento < 18)) {
       return res.status(400).json({ success: false, message: "Motorista deve ter 18 anos ou mais." });
+    }
+
+    //RIA 15: Senha >= 6 caracteres, letras e digitos
+    const regexSenha = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+    if (!regexSenha.test(senha_acesso_web)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "A senha deve ter pelo menos 6 caracteres, incluindo letras e números." 
+      });
     }
 
     const passwordHash = await bcrypt.hash(senha_acesso_web, SALT_ROUNDS);
@@ -33,8 +49,18 @@ exports.create = async (req, res) => {
     };
 
     if (tipo === 'motorista') {
+      if (!n_carta_conducao) {
+        return res.status(400).json({ success: false, message: "Número da carta de condução é obrigatório para motoristas." });
+      }
+
       userData.n_carta_conducao = n_carta_conducao;
-      userData.morada_motorista = morada_motorista;
+
+      if (localizacao && localizacao.long && localizacao.lat) {
+        userData.morada = {
+          type: "Point",
+          coordenadas: [localizacao.long, localizacao.lat] 
+        };
+      }
     }
 
     const newUser = new User(userData);
@@ -53,6 +79,7 @@ exports.create = async (req, res) => {
 };
 
 // Listar todos os utilizadores
+//US ???
 exports.list = async (req, res) => {
   try {
     const users = await User.find();
@@ -64,6 +91,8 @@ exports.list = async (req, res) => {
 
 
 // Login
+//US4 - Motorista e Gestor
+//US18 
 exports.login = async (req, res) => {
   try {
     const { nif, senha_acesso_web } = req.body;
@@ -95,6 +124,7 @@ exports.login = async (req, res) => {
 };
 
 // Remover utilizador
+//US13 - Parte de remover
 exports.delete = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -127,3 +157,5 @@ exports.delete = async (req, res) => {
     console.error(error);
   }
 };
+
+//US13 - Falta editar

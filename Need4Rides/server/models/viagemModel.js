@@ -2,17 +2,18 @@ const mongoose = require('mongoose');
 
 const viagemSchema = new mongoose.Schema({
     morada_inicial_viagem: {
-        type: String,
+        type: { type: String, enum: ['Point'], default: 'Point' },
+        coordinates: { type: [Number], default: [0, 0] },
         required: true
     },
 
     morada_final_viagem: {
-        type: String,
+        type: { type: String, enum: ['Point'], default: 'Point' },
+        coordinates: { type: [Number], default: [0, 0] }
     },
 
     hora_inicial_viagem: { 
-        type: Date, 
-        required: true 
+        type: Date
     },
 
     hora_final_viagem: { 
@@ -50,9 +51,10 @@ const viagemSchema = new mongoose.Schema({
 
     turno: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Turno', 
-        required: true 
+        ref: 'Turno'
     }
 });
 
+viagemSchema.index({ morada_inicial_viagem: "2dsphere" });
+viagemSchema.index({ morada_final_viagem: "2dsphere" });
 module.exports = mongoose.model("Viagem", viagemSchema, "Viagens");

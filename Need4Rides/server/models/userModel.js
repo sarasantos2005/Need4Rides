@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   tipo: {
     type: String,
     required: true,
-    enum: ["cliente", "motorista"]
+    enum: ["Cliente", "Motorista"]
   },
 
   nome: {
@@ -41,10 +41,13 @@ const userSchema = new mongoose.Schema({
 
   motorista: {
     n_carta_conducao: String,
-    latitude_motorista: String,
-    longitude_motorista: String
+    morada: {
+      type: { type: String, enum: ['Point'], default: 'Point' },
+      coordenadas: { type: [Number], default: [0, 0] } 
+    }
   }
 
 }, { timestamps: true });
 
+userSchema.index({ localizacao: "2dsphere" });
 module.exports = mongoose.model("User", userSchema, "Pessoas");
