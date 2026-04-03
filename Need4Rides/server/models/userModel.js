@@ -5,7 +5,13 @@ const userSchema = new mongoose.Schema({
   tipo: {
     type: String,
     required: true,
-    enum: ["Cliente", "Motorista"]
+    enum: ["Cliente", "Motorista", "Gestor"]
+  },
+
+  email: {
+    type: String,
+    required: true,
+    lowercase: true
   },
 
   nome: {
@@ -23,7 +29,6 @@ const userSchema = new mongoose.Schema({
   nif: {
     type: String,
     required: true,
-    unique: true, 
     minlength: 9, 
     maxlength: 9
   },
@@ -40,14 +45,23 @@ const userSchema = new mongoose.Schema({
   },
 
   motorista: {
-    n_carta_conducao: String,
+    n_carta_conducao: {
+      type: String
+    },
+
     morada: {
-      type: { type: String, enum: ['Point'], default: 'Point' },
-      coordenadas: { type: [Number], default: [0, 0] } 
+      type: { type: String, enum: ['Point'] },
+      coordenadas: { type: [Number] } 
     }
   }
 
-}, { timestamps: true });
+});
 
-userSchema.index({ localizacao: "2dsphere" });
+// Garante que não existam dois "Motoristas" com o mesmo NIF ou dois "Clientes" com o mesmo NIF
+userSchema.index({ tipo: 1, nif: 1 }, { unique: true });
+
+// Garante que não existam dois "Motoristas" com o mesmo email ou dois "Clientes" com o mesmo email
+userSchema.index({ email: 1, tipo: 1 }, { unique: true });
+
+userSchema.index({ "motorista.morada.coordenadas": "2dsphere" }, { sparse: true });
 module.exports = mongoose.model("User", userSchema, "Pessoas");

@@ -2,14 +2,33 @@ const mongoose = require('mongoose');
 
 const viagemSchema = new mongoose.Schema({
     morada_inicial_viagem: {
-        type: { type: String, enum: ['Point'], default: 'Point' },
-        coordinates: { type: [Number], default: [0, 0] },
-        required: true
+        type: { 
+            type: String, 
+            enum: ['Point'], 
+            default: 'Point',
+            required: true
+        },
+
+        coordenadas: {
+            type: [Number], 
+            default: [0, 0],
+            required: true
+        }
     },
 
     morada_final_viagem: {
-        type: { type: String, enum: ['Point'], default: 'Point' },
-        coordinates: { type: [Number], default: [0, 0] }
+        type: { 
+            type: String, 
+            enum: ['Point'], 
+            default: 'Point',
+            required: true
+        },
+
+        coordenadas: {
+            type: [Number], 
+            default: [0, 0],
+            required: true
+        }
     },
 
     hora_inicial_viagem: { 

@@ -8,12 +8,19 @@ const cors = require('cors');
 const helmet = require('helmet');
 const bearer = require('express-bearer-token');
 
+const User = require('./models/userModel');
+const Fatura = require("./models/faturaModel");
+const Reabastecimento = require("./models/reabastecimentoModel");
+const Taxi = require("./models/taxiModel");
+const Turno = require("./models/turnoModel");
+const Viagem = require("./models/viagemModel");
+
 // Validação básica das variáveis de ambiente
 const PORT = Number(process.env.PORT) || 3000;
 const DB_URI = process.env.DB_URI;
 
 if (!DB_URI) {
-  console.error("❌ ERRO: DB_URI não definida no ficheiro .env");
+  console.error("ERRO: DB_URI não definida no ficheiro .env");
   process.exit(1);
 }
 
@@ -53,10 +60,51 @@ app.use((err, req, res, next) => {
     await mongoose.connect(DB_URI, {
       serverSelectionTimeoutMS: 5000 
     });
-    console.log("✅ Ligação bem sucedida ao MongoDB Atlas.");
+    console.log("Ligação bem sucedida ao MongoDB Atlas.");
+
+    /*
+    // --- APAGAR ABSOLUTAMENTE TUDO ---
+    console.log("A fazer limpeza total da Base de Dados...");
+    const collectionsInAtlas = await mongoose.connection.db.listCollections().toArray();
+    
+    for (const col of collectionsInAtlas) {
+      await mongoose.connection.db.dropCollection(col.name);
+      console.log(`Coleção antiga [${col.name}] eliminada.`);
+    }
+
+    // --- DEFINIR OS MODELS PARA RECONSTRUÇÃO ---
+    const modelsToCreate = [
+      { name: 'Pessoas', model: User },
+      { name: 'Faturas', model: Fatura },
+      { name: 'Reabastecimentos', model: Reabastecimento },
+      { name: 'Taxis', model: Taxi },
+      { name: 'Turnos', model: Turno },
+      { name: 'Viagens', model: Viagem }
+    ];
+
+    console.log("A criar novas coleções...");
+    for (const item of modelsToCreate) {
+      try {
+        await mongoose.connection.db.createCollection(item.name);
+        
+        await item.model.createIndexes();
+        
+        console.log(`[${item.name}] criada e pronta.`);
+      } catch (err) {
+        console.log(`Erro ao criar [${item.name}]:`, err.message);
+      }
+    }
+
+    console.log("A semear dados de teste...");
+    await User.create({ nome: "Cliente", email: "pessoa@need4rides.com", genero: "M", tipo: "Cliente", nif: 999999999, senha_acesso_web: "123ABC", ano_nascimento: 2005 });
+    await User.create({ nome: "Admin", email: "pessoa@need4rides.com", genero: "M", tipo: "Gestor", nif: 999999999, senha_acesso_web: "123ABC", ano_nascimento: 2005 });
+    await User.create({ nome: "Motorista", email: "pessoa@need4rides.com", genero: "M", tipo: "Motorista", nif: 999999999, senha_acesso_web: "123ABC", ano_nascimento: 2005, motorista: {n_carta_conducao: "ZA-12345 6", morada: {type: "Point", coordenadas: [-9.1393, 38.7223]}}});
+
+    console.log("Dados de teste inseridos.");
+    */
 
     const server = app.listen(PORT, () => {
-      console.log(`🚀 Servidor a correr em http://localhost:${PORT}`);
+      console.log("Servidor a correr em http://localhost:" + PORT);
     });
 
     // --- MELHORIA: Graceful Shutdown (Fechar conexões limpas ao desligar) ---
@@ -69,10 +117,10 @@ app.use((err, req, res, next) => {
     });
 
   } catch (error) {
-    console.log("❌ Erro ao ligar ao MongoDB:", error.message);
+    console.log("Erro ao ligar ao MongoDB:", error.message);
     // Explicação para o erro de DNS comum
     if (error.message.includes('ECONNREFUSED')) {
-      console.log("DICA: Verifica se o teu IP está autorizado no Network Access do MongoDB Atlas.");
+      console.log("Verifique se o seu IP está autorizado no Network Access do MongoDB Atlas.");
     }
   }
 })();

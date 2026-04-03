@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const Turno = require("../models/turnoModel");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -10,11 +11,19 @@ const TOKEN_EXPIRATION = process.env.TOKEN_EXPIRATION;
 //US2 / US17
 exports.create = async (req, res) => {
   try {
-    const { tipo, nome, genero, nif, senha_acesso_web, ano_nascimento, motorista, localizacao } = req.body;
+    const { tipo, email, nome, genero, nif, senha_acesso_web, ano_nascimento, n_carta_conducao, localizacao } = req.body;
 
     //RIA 12: NIF com 9 digitos
     if (!/^\d{9}$/.test(nif)) {
       return res.status(400).json({ success: false, message: "NIF deve ter exatamente 9 dígitos." });
+    }
+
+    const userComEsteEmail = await User.findOne({ email: email.toLowerCase() });
+    if (userComEsteEmail && userComEsteEmail.nif !== nif) {
+      return res.status(409).json({ 
+        success: false, 
+        message: "Este email já está associado a um NIF diferente. Use outro email." 
+      });
     }
 
     const existing = await User.findOne({ nif });
@@ -24,7 +33,7 @@ exports.create = async (req, res) => {
 
     //RIA 4: Motorista >= 18 anos
     const anoAtual = new Date().getFullYear();
-    if (tipo === 'motorista' && (anoAtual - ano_nascimento < 18)) {
+    if (tipo === 'Motorista' && (anoAtual - ano_nascimento < 18)) {
       return res.status(400).json({ success: false, message: "Motorista deve ter 18 anos ou mais." });
     }
 
@@ -41,6 +50,7 @@ exports.create = async (req, res) => {
 
     const userData = {
       tipo,
+      email,
       nome,
       genero,
       nif,
@@ -48,17 +58,25 @@ exports.create = async (req, res) => {
       ano_nascimento
     };
 
-    if (tipo === 'motorista') {
+    if (tipo === 'Motorista') {
       if (!n_carta_conducao) {
         return res.status(400).json({ success: false, message: "Número da carta de condução é obrigatório para motoristas." });
       }
 
-      userData.n_carta_conducao = n_carta_conducao;
+      if(!regexCarta.test(n_carta_conducao)){
+        return res.status(400).json({ 
+          success: false, 
+          message: "Formato da carta inválido (Ex: ZA-12345 6). " 
+        });
+      }
 
       if (localizacao && localizacao.long && localizacao.lat) {
-        userData.morada = {
-          type: "Point",
-          coordenadas: [localizacao.long, localizacao.lat] 
+        userData.motorista = {
+          n_carta_conducao: n_carta_conducao,
+          morada: {
+            type: "Point",
+            coordenadas: [localizacao.long, localizacao.lat] 
+          }
         };
       }
     }
@@ -79,7 +97,6 @@ exports.create = async (req, res) => {
 };
 
 // Listar todos os utilizadores
-//US ???
 exports.list = async (req, res) => {
   try {
     const users = await User.find();
@@ -141,6 +158,17 @@ exports.delete = async (req, res) => {
       return res.status(401).json({ success: false, message: "Token inválido." });
     }
 
+    const user = await User.findById(userId);
+    if (user && user.tipo === 'Motorista') {
+        const temTurnos = await Turno.findOne({ motorista: userId });
+        if (temTurnos) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "A remoção só é permitida caso o motorista não tenha requisitado um turno." 
+            });
+        }
+    }
+
     if (payload.id !== userId) {
       return res.status(403).json({ success: false, message: "Não pode remover outro utilizador." });
     }
@@ -158,4 +186,28 @@ exports.delete = async (req, res) => {
   }
 };
 
-//US13 - Falta editar
+//US13 -Editar
+exports.update = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    if (updates.senha_acesso_web) {
+      const regexSenha = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+      if (!regexSenha.test(updates.senha_acesso_web)) {
+        return res.status(400).json({ message: "Nova senha não cumpre requisitos (letras e números)." });
+      }
+      updates.senha_acesso_web = await bcrypt.hash(updates.senha_acesso_web, SALT_ROUNDS);
+    }
+
+    const userAtualizado = await User.findByIdAndUpdate(id, updates, { new: true });
+    
+    if (!userAtualizado) {
+      return res.status(404).json({ success: false, message: "Utilizador não encontrado." });
+    }
+
+    res.status(200).json({ success: true, user: userAtualizado });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Erro ao atualizar." });
+  }
+};
