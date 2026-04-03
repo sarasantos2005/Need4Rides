@@ -49,7 +49,7 @@ exports.finalizarViagem = async (req, res) => {
     }
 
     //RIA 19: Calcular distancia com a morada inicial e final
-    const km = calcularDistancia(viagem.morada_inicial_viagem.coordinates, [destino.long, destino.lat]);
+    const km = calcularDistancia(viagem.morada_inicial_viagem.coordenadas, [destino.long, destino.lat]);
     
     //RIA 20: Calclar preco com o nivel de conforto, e hora inicial e final
     const preco = await calcularPreco(viagem.nivel_conforto, viagem.hora_inicial_viagem, horaFim);
@@ -60,7 +60,7 @@ exports.finalizarViagem = async (req, res) => {
             hora_final_viagem: horaFim,
             morada_final_viagem: {
                 type: "Point",
-                coordinates: [parseFloat(destino.long), parseFloat(destino.lat)]
+                coordenadas: [parseFloat(destino.long), parseFloat(destino.lat)]
             },
             km_percorridos: km,
             preco_viagem: preco
@@ -105,12 +105,12 @@ exports.pedirTaxi = async (req, res) => {
 
     const pontoOrigem = {
       type: "Point",
-      coordinates: [parseFloat(origem.long), parseFloat(origem.lat)]
+      coordenadas: [parseFloat(origem.long), parseFloat(origem.lat)]
     };
 
     const pontoDestino = {
       type: "Point",
-      coordinates: [parseFloat(destino.long), parseFloat(destino.lat)]
+      coordenadas: [parseFloat(destino.long), parseFloat(destino.lat)]
     };
 
     const novoPedido = new Viagem({
@@ -231,7 +231,7 @@ exports.listarPedidosParaMotorista = async (req, res) => {
       turno: null,
       morada_inicial_viagem: {
         $near: {
-          $geometry: { type: "Point", coordinates: [parseFloat(longitude), parseFloat(latitude)] },
+          $geometry: { type: "Point", coordenadas: [parseFloat(longitude), parseFloat(latitude)] },
           $maxDistance: 10000
         }
       }
@@ -335,7 +335,7 @@ async function calcularPreco(nivelConforto, horaInicio, horaFim) {
 function calcularTempoEstimado(coordsInicio, coordsFim) {
   if (!coordsFim) return 10; 
   
-  const distancia = calcularDistancia(coordsInicio.coordinates, coordsFim.coordinates || coordsFim);
+  const distancia = calcularDistancia(coordsInicio.coordenadas, coordsFim.coordenadas || coordsFim);
   const velocidadeMedia = 60; 
   const tempoHoras = distancia / velocidadeMedia;
   return Math.max(tempoHoras * 60, 5); 
