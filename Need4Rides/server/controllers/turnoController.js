@@ -1,4 +1,4 @@
-const Turno = require('../models/Turno');
+const Turno = require('../models/turnoModel');
 
 //US5
 exports.requisitarTurno = async (req, res) => {
