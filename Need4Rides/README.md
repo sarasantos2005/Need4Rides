@@ -88,6 +88,27 @@ Corre em: http://localhost:5000
 
 ---
 
+## Credenciais na base de dados
+
+| Perfil    | Email                 | NIF        | Password |
+|-----------|-----------------------|------------|----------|
+| Gestor    | pessoa@need4rides.com | 999999999  | 123ABC   |
+| Cliente   | pessoa@need4rides.com | 999999999  | 123ABC   |
+| Motorista | pessoa@need4rides.com | 999999999  | 123ABC   |
+
+---
+
+### Ver BD 
+
+```bash
+cd server
+node index.js
+```
+
+Corre em: http://localhost:3000
+
+---
+
 ## Stack tecnológica
 
 | Camada    | Tecnologia          |
