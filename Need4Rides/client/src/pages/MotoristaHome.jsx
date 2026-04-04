@@ -42,6 +42,18 @@ export default function MotoristaHome() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [userData, setUserData] = useState({ nome: 'Utilizador' });
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user_logado');
+    const token = localStorage.getItem('token');
+
+    if (!token || !storedUser) {
+      navigate('/login'); 
+    } else {
+      setUserData(JSON.parse(storedUser));
+    }
+  }, [navigate]);
+
   useEffect(() => {
     const onStorage = () => {
       const saved = localStorage.getItem('motoristataxi');
@@ -90,7 +102,7 @@ export default function MotoristaHome() {
             </div>
             <div>
               <p className="mh-welcome-sub">Bem-vindo de volta,</p>
-              <h1 className="mh-welcome-name">Carlos Silva</h1>
+              <h1 className="mh-welcome-name">{userData.nome.split(' ')[0]}</h1>
               <span className={`mh-status-badge ${emTurno ? 'online' : 'offline'}`}>
                 {emTurno ? '● Em turno' : '○ Fora de turno'}
               </span>

@@ -16,6 +16,9 @@ export default function AvatarDropdown({ profilePath = '/profile', avatarClass =
 
   const handleLogout = () => {
     localStorage.removeItem('motoristataxi');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user_logado');
+    setOpen(false);
     navigate('/login');
   };
 

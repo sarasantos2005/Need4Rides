@@ -114,9 +114,9 @@ exports.list = async (req, res) => {
 //US18 
 exports.login = async (req, res) => {
   try {
-    const { nif, senha_acesso_web } = req.body;
-
-    const user = await User.findOne({ nif });
+    const { role, nif, senha_acesso_web } = req.body;
+    
+    const user = await User.findOne({ nif, tipo: role });
     if (!user) {
       return res.status(401).json({ success: false, message: "Credenciais inválidas." });
     }
@@ -126,13 +126,13 @@ exports.login = async (req, res) => {
       return res.status(401).json({ success: false, message: "Credenciais inválidas." });
     }
 
-    const payload = { id: user._id, tipo: user.tipo };
+    const payload = { id: user._id, tipo: role };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXPIRATION });
 
     res.status(200).json({
       success: true,
       message: "Login bem sucedido.",
-      user: { id: user._id, nome: user.nome, tipo: user.tipo },
+      user: { id: user._id, nome: user.nome, tipo: role },
       token
     });
 

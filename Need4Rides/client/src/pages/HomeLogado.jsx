@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import taxiImg from '../assets/images/taxi.png';
 import heroBg from '../assets/images/LA.jpg';
@@ -33,6 +33,18 @@ export default function HomeLogado() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ origin: '', destination: '', passengers: '', comfort: '' });
 
+  const [userData, setUserData] = useState({ nome: 'Utilizador' });
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user_logado');
+    const token = localStorage.getItem('token');
+
+    if (!token || !storedUser) {
+      navigate('/login'); 
+    } else {
+      setUserData(JSON.parse(storedUser));
+    }
+  }, [navigate]);
+
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleGetTaxi = () => {
@@ -59,7 +71,7 @@ export default function HomeLogado() {
       >
         <div className="hero-overlay" />
         <div className="hero-content">
-          <h1 className="hero-title">Vamos viajar, Gui?</h1>
+          <h1 className="hero-title">Vamos viajar, {userData.nome.split(' ')[0]}?</h1>
           <div className="hero-form-block">
             <form className="hero-form" onSubmit={e => e.preventDefault()}>
               <input
@@ -82,8 +94,6 @@ export default function HomeLogado() {
                 <option value="2">2 Passageiros</option>
                 <option value="3">3 Passageiros</option>
                 <option value="4">4 Passageiros</option>
-                <option value="5">5 Passageiros</option>
-                <option value="6">6 Passageiros</option>
               </select>
               <select name="comfort" value={form.comfort} onChange={handleChange}>
                 <option value="" disabled>Conforto do Carro</option>

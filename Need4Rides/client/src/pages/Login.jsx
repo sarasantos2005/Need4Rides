@@ -32,7 +32,7 @@ function IconMail() {
 
 export default function Login() {
   const [mode, setMode] = useState('login');
-  const [role, setRole] = useState('cliente');
+  const [role, setRole] = useState('Cliente');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [erro, setErro] = useState('');
@@ -43,12 +43,10 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErro('');
-    const body = { role, password };
-    if (role === 'motorista') body.nif = identifier;
-    else body.email = identifier;
+    const body = { role, nif: identifier, senha_acesso_web: password };
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/login', {
+      const res = await fetch('http://localhost:3000/api/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -56,8 +54,12 @@ export default function Login() {
       const data = await res.json();
       if (!res.ok) { setErro(data.message); return; }
 
-      if (data.user.role === 'motorista') navigate('/motorista');
-      else if (data.user.role === 'gestor') navigate('/gestor');
+      //Guardar o login no localstorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user_logado', JSON.stringify(data.user));
+
+      if (data.user.tipo === 'Motorista') navigate('/motorista');
+      else if (data.user.tipo === 'Gestor') navigate('/gestor');
       else navigate('/home');
     } catch {
       setErro('Erro ao ligar ao servidor.');
@@ -76,7 +78,7 @@ export default function Login() {
 
             {/* Selector de perfil */}
             <div className="lp-tabs">
-              {['cliente', 'motorista', 'gestor'].map((r) => (
+              {['Cliente', 'Motorista', 'Gestor'].map((r) => (
                 <button
                   key={r}
                   type="button"
@@ -89,19 +91,12 @@ export default function Login() {
             </div>
 
             <form onSubmit={handleLogin} style={{ display: 'contents' }}>
-              {role === 'motorista' ? (
-                <div className="lp-input-wrap">
-                  <input type="text" placeholder="NIF" className="lp-input" maxLength={9}
-                    value={identifier} onChange={e => setIdentifier(e.target.value)} />
-                  <span className="lp-icon"><IconUser /></span>
-                </div>
-              ) : (
-                <div className="lp-input-wrap">
-                  <input type="email" placeholder="Email" className="lp-input"
-                    value={identifier} onChange={e => setIdentifier(e.target.value)} />
-                  <span className="lp-icon"><IconMail /></span>
-                </div>
-              )}
+              
+              <div className="lp-input-wrap">
+                <input type="text" placeholder="NIF" className="lp-input" maxLength={9}
+                  value={identifier} onChange={e => setIdentifier(e.target.value)} />
+                <span className="lp-icon"><IconUser /></span>
+              </div>
 
               <div className="lp-input-wrap">
                 <input type="password" placeholder="Password" className="lp-input"
@@ -122,7 +117,7 @@ export default function Login() {
               <button type="submit" className="lp-btn">Entrar</button>
             </form>
 
-            {role === 'cliente' && (
+            {role === 'Cliente' && (
               <p className="lp-switch">
                 Não tens conta?{' '}
                 <span onClick={() => switchTo('register')}>Criar conta</span>

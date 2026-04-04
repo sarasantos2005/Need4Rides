@@ -235,7 +235,7 @@ exports.listarPedidosParaMotorista = async (req, res) => {
           $maxDistance: 10000
         }
       }
-    }).populate('cliente');
+    }).populate('Cliente');
 
     // Filtrar pedidos que não podem ser satisfeitos no tempo restante do turno
     const pedidosFiltrados = pedidos.filter(pedido => {

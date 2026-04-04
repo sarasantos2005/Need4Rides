@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
 import '../css/GestorHome.css';
@@ -19,6 +20,18 @@ const mockMotoristas = [
 
 export default function GestorHome() {
   const navigate = useNavigate();
+
+  const [userData, setUserData] = useState({ nome: 'Utilizador' });
+    useEffect(() => {
+      const storedUser = localStorage.getItem('user_logado');
+      const token = localStorage.getItem('token');
+  
+      if (!token || !storedUser) {
+        navigate('/login'); 
+      } else {
+        setUserData(JSON.parse(storedUser));
+      }
+    }, [navigate]);
 
   return (
     <div className="gh-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -48,7 +61,7 @@ export default function GestorHome() {
             </div>
             <div>
               <p className="gh-welcome-sub">Bem-vindo de volta,</p>
-              <h1 className="gh-welcome-name">Admin Need4Rides</h1>
+              <h1 className="gh-welcome-name">{userData.nome.split(' ')[0]}</h1>
               <span className="gh-role-badge">Gestor</span>
             </div>
           </div>

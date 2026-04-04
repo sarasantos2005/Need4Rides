@@ -57,6 +57,19 @@ const userSchema = new mongoose.Schema({
 
 });
 
+const bcrypt = require('bcrypt');
+
+userSchema.pre('save', async function() {
+  if (!this.isModified('senha_acesso_web')) return;
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.senha_acesso_web = await bcrypt.hash(this.senha_acesso_web, salt);
+  } catch (error){
+    throw error;
+  }
+});
+
 // Garante que não existam dois "Motoristas" com o mesmo NIF ou dois "Clientes" com o mesmo NIF
 userSchema.index({ tipo: 1, nif: 1 }, { unique: true });
 
