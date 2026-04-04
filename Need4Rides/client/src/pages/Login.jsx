@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Login.css';
 
@@ -31,12 +31,19 @@ function IconMail() {
 }
 
 export default function Login() {
-  const [mode, setMode] = useState('login');
+  const location = useLocation();
+  const [mode, setMode] = useState(location.state?.mode || 'login');
   const [role, setRole] = useState('Cliente');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [erro, setErro] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.state?.mode) {
+      setMode(location.state.mode);
+    }
+  }, [location.state]);
 
   const switchTo = (newMode) => { setMode(newMode); setErro(''); };
 

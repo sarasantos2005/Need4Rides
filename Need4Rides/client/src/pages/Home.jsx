@@ -26,7 +26,7 @@ export default function Home() {
           <li>
             <button
               className="navbar-login-btn"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/login', { state: { mode: 'login' } })}
             >
               Login
             </button>
@@ -45,10 +45,10 @@ export default function Home() {
           <h1 className="hero-title">Need4Rides</h1>
           <p className="hero-slogan">A tua viagem, ao teu ritmo.</p>
           <div className="hero-auth-btns">
-            <button className="hero-btn-register" onClick={() => navigate('/login')}>
+            <button className="hero-btn-register" onClick={() => navigate('/login', { state: { mode: 'register' } })}>
               Registar
             </button>
-            <button className="hero-btn" onClick={() => navigate('/login')}>
+            <button className="hero-btn" onClick={() => navigate('/login', { state: { mode: 'login' } })}>
               Login
             </button>
           </div>
