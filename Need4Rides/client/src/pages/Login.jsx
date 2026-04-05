@@ -38,6 +38,20 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [erro, setErro] = useState('');
   const navigate = useNavigate();
+  const [regData, setRegData] = useState({
+    tipo: 'Cliente',
+    email: '',
+    nome: '',
+    genero: '',
+    nif: '',
+    password: '',
+    ano_nascimento: '',
+    confirmPassword: ''
+  });
+
+  const handleRegChange = (e) => {
+    setRegData({ ...regData, [e.target.name]: e.target.value });
+  };
 
   useEffect(() => {
     if (location.state?.mode) {
@@ -54,6 +68,46 @@ export default function Login() {
 
     try {
       const res = await fetch('http://localhost:3000/api/user/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) { setErro(data.message); return; }
+
+      //Guardar o login no localstorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user_logado', JSON.stringify(data.user));
+
+      if (data.user.tipo === 'Motorista') navigate('/motorista');
+      else if (data.user.tipo === 'Gestor') navigate('/gestor');
+      else navigate('/home');
+    } catch {
+      setErro('Erro ao ligar ao servidor.');
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setErro('');
+    
+    if (regData.password !== regData.confirmPassword) {
+      setErro('As passwords não coincidem!');
+      return;
+    }
+
+    const body = {
+      tipo: 'Cliente',
+      email: regData.email,
+      nome: regData.nome,
+      genero: regData.genero === 'masculino' ? 'M' : 'F',
+      nif: regData.nif,
+      senha_acesso_web: regData.password,
+      ano_nascimento: new Date(regData.ano_nascimento).getFullYear(),
+    }
+
+    try {
+      const res = await fetch('http://localhost:3000/api/user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -136,42 +190,42 @@ export default function Login() {
             <h1 className="lp-title">Criar Conta</h1>
 
             <div className="lp-input-wrap">
-              <input type="text" placeholder="Nome" className="lp-input" />
+              <input type="text" placeholder="Nome" name="nome" className="lp-input" value={regData.nome} onChange={handleRegChange}/>
               <span className="lp-icon"><IconUser /></span>
             </div>
 
             <div className="lp-input-wrap">
-              <input type="email" placeholder="Email" className="lp-input" />
+              <input type="email" placeholder="Email" name="email" className="lp-input" value={regData.email} onChange={handleRegChange}/>
               <span className="lp-icon"><IconMail /></span>
             </div>
 
             <div className="lp-input-wrap">
-              <input type="password" placeholder="Password" className="lp-input" />
+              <input type="password" placeholder="Password" name="password" className="lp-input" value={regData.password} onChange={handleRegChange}/>
               <span className="lp-icon"><IconLock /></span>
             </div>
 
             <div className="lp-input-wrap">
-              <input type="password" placeholder="Confirmar Password" className="lp-input" />
+              <input type="password" placeholder="Confirmar Password" name="confirmPassword" className="lp-input" value={regData.confirmPassword} onChange={handleRegChange}/>
               <span className="lp-icon"><IconLock /></span>
             </div>
 
             <div className="lp-input-wrap">
-              <input type="date" placeholder="Data de Nascimento" className="lp-input" />
+              <input type="date" placeholder="Data de Nascimento" className="lp-input" name="ano_nascimento" value={regData.ano_nascimento} onChange={handleRegChange}/>
             </div>
 
             <div className="lp-input-wrap">
-              <input type="text" placeholder="NIF" className="lp-input" maxLength={9} />
+              <input type="text" placeholder="NIF" className="lp-input" name="nif" maxLength={9}  minLength={9} value={regData.nif} onChange={handleRegChange}/>
             </div>
 
             <div className="lp-input-wrap">
-              <select className="lp-input lp-select" defaultValue="">
+              <select className="lp-input lp-select" name="genero" defaultValue="" value={regData.genero} onChange={handleRegChange}>
                 <option value="" disabled>Género</option>
                 <option value="masculino">Masculino</option>
                 <option value="feminino">Feminino</option>
               </select>
             </div>
 
-            <button className="lp-btn">Registar</button>
+            <button className="lp-btn" onClick={handleRegister}>Registar</button>
 
             <p className="lp-switch">
               Já tens conta?{' '}

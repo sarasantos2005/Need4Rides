@@ -25,15 +25,23 @@ const taxiSchema = new mongoose.Schema({
 
     ano_compra: {
         type: Number,
-        required: true
+        required: true,
+        min: 1990,
+        max: new Date().getFullYear()
     },
 
     nivel_conforto: {
         type: String,
         required: true,
         enum: ["Básico", "Luxuoso"]
+    },
+
+    cor: {
+        type: String, 
+        required: true,
+        match: /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
     }
 
-}, { timestamps: true });
+});
 
 module.exports = mongoose.model("Taxi", taxiSchema, "Taxis");

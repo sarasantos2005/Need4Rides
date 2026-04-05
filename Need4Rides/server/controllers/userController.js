@@ -13,7 +13,7 @@ const regexCarta = /^[A-Z]{2}-\d{5} \d{1}$/; // Ex: ZA-12345 6
 //US2 / US17
 exports.create = async (req, res) => {
   try {
-    const { tipo, email, nome, genero, nif, senha_acesso_web, ano_nascimento, n_carta_conducao, localizacao } = req.body;
+    const { tipo, email, nome, genero, nif, senha_acesso_web, ano_nascimento, n_carta_conducao, morada, localizacao } = req.body;
 
     //RIA 12: NIF com 9 digitos
     if (!/^\d{9}$/.test(nif)) {
@@ -61,8 +61,8 @@ exports.create = async (req, res) => {
     };
 
     if (tipo === 'Motorista') {
-      if (!n_carta_conducao) {
-        return res.status(400).json({ success: false, message: "Número da carta de condução é obrigatório para motoristas." });
+      if (!n_carta_conducao || !morada || !localizacao) {
+        return res.status(400).json({ success: false, message: "Dados de motorista incompletos (Carta, Morada e Localização são obrigatórios)." });
       }
 
       if(!regexCarta.test(n_carta_conducao)){
@@ -74,10 +74,13 @@ exports.create = async (req, res) => {
 
       if (localizacao && localizacao.long && localizacao.lat) {
         userData.motorista = {
-          n_carta_conducao: n_carta_conducao,
+          n_carta_conducao,
           morada: {
-            type: "Point",
-            coordenadas: [localizacao.long, localizacao.lat] 
+            texto: morada,
+            localizacao: {
+              type: "Point",
+              coordinates: [parseFloat(localizacao.long), parseFloat(localizacao.lat)]
+            }
           }
         };
       }
@@ -200,6 +203,14 @@ exports.update = async (req, res) => {
         return res.status(400).json({ message: "Nova senha não cumpre requisitos (letras e números)." });
       }
       updates.senha_acesso_web = await bcrypt.hash(updates.senha_acesso_web, SALT_ROUNDS);
+    }
+
+    if (data.morada) updates["motorista.morada.texto"] = data.morada;
+    if (data.localizacao) {
+      updates["motorista.morada.localizacao.coordinates"] = [
+        parseFloat(data.localizacao.long), 
+        parseFloat(data.localizacao.lat)
+      ];
     }
 
     const userAtualizado = await User.findByIdAndUpdate(id, updates, { new: true });

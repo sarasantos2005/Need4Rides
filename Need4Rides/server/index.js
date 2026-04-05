@@ -15,6 +15,7 @@ const Taxi = require("./models/taxiModel");
 const Turno = require("./models/turnoModel");
 const Viagem = require("./models/viagemModel");
 const Preco = require("./models/precoModel");
+const inserts = require('./data/inserts');
 
 // Validação básica das variáveis de ambiente
 const PORT = Number(process.env.PORT) || 3000;
@@ -98,12 +99,12 @@ app.use((err, req, res, next) => {
     // --- DEFINIR OS MODELS PARA RECONSTRUÇÃO ---
     const modelsToCreate = [
       { name: 'Pessoas', model: User },
-      { name: 'Faturas', model: Fatura },
-      { name: 'Reabastecimentos', model: Reabastecimento },
-      { name: 'Taxis', model: Taxi },
+      { name: 'Precos', model: Preco },
+      { name: 'Taxis', model: Taxi },  
       { name: 'Turnos', model: Turno },
+      { name: 'Reabastecimentos', model: Reabastecimento },
       { name: 'Viagens', model: Viagem },
-      { name: 'Precos', model: Preco }
+      { name: 'Faturas', model: Fatura },
     ];
 
     console.log("A criar novas coleções...");
@@ -119,11 +120,7 @@ app.use((err, req, res, next) => {
       }
     }
 
-    console.log("A semear dados de teste...");
-    await User.create({ nome: "Cliente", email: "pessoa@need4rides.com", genero: "M", tipo: "Cliente", nif: 999999999, senha_acesso_web: "123ABC", ano_nascimento: 2005 });
-    await User.create({ nome: "Admin", email: "pessoa@need4rides.com", genero: "M", tipo: "Gestor", nif: 999999999, senha_acesso_web: "123ABC", ano_nascimento: 2005 });
-    await User.create({ nome: "Motorista", email: "pessoa@need4rides.com", genero: "M", tipo: "Motorista", nif: 999999999, senha_acesso_web: "123ABC", ano_nascimento: 2005, motorista: {n_carta_conducao: "ZA-12345 6", morada: {type: "Point", coordenadas: [-9.1393, 38.7223]}}});
-
+    await inserts();
     console.log("Dados de teste inseridos.");
     */
 

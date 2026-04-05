@@ -44,6 +44,12 @@ const reabastecimentoSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Turno', 
         required: true 
+    },
+
+    estado: {
+        type: String, 
+        enum: ['Em curso', 'Concluído', 'Cancelado'], 
+        required: true
     }
 });
 

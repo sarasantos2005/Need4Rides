@@ -2,32 +2,26 @@ const mongoose = require('mongoose');
 
 const viagemSchema = new mongoose.Schema({
     morada_inicial_viagem: {
-        type: { 
+        morada: { 
             type: String, 
-            enum: ['Point'], 
-            default: 'Point',
-            required: true
+            required: true 
         },
 
-        coordenadas: {
-            type: [Number], 
-            default: [0, 0],
-            required: true
+        localizacao: {
+            type: { type: String, default: 'Point' },
+            coordinates: { type: [Number], required: true }
         }
     },
 
     morada_final_viagem: {
-        type: { 
+        morada: { 
             type: String, 
-            enum: ['Point'], 
-            default: 'Point',
-            required: true
+            required: true 
         },
 
-        coordenadas: {
-            type: [Number], 
-            default: [0, 0],
-            required: true
+        localizacao: {
+            type: { type: String, default: 'Point' },
+            coordinates: { type: [Number], required: true }
         }
     },
 
@@ -74,6 +68,6 @@ const viagemSchema = new mongoose.Schema({
     }
 });
 
-viagemSchema.index({ morada_inicial_viagem: "2dsphere" });
-viagemSchema.index({ morada_final_viagem: "2dsphere" });
+viagemSchema.index({ "morada_inicial_viagem.localizacao": "2dsphere" });
+viagemSchema.index({ "morada_final_viagem.localizacao": "2dsphere" });
 module.exports = mongoose.model("Viagem", viagemSchema, "Viagens");

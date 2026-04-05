@@ -12,7 +12,8 @@ const faturaSchema = new mongoose.Schema({
     },
 
     data_emissao: { 
-        type: Date
+        type: Date,
+        required: true
     },
     
     // Chave Estrangeira

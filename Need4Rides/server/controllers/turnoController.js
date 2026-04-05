@@ -3,7 +3,7 @@ const Turno = require('../models/turnoModel');
 //US5
 exports.requisitarTurno = async (req, res) => {
   try {
-    const { motoristaId, taxiId, hora_inicio, hora_fim } = req.body;
+    const { motorista, taxiId, hora_inicio, hora_fim } = req.body;
 
     const inicio = new Date(hora_inicio);
     const fim = new Date(hora_fim);
@@ -21,7 +21,8 @@ exports.requisitarTurno = async (req, res) => {
 
     // RIA6: Sem sobreposição de turnos (Lógica simplificada) 
     const sobreposicao = await Turno.findOne({
-      motorista: motoristaId,
+      $or: [{ motorista }, { taxi }],
+      estado: { $ne: 'Cancelado' },
       $or: [
         { hora_inicio: { $lt: fim, $gt: inicio } },
         { hora_fim: { $gt: inicio, $lt: fim } }
@@ -32,7 +33,16 @@ exports.requisitarTurno = async (req, res) => {
       return res.status(400).json({ message: "Já existe um turno agendado para este período." });
     }
 
-    const novoTurno = new Turno({ motorista: motoristaId, taxi: taxiId, hora_inicio: hora_inicio, hora_fim: hora_fim });
+    // R11: Validar se o táxi é elétrico e se tem carregamento ativo
+    const veiculo = await Taxi.findById(taxi);
+    if (veiculo.tipo_motor === 'Elétrico') {
+       const carregamentoAtivo = await Reabastecimento.findOne({ taxi, estado: 'Em curso' });
+       if (carregamentoAtivo) {
+         return res.status(400).json({ message: "Este táxi elétrico está a carregar e não pode ser usado (R11)." });
+       }
+    }
+
+    const novoTurno = new Turno(req.body);
     await novoTurno.save();
     res.status(201).json(novoTurno);
   } catch (error) {

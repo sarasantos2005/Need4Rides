@@ -21,6 +21,12 @@ const turnoSchema = new mongoose.Schema({
         ref: 'Taxi',
         required: true
     },
+
+    estado: { 
+        type: String, 
+        enum: ['Agendado', 'Ativo', 'Terminado', 'Cancelado'], 
+        default: 'Agendado' 
+    }
     
 
 }, { timestamps: true });

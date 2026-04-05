@@ -4,7 +4,7 @@ const Turno = require('../models/turnoModel');
 //US11
 exports.registarReabastecimento = async (req, res) => {
   try {
-    const { turnoId, quilometragem, valor_pago, litros, kWh, inicio, fim } = req.body;
+    const { turnoId, quilometragem, valor_pago, litros, kWh, inicio, fim, estado } = req.body;
 
     // Buscar Turno para saber o tipo de motor (US11)
     const turnoAtivo = await Turno.findById(turnoId).populate('taxi');
@@ -57,20 +57,32 @@ exports.registarReabastecimento = async (req, res) => {
         });
     }
 
+    if (estado === 'Cancelado') estadoFinal = 'Cancelado';
+    const agora = new Date();
+    if(agora >= inicio && agora <= fim){
+        estadoFinal = "Em curso";
+    } else if (agora > fim) {
+        estadoFinal = "Concluído";
+    }
+    estadoFinal = "Em curso";
+
     const novoRegisto = new Reabastecimento({
-      taxi: taxi._id,
-      turno: turnoId,
-      quilometragem,
-      valor_pago, 
-      inicio_abastecimento: inicio,
-      fim_abastecimento: fim
+        taxi: taxi._id,
+        turno: turnoId,
+        quilometragem,
+        valor_pago, 
+        inicio_abastecimento: inicio,
+        fim_abastecimento: fim,
+        estado: estadoFinal
     });
 
     // US11: Atribuir litros ou kWh conforme o motor
     if (taxi.tipo_motor === 'Combustão') {
-      novoRegisto.litros = litros; // RIA 22
+        novoRegisto.kWh = undefined;
+        novoRegisto.litros = litros; // RIA 22
     } else {
-      novoRegisto.kWh = kWh; // RIA 23
+        novoRegisto.kWh = kWh; // RIA 23
+        novoRegisto.litros = undefined;
     }
 
     await novoRegisto.save();

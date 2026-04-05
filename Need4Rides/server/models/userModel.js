@@ -49,9 +49,16 @@ const userSchema = new mongoose.Schema({
       type: String
     },
 
-    morada: {
-      type: { type: String, enum: ['Point'] },
-      coordenadas: { type: [Number] } 
+    morada: { 
+      texto: {
+          type: String, 
+          required: function() { return this.tipo === 'Motorista'; }
+      },
+
+      localizacao: {
+          type: { type: String, default: 'Point' },
+          coordinates: { type: [Number], required: function() { return this.tipo === 'Motorista'; } }
+      }
     }
   }
 
@@ -76,5 +83,5 @@ userSchema.index({ tipo: 1, nif: 1 }, { unique: true });
 // Garante que não existam dois "Motoristas" com o mesmo email ou dois "Clientes" com o mesmo email
 userSchema.index({ email: 1, tipo: 1 }, { unique: true });
 
-userSchema.index({ "motorista.morada.coordenadas": "2dsphere" }, { sparse: true });
+userSchema.index({ "motorista.morada.localizacao.coordinates": "2dsphere" }, { sparse: true });
 module.exports = mongoose.model("User", userSchema, "Pessoas");
