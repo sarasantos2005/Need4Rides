@@ -1,51 +1,34 @@
 const Turno = require('../models/turnoModel');
+const Taxi = require("../models/taxiModel");
 
 //US5
-exports.requisitarTurno = async (req, res) => {
+exports.requisitarTaxiTurno = async (req, res) => {
   try {
-    const { motorista, taxiId, hora_inicio, hora_fim } = req.body;
+    const { turnoId, taxiId} = req.body;
+    
+    const veiculo = await Taxi.findById(taxiId);
 
-    const inicio = new Date(hora_inicio);
-    const fim = new Date(hora_fim);
-
-    // RIA1: Início antes do fim 
-    if (inicio >= fim) {
-      return res.status(400).json({ message: "A hora de início deve ser anterior ao fim." });
+    if (!turnoId) {
+      return res.status(404).json({ message: "Turno não encontrado." });
     }
 
-    // RIA2: Turno máx. 8 horas 
-    const duracaoHoras = (fim - inicio) / (1000 * 60 * 60);
-    if (duracaoHoras > 8) {
-      return res.status(400).json({ message: "O turno não pode exceder 8 horas." });
+    if (!veiculo) {
+      return res.status(404).json({ message: "O veículo selecionado não existe na base de dados." });
     }
 
-    // RIA6: Sem sobreposição de turnos (Lógica simplificada) 
-    const sobreposicao = await Turno.findOne({
-      $or: [{ motorista }, { taxi }],
-      estado: { $ne: 'Cancelado' },
-      $or: [
-        { hora_inicio: { $lt: fim, $gt: inicio } },
-        { hora_fim: { $gt: inicio, $lt: fim } }
-      ]
-    });
+    const turnoAtualizado = await Turno.findByIdAndUpdate(
+      turnoId,
+      { taxi: taxiId }, 
+      { new: true }  
+    );
 
-    if (sobreposicao) {
-      return res.status(400).json({ message: "Já existe um turno agendado para este período." });
+    if (!turnoAtualizado) {
+      return res.status(404).json({ message: "Turno não encontrado." });
     }
 
-    // R11: Validar se o táxi é elétrico e se tem carregamento ativo
-    const veiculo = await Taxi.findById(taxi);
-    if (veiculo.tipo_motor === 'Elétrico') {
-       const carregamentoAtivo = await Reabastecimento.findOne({ taxi, estado: 'Em curso' });
-       if (carregamentoAtivo) {
-         return res.status(400).json({ message: "Este táxi elétrico está a carregar e não pode ser usado (R11)." });
-       }
-    }
-
-    const novoTurno = new Turno(req.body);
-    await novoTurno.save();
-    res.status(201).json(novoTurno);
+    res.status(200).json(turnoAtualizado);
   } catch (error) {
+    console.error("ERRO REAL:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -67,4 +50,33 @@ exports.turnoAtual = async (req, res) => {
   } catch (error){
     res.status(500).json({ error: error.message });
   }
+};
+
+//AINDA TEM DE SER ALTERADO NA TOTALIDADE
+exports.novoTurno = async (req, res) => {
+  
 };  
+
+exports.devolverTaxiTurno = async (req, res) => {
+  try {
+    const { turnoId } = req.body;
+
+    if (!turnoId) {
+      return res.status(404).json({ message: "Turno não encontrado." });
+    }
+    
+    const turnoAtualizado = await Turno.findByIdAndUpdate(
+      turnoId,
+      { taxi: null },
+      { new: true }
+    );
+
+    if (!turnoAtualizado) {
+      return res.status(404).json({ message: "Turno não encontrado." });
+    }
+
+    res.status(200).json({ message: "Táxi devolvido com sucesso", turno: turnoAtualizado });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -5,7 +5,7 @@ const Turno = require("../models/turnoModel");
 //US1
 exports.create = async (req, res) => {
   try {
-    const { matricula, marca, modelo, ano_compra, nivel_conforto, tipo_motor } = req.body;
+    const { matricula, marca, modelo, ano_compra, nivel_conforto, tipo_motor, cor, nivel_combustivel_carga, autonomia_maxima } = req.body;
 
     // RIA 5: Ano de compra <= ano atual 
     const anoAtual = new Date().getFullYear();
@@ -30,7 +30,10 @@ exports.create = async (req, res) => {
       modelo,
       tipo_motor,
       ano_compra,
-      nivel_conforto
+      nivel_conforto,
+      cor,
+      nivel_combustivel_carga,
+      autonomia_maxima
     });
 
     await novoTaxi.save();
@@ -66,3 +69,16 @@ exports.delete = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.listarDisponiveis = async (req, res) => {
+  try {
+    const turnosOcupados = await Turno.find({
+      estado: {$in: ["Ativo", "Agendado"]}
+    }).distinct("taxi");
+
+    const taxis = await Taxi.find({_id: {$nin: turnosOcupados}});
+    res.json(taxis);
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao procurar táxis." });
+  }
+}

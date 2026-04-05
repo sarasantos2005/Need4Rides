@@ -4,5 +4,6 @@ const taxiController = require('../controllers/taxiController');
 const router = express.Router();
 router.post('/', taxiController.create);
 router.delete('/:id', taxiController.delete);
+router.get('/', taxiController.listarDisponiveis);
 
 module.exports = router;

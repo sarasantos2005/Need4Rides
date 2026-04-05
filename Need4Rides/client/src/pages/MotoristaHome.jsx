@@ -5,9 +5,7 @@ import ddImg from '../assets/images/fennec.jpg';
 import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import axios from 'axios';
-
-let TURNO_INICIO, TURNO_FIM;
-const TURNO_TOTAL = TURNO_FIM - TURNO_INICIO;
+import VEICULOS from "../../../server/data/marcasEmodelos";
 
 function minutosAgora() {
   const now = new Date();
@@ -66,7 +64,7 @@ export default function MotoristaHome() {
       setViagensPendentes(resPendentes.data);
       setHistorico(resHistorico.data);
       setTurnoAtivo(resTurno.data);
-      
+      setTaxi(resTurno.data.taxi)
     } catch (err) {
       console.error("Erro ao procurar dados na BD", err);
     } finally {
@@ -87,15 +85,51 @@ export default function MotoristaHome() {
 
   //---------------------------------------------------------------------------------------
   //Parte do turno
-  const agoraMins = minutosAgora();
-  const fimTurnoMins = turnoAtivo ? new Date(turnoAtivo.hora_fim).getHours() * 60 + new Date(turnoAtivo.hora_fim).getMinutes() : TURNO_FIM;
+  const agoraDate = new Date();
 
-  const inicioTurnoMins = turnoAtivo ? new Date(turnoAtivo.hora_inicio).getHours() * 60 + new Date(turnoAtivo.hora_inicio).getMinutes() : TURNO_INICIO;
+  const fimTurno = turnoAtivo ? new Date(turnoAtivo.hora_fim) : null;
+  const inicioTurno = turnoAtivo ? new Date(turnoAtivo.hora_inicio) : null;
 
-  const minutosRestantesReal = Math.max(0, fimTurnoMins - agoraMins);
-  const progressoReal = Math.min(100, Math.max(0, ((agoraMins - inicioTurnoMins) / (fimTurnoMins - inicioTurnoMins)) * 100));
+  const temTurnoValido = inicioTurno && !isNaN(inicioTurno) && fimTurno && !isNaN(fimTurno);
+
+  const totalMs = temTurnoValido ? (fimTurno - inicioTurno) : 0;
+  const decorridoMs = temTurnoValido ? (agoraDate - inicioTurno) : 0;
+  const restanteMs = temTurnoValido ? (fimTurno - agoraDate) : 0;
+
+  const minutosRestantesReal = Math.max(0, Math.floor(restanteMs / (1000 * 60)));
+  const progressoReal = (temTurnoValido && totalMs > 0) ? Math.min(100, Math.max(0, (decorridoMs/totalMs) * 100)) : 0;
+
+  const formatarParaExibicao = (date) => {
+    if (!date) return "00:00";
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   //---------------------------------------------------------------------------------------
+
+  const devolverTaxi = async () => {
+    if (!turnoAtivo) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Chamada ao backend para limpar o taxi no turno
+      await axios.patch('http://localhost:3000/api/turno/devolver', 
+        { turnoId: turnoAtivo._id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      localStorage.removeItem('motoristataxi');
+      setTaxi(null);
+      
+      const userId = userData._id || userData.id;
+      fetchDadosIniciais(userId, token);
+
+      alert("Táxi devolvido com sucesso!");
+    } catch (err) {
+      console.error("Erro ao devolver táxi:", err);
+      alert("Erro ao devolver o táxi na base de dados.");
+    }
+  };
 
   const aceitarViagem = async (viagemId) => {
     try {
@@ -125,6 +159,12 @@ export default function MotoristaHome() {
     const t = setInterval(() => setAgora(minutosAgora()), 60000);
     return () => clearInterval(t);
   }, []);
+
+  //Encontrar os dados da marca (id no marcasEModelos = marca na BD)
+  const getDadosMarca = (idBD) => {
+    const marcaEncontrada = VEICULOS.marcas.find(m => m.id === idBD);
+    return marcaEncontrada ? marcaEncontrada.nome : idBD;
+  };
 
   if (loading || !userData) return <div className="mh-loading">A carregar...</div>;
 
@@ -206,31 +246,31 @@ export default function MotoristaHome() {
                     <span className="mh-car-value">{taxi.matricula}</span>
                   </div>
                   <div className="mh-car-item">
-                    <span className="mh-car-label">Modelo</span>
-                    <span className="mh-car-value">{taxi.modelo}</span>
+                    <span className="mh-car-label">Marca e Modelo</span>
+                    <span className="mh-car-value">{getDadosMarca(taxi.marca)} {taxi.modelo}</span>
                   </div>
                   <div className="mh-car-item">
                     <span className="mh-car-label">Tipo</span>
-                    <span className="mh-car-value">{taxi.tipo}</span>
+                    <span className="mh-car-value">{taxi.tipo_motor}</span>
                   </div>
                   <div className="mh-car-item">
                     <span className="mh-car-label">Conforto</span>
-                    <span className="mh-car-value">{taxi.conforto}</span>
+                    <span className="mh-car-value">{taxi.nivel_conforto}</span>
                   </div>
                 </div>
                 <div className="mh-fuel-row">
-                  <span className="mh-car-label">Combustível</span>
-                  <span className="mh-car-label">{taxi.combustivel}%</span>
+                  <span className="mh-car-label">Combustível / Carga</span>
+                  <span className="mh-car-label">{taxi.nivel_combustivel_carga}%</span>
                 </div>
                 <div className="mh-fuel-bar-bg">
-                  <div className="mh-fuel-bar" style={{ width: `${taxi.combustivel}%` }} />
+                  <div className="mh-fuel-bar" style={{ width: `${taxi.nivel_combustivel_carga}%` }} />
                 </div>
                 <div className="mh-reab-row">
-                  <span className="mh-car-label">Próximo reabastecimento</span>
-                  <span className="mh-reab-val">≈ {taxi.autonomia} km</span>
+                  <span className="mh-car-label">Autonomia Máxima</span>
+                  <span className="mh-reab-val">≈ {taxi.autonomia_maxima} km</span>
                 </div>
                 <button className="mh-btn-requisitar" style={{ marginTop: '1rem' }}
-                  onClick={() => { localStorage.removeItem('motoristataxi'); setTaxi(null); }}>
+                  onClick={devolverTaxi}>
                   Devolver Táxi
                 </button>
               </>
@@ -265,12 +305,12 @@ export default function MotoristaHome() {
             <div className="mh-turno-times">
               <div className="mh-turno-time-item">
                 <span className="mh-car-label">Início</span>
-                <span className="mh-turno-time-val">{formatHora(inicioTurnoMins)}</span>
+                <span className="mh-turno-time-val">{formatarParaExibicao(inicioTurno)}</span>
               </div>
               <div className="mh-turno-progress-pct">{Math.round(progressoReal)}% concluído</div>
               <div className="mh-turno-time-item right">
                 <span className="mh-car-label">Fim</span>
-                <span className="mh-turno-time-val">{formatHora(fimTurnoMins)}</span>
+                <span className="mh-turno-time-val">{formatarParaExibicao(fimTurno)}</span>
               </div>
             </div>
             <div className="mh-progress-bar-bg">

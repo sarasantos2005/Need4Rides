@@ -40,6 +40,19 @@ const taxiSchema = new mongoose.Schema({
         type: String, 
         required: true,
         match: /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
+    },
+
+    nivel_combustivel_carga: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 100,
+        default: 100
+    },
+
+    autonomia_maxima: {
+        type: Number,
+        required: true
     }
 
 });
