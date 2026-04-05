@@ -49,3 +49,22 @@ exports.requisitarTurno = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.turnoAtual = async (req, res) => {
+  try{
+    const { id } = req.query;
+
+    const turno = await Turno.findOne({ 
+      motorista: id, 
+      estado: 'Ativo' 
+    }).populate('taxi');
+
+    if (!turno) {
+      return res.status(200).json(null); 
+    }
+
+    res.status(200).json(turno);
+  } catch (error){
+    res.status(500).json({ error: error.message });
+  }
+};  

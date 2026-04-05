@@ -222,34 +222,49 @@ exports.cancelarAceitacaoMotorista = async (req, res) => {
 //US7 - Mostrar viagens ao motorista
 exports.listarPedidosParaMotorista = async (req, res) => {
   try {
-    const { turnoId, longitude, latitude } = req.query;
+    const { id } = req.query;
 
-    const turno = await Turno.findById(turnoId);
-    if (!turno) return res.status(404).json({ message: "Turno não encontrado." });
+    const motoristaId = id;
 
+    const motorista = await Pessoa.findById(motoristaId);
+    
+    if (!motorista || !motorista.motorista?.morada?.localizacao?.coordinates) {
+      return res.status(404).json({ message: "Localização do motorista não encontrada." });
+    }
+    
+    const turnoAtivo = await Turno.findOne({ motorista: motoristaId, estado: 'Ativo' });
+
+    if (!turnoAtivo) {
+      return res.status(403).json({ message: "Precisa de estar em turno ativo para ver pedidos." });
+    }
+
+    const coordenadasMotorista = motorista.motorista.morada.localizacao.coordinates;
+    
     const pedidos = await Viagem.find({
       turno: null,
       motorista_proposto: { $exists: false },
-      "morada_inicial.localizacao": {
+      "morada_inicial_viagem.localizacao": {
         $near: {
           $geometry: {
             type: "Point",
-            coordinates: [parseFloat(longitude), parseFloat(latitude)]
+            coordinates: coordenadasMotorista
           },
-          $maxDistance: metros
+          $maxDistance: 10000
         }
       }
     }).populate('cliente', 'nome');
 
+    const agora = new Date();
+
     // Filtrar pedidos que não podem ser satisfeitos no tempo restante do turno
     const pedidosFiltrados = pedidos.filter(pedido => {
-      const tempoEstimadoViagem = calcularTempoEstimado(pedido.morada_inicial_viagem, pedido.morada_final_viagem);
+      const tempoEstimadoViagem = calcularTempoEstimado(pedido.morada_inicial_viagem.localizacao, pedido.morada_final_viagem.localizacao);
       const agora = new Date();
       
       // Verifica se a hora atual + duração estimada ultrapassa o fim do turno
       const horaPrevisaoFim = new Date(agora.getTime() + tempoEstimadoViagem * 60000);
       
-      return horaPrevisaoFim <= turno.hora_fim;
+      return horaPrevisaoFim <= turnoAtivo.hora_fim;
     });
     
     res.status(200).json(pedidosFiltrados);
@@ -324,6 +339,30 @@ async function calcularPreco(nivelConforto, horaInicio, horaFim) {
     configuracaoPreco.acrescimo_noturno
   );
 }
+
+
+// Mostrar historico de viagens do motorista
+exports.historicoDeViagens = async (req, res) => {
+  try {
+    const { id } = req.query;
+
+    const turnosDoMotorista = await Turno.find({ motorista: id }).select('_id');
+    const idsTurnos = turnosDoMotorista.map(t => t._id);
+
+    const historico = await Viagem.find({
+      turno: { $in: idsTurnos },
+      hora_final_viagem: { $exists: true }
+    })
+    .populate('cliente', 'nome') 
+    .sort({ hora_inicial_viagem: -1 });
+
+    const resultadoFiltrado = historico.filter(v => v.turno !== null);
+
+    res.json(resultadoFiltrado);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 function calcularPrecoViagem(inicio, fim, precoMinuto, agravamento) {
   const multiplicadorNoturno = 1 + agravamento / 100;

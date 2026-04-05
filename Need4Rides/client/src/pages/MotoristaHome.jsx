@@ -4,22 +4,9 @@ import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
 import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import axios from 'axios';
 
-const mockPendentes = [
-  { id: 1, from: 'Aeroporto de Lisboa', to: 'Baixa-Chiado', dist: '14 km', price: '€18.50', passengers: 2, wait: '3 min' },
-  { id: 2, from: 'Parque das Nações', to: 'Benfica', dist: '9 km', price: '€12.80', passengers: 1, wait: '6 min' },
-  { id: 3, from: 'Cascais', to: 'Sintra', dist: '22 km', price: '€31.00', passengers: 4, wait: '11 min' },
-];
-
-const mockHistorico = [
-  { id: 1, from: 'Oriente', to: 'Alfama', date: '31 Mar 2026', time: '09:42', price: '€09.20', status: 'Concluída' },
-  { id: 2, from: 'Saldanha', to: 'Aeroporto', date: '31 Mar 2026', time: '08:15', price: '€22.00', status: 'Concluída' },
-  { id: 3, from: 'Belém', to: 'Marquês de Pombal', date: '30 Mar 2026', time: '17:30', price: '€14.60', status: 'Concluída' },
-  { id: 4, from: 'Campo Grande', to: 'Cascais', date: '30 Mar 2026', time: '14:05', price: '€38.90', status: 'Concluída' },
-];
-
-const TURNO_INICIO = 8 * 60;   // 08:00 em minutos
-const TURNO_FIM   = 16 * 60;  // 16:00 em minutos
+let TURNO_INICIO, TURNO_FIM;
 const TURNO_TOTAL = TURNO_FIM - TURNO_INICIO;
 
 function minutosAgora() {
@@ -35,6 +22,12 @@ function formatHora(minutos) {
 
 export default function MotoristaHome() {
   const navigate = useNavigate();
+
+  const [viagensPendentes, setViagensPendentes] = useState([]);
+  const [historico, setHistorico] = useState([]);
+  const [turnoAtivo, setTurnoAtivo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [emTurno, setEmTurno] = useState(true);
   const [agora, setAgora] = useState(minutosAgora());
   const [taxi, setTaxi] = useState(() => {
@@ -42,7 +35,7 @@ export default function MotoristaHome() {
     return saved ? JSON.parse(saved) : null;
   });
 
-  const [userData, setUserData] = useState({ nome: 'Utilizador' });
+  const [userData, setUserData] = useState(null);
   useEffect(() => {
     const storedUser = localStorage.getItem('user_logado');
     const token = localStorage.getItem('token');
@@ -50,9 +43,73 @@ export default function MotoristaHome() {
     if (!token || !storedUser) {
       navigate('/login'); 
     } else {
-      setUserData(JSON.parse(storedUser));
+      const user = JSON.parse(storedUser);
+      setUserData(user);
+
+      const userId = user._id || user.id; 
+      if (userId) {
+        fetchDadosIniciais(userId, token);
+      }
     }
   }, [navigate]);
+
+  const fetchDadosIniciais = async (userId, token) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      
+      const [resPendentes, resHistorico, resTurno] = await Promise.all([
+        axios.get(`http://localhost:3000/api/viagem/disponiveis?id=${userId}`, config),
+        axios.get(`http://localhost:3000/api/viagem/motorista?id=${userId}`, config),
+        axios.get(`http://localhost:3000/api/turno/atual?id=${userId}`, config)
+      ]);
+
+      setViagensPendentes(resPendentes.data);
+      setHistorico(resHistorico.data);
+      setTurnoAtivo(resTurno.data);
+      
+    } catch (err) {
+      console.error("Erro ao procurar dados na BD", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //Estatisticas diarias
+  const viagensHoje = historico.filter(v => {
+    const dataViagem = new Date(v.hora_inicial_viagem).toDateString();
+    const hoje = new Date().toDateString();
+    return dataViagem === hoje;
+  });
+
+  const ganhosHoje = viagensHoje.reduce((acc, v) => acc + (v.preco_viagem || 0), 0);
+
+  const kmHoje = viagensHoje.reduce((acc, v) => acc + (v.km_percorridos || 0), 0);
+
+  //---------------------------------------------------------------------------------------
+  //Parte do turno
+  const agoraMins = minutosAgora();
+  const fimTurnoMins = turnoAtivo ? new Date(turnoAtivo.hora_fim).getHours() * 60 + new Date(turnoAtivo.hora_fim).getMinutes() : TURNO_FIM;
+
+  const inicioTurnoMins = turnoAtivo ? new Date(turnoAtivo.hora_inicio).getHours() * 60 + new Date(turnoAtivo.hora_inicio).getMinutes() : TURNO_INICIO;
+
+  const minutosRestantesReal = Math.max(0, fimTurnoMins - agoraMins);
+  const progressoReal = Math.min(100, Math.max(0, ((agoraMins - inicioTurnoMins) / (fimTurnoMins - inicioTurnoMins)) * 100));
+
+  //---------------------------------------------------------------------------------------
+
+  const aceitarViagem = async (viagemId) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(`http://localhost:3000/api/viagem/aceitar`, 
+        { motoristaId: userData._id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Refresh aos dados
+      fetchDadosIniciais(userData._id, token);
+    } catch (err) {
+      alert("Erro ao aceitar viagem");
+    }
+  };
 
   useEffect(() => {
     const onStorage = () => {
@@ -60,7 +117,6 @@ export default function MotoristaHome() {
       setTaxi(saved ? JSON.parse(saved) : null);
     };
     window.addEventListener('storage', onStorage);
-    // também verifica ao montar (caso voltemos de outra página)
     onStorage();
     return () => window.removeEventListener('storage', onStorage);
   }, []);
@@ -70,8 +126,7 @@ export default function MotoristaHome() {
     return () => clearInterval(t);
   }, []);
 
-  const minutosRestantes = Math.max(0, TURNO_FIM - agora);
-  const progresso = Math.min(100, Math.max(0, ((agora - TURNO_INICIO) / TURNO_TOTAL) * 100));
+  if (loading || !userData) return <div className="mh-loading">A carregar...</div>;
 
   return (
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -120,19 +175,21 @@ export default function MotoristaHome() {
         <div className="mh-stats-row">
           <div className="mh-stat-card">
             <span className="mh-stat-label">Turno</span>
-            <span className="mh-stat-value">{formatHora(TURNO_INICIO)} – {formatHora(TURNO_FIM)}</span>
+            <span className="mh-stat-value">{turnoAtivo 
+        ? `${new Date(turnoAtivo.hora_inicio).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} – ${new Date(turnoAtivo.hora_fim).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+        : "Sem turno"}</span>
           </div>
           <div className="mh-stat-card">
             <span className="mh-stat-label">Viagens hoje</span>
-            <span className="mh-stat-value">6</span>
+            <span className="mh-stat-value">{viagensHoje.length}</span>
           </div>
           <div className="mh-stat-card accent">
             <span className="mh-stat-label">Ganhos hoje</span>
-            <span className="mh-stat-value">€97.70</span>
+            <span className="mh-stat-value">{ganhosHoje.toFixed(2)}€</span>
           </div>
           <div className="mh-stat-card">
             <span className="mh-stat-label">Km percorridos</span>
-            <span className="mh-stat-value">138 km</span>
+            <span className="mh-stat-value">{kmHoje.toFixed(1)}km</span>
           </div>
         </div>
 
@@ -197,27 +254,27 @@ export default function MotoristaHome() {
                   cx="60" cy="60" r="50"
                   className="mh-ring-fill"
                   strokeDasharray={`${2 * Math.PI * 50}`}
-                  strokeDashoffset={`${2 * Math.PI * 50 * (1 - progresso / 100)}`}
+                  strokeDashoffset={`${2 * Math.PI * 50 * (1 - progressoReal / 100)}`}
                 />
               </svg>
               <div className="mh-turno-center">
-                <span className="mh-turno-min">{minutosRestantes}</span>
+                <span className="mh-turno-min">{minutosRestantesReal}</span>
                 <span className="mh-turno-min-label">min restantes</span>
               </div>
             </div>
             <div className="mh-turno-times">
               <div className="mh-turno-time-item">
                 <span className="mh-car-label">Início</span>
-                <span className="mh-turno-time-val">{formatHora(TURNO_INICIO)}</span>
+                <span className="mh-turno-time-val">{formatHora(inicioTurnoMins)}</span>
               </div>
-              <div className="mh-turno-progress-pct">{Math.round(progresso)}% concluído</div>
+              <div className="mh-turno-progress-pct">{Math.round(progressoReal)}% concluído</div>
               <div className="mh-turno-time-item right">
                 <span className="mh-car-label">Fim</span>
-                <span className="mh-turno-time-val">{formatHora(TURNO_FIM)}</span>
+                <span className="mh-turno-time-val">{formatHora(fimTurnoMins)}</span>
               </div>
             </div>
             <div className="mh-progress-bar-bg">
-              <div className="mh-progress-bar" style={{ width: `${progresso}%` }} />
+              <div className="mh-progress-bar" style={{ width: `${progressoReal}%` }} />
             </div>
           </div>
 
@@ -227,34 +284,38 @@ export default function MotoristaHome() {
         <div className="mh-card">
           <div className="mh-section-header">
             <h3 className="mh-card-title">Pedidos Pendentes</h3>
-            <span className="mh-badge">{mockPendentes.length}</span>
+            <span className="mh-badge">{viagensPendentes.length}</span>
           </div>
           <div className="mh-pendentes-list">
-            {mockPendentes.map(p => (
-              <div className="mh-pedido-card" key={p.id}>
+            {viagensPendentes.length > 0 ? (
+              viagensPendentes.map(p => (
+              <div className="mh-pedido-card" key={p._id}>
                 <div className="mh-pedido-route">
                   <div className="mh-pedido-point">
                     <span className="mh-dot origin" />
-                    <span>{p.from}</span>
+                    <span>{p.morada_inicial_viagem?.morada}</span>
                   </div>
                   <div className="mh-pedido-line" />
                   <div className="mh-pedido-point">
                     <span className="mh-dot dest" />
-                    <span>{p.to}</span>
+                    <span>{p.morada_final_viagem?.morada}</span>
                   </div>
                 </div>
                 <div className="mh-pedido-meta">
                   <span>{p.dist}</span>
-                  <span>{p.passengers} pax</span>
+                  <span>{p.n_passageiros} pax</span>
                   <span className="mh-pedido-wait">⏱ {p.wait}</span>
-                  <span className="mh-pedido-price">{p.price}</span>
+                  <span className="mh-pedido-price">{p.preco_viagem?.toFixed(2)}</span>
                 </div>
                 <div className="mh-pedido-actions">
                   <button className="mh-btn-recusar">Recusar</button>
                   <button className="mh-btn-aceitar">Aceitar</button>
                 </div>
               </div>
-            ))}
+            ))
+          ) : (
+            <p className="mh-no-data">Não há pedidos na sua zona.</p>
+          )}
           </div>
         </div>
 
@@ -262,25 +323,31 @@ export default function MotoristaHome() {
         <div className="mh-card">
           <div className="mh-section-header">
             <h3 className="mh-card-title">Histórico de Viagens</h3>
+            {historico.length > 0 && (
             <button className="mh-ver-historico-btn" onClick={() => navigate('/motorista/historico')}>
               Ver Histórico Completo
             </button>
+            )}
           </div>
           <div className="mh-historico-list">
-            {mockHistorico.map(v => (
-              <div className="mh-hist-row" key={v.id}>
+            {historico.length > 0 ? (
+            historico.slice(0,5).map(v => (
+              <div className="mh-hist-row" key={v._id}>
                 <div className="mh-hist-route">
-                  <span className="mh-hist-from">{v.from}</span>
+                  <span className="mh-hist-from">{v.morada_inicial_viagem.morada}</span>
                   <span className="mh-hist-arrow">→</span>
-                  <span className="mh-hist-to">{v.to}</span>
+                  <span className="mh-hist-to">{v.morada_final_viagem.morada}</span>
                 </div>
                 <div className="mh-hist-meta">
-                  <span>{v.date} · {v.time}</span>
-                  <span className="mh-hist-status">{v.status}</span>
-                  <span className="mh-hist-price">{v.price}</span>
+                  <span>{v.hora_inicial_viagem ? new Date(v.hora_inicial_viagem).toLocaleDateString() : 'Sem data'}</span>
+                  <span className="mh-hist-status">Concluída</span>
+                  <span className="mh-hist-price">{v.preco_viagem?.toFixed(2)}€</span>
                 </div>
               </div>
-            ))}
+            ))
+            ) : (
+              <p className="mh-no-data">Ainda não realizou nenhuma viagem.</p>
+            )}
           </div>
         </div>
 
