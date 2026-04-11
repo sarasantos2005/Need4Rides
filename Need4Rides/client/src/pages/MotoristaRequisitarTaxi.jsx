@@ -30,7 +30,7 @@ export default function MotoristaRequisitarTaxi() {
             const config = { headers: { Authorization: `Bearer ${token}` } };
             const userId = user._id || user.id;
 
-            const resTurno = await axios.get(`http://localhost:3000/api/turno/atual?id=${userId}`, config);
+            const resTurno = await axios.get(`http://localhost:3000/api/turno/atual`, config);
             setTurnoAtivo(resTurno.data);
 
             const res = await axios.get('http://localhost:3000/api/taxi/', {

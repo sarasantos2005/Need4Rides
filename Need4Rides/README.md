@@ -71,7 +71,14 @@ Abre em: http://localhost:5173
 
 ```bash
 cd server
-npm run dev
+npm run dev 
+```
+
+OU 
+
+```bash
+cd server
+node index.js 
 ```
 
 Corre em: http://localhost:5000

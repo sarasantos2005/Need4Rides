@@ -222,7 +222,7 @@ exports.cancelarAceitacaoMotorista = async (req, res) => {
 //US7 - Mostrar viagens ao motorista
 exports.listarPedidosParaMotorista = async (req, res) => {
   try {
-    const { id } = req.query;
+    const id = req.userId;
 
     const motoristaId = id;
 
@@ -344,7 +344,7 @@ async function calcularPreco(nivelConforto, horaInicio, horaFim) {
 // Mostrar historico de viagens do motorista
 exports.historicoDeViagens = async (req, res) => {
   try {
-    const { id } = req.query;
+    const id = req.userId;
 
     const turnosDoMotorista = await Turno.find({ motorista: id }).select('_id');
     const idsTurnos = turnosDoMotorista.map(t => t._id);

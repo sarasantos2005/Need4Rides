@@ -35,7 +35,7 @@ exports.requisitarTaxiTurno = async (req, res) => {
 
 exports.turnoAtual = async (req, res) => {
   try{
-    const { id } = req.query;
+    const id = req.userId;
 
     const turno = await Turno.findOne({ 
       motorista: id, 

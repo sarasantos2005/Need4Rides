@@ -45,28 +45,38 @@ export default function MotoristaHome() {
       setUserData(user);
 
       const userId = user._id || user.id; 
-      if (userId) {
-        fetchDadosIniciais(userId, token);
+      if (userId && token) {
+        fetchDadosIniciais(token);
       }
     }
   }, [navigate]);
 
-  const fetchDadosIniciais = async (userId, token) => {
+  const fetchDadosIniciais = async (token) => {
+    if (!token) {
+      console.error("Token ausente em fetchDadosIniciais");
+      return;
+    }
     try {
+      setLoading(true);
+      
       const config = { headers: { Authorization: `Bearer ${token}` } };
       
-      const [resPendentes, resHistorico, resTurno] = await Promise.all([
-        axios.get(`http://localhost:3000/api/viagem/disponiveis?id=${userId}`, config),
-        axios.get(`http://localhost:3000/api/viagem/motorista?id=${userId}`, config),
-        axios.get(`http://localhost:3000/api/turno/atual?id=${userId}`, config)
-      ]);
+      console.log("A enviar pedidos...");
+
+     const [resPendentes, resHistorico, resTurno] = await Promise.all([
+      axios.get(`http://localhost:3000/api/viagem/disponiveis`, config),
+      axios.get(`http://localhost:3000/api/viagem/motorista`, config),
+      axios.get(`http://localhost:3000/api/turno/atual`, config)
+    ]);
 
       setViagensPendentes(resPendentes.data);
       setHistorico(resHistorico.data);
       setTurnoAtivo(resTurno.data);
-      setTaxi(resTurno.data.taxi)
+      if (resTurno.data && resTurno.data.taxi) {
+        setTaxi(resTurno.data.taxi);
+      }
     } catch (err) {
-      console.error("Erro ao procurar dados na BD", err);
+      console.error("Erro ao procurar dados na BD", err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
