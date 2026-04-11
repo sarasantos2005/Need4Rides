@@ -2,6 +2,7 @@ const Viagem = require('../models/viagemModel');
 const Turno = require('../models/turnoModel');
 const Pessoa = require('../models/userModel');
 const Preco = require('../models/precoModel');
+const axios = require('axios');
 
 //Registar viagem -> Depois do cliente pedir, o motorista aceitar e o cliente confirmar
 //US-8
@@ -227,45 +228,68 @@ exports.listarPedidosParaMotorista = async (req, res) => {
     const motoristaId = id;
 
     const motorista = await Pessoa.findById(motoristaId);
+
+    let coordenadasBusca;
+
+    if (req.query.lat && req.query.lng) {
+      coordenadasBusca = [parseFloat(req.query.lat), parseFloat(req.query.lng)];
+    } else {
+      const motorista = await Pessoa.findById(motoristaId);
+      coordenadasBusca = motorista.motorista.morada.localizacao.coordinates;
+    }
     
     if (!motorista || !motorista.motorista?.morada?.localizacao?.coordinates) {
       return res.status(404).json({ message: "Localização do motorista não encontrada." });
     }
     
-    const turnoAtivo = await Turno.findOne({ motorista: motoristaId, estado: 'Ativo' });
+    const turnoAtivo = await Turno.findOne({ motorista: motoristaId, estado: 'Ativo' }).populate('taxi');;
 
     if (!turnoAtivo) {
       return res.status(403).json({ message: "Precisa de estar em turno ativo para ver pedidos." });
     }
 
-    const coordenadasMotorista = motorista.motorista.morada.localizacao.coordinates;
+    const confortoDoTaxi = turnoAtivo.taxi.nivel_conforto;
     
     const pedidos = await Viagem.find({
       turno: null,
+      nivel_conforto: confortoDoTaxi,
       motorista_proposto: { $exists: false },
       "morada_inicial_viagem.localizacao": {
-        $near: {
+        $nearSphere: {
           $geometry: {
             type: "Point",
-            coordinates: coordenadasMotorista
+            coordinates: coordenadasBusca
           },
           $maxDistance: 10000
         }
       }
     }).populate('cliente', 'nome');
 
-    const agora = new Date();
 
     // Filtrar pedidos que não podem ser satisfeitos no tempo restante do turno
-    const pedidosFiltrados = pedidos.filter(pedido => {
-      const tempoEstimadoViagem = calcularTempoEstimado(pedido.morada_inicial_viagem.localizacao, pedido.morada_final_viagem.localizacao);
+    const pedidosComTempo = await Promise.all(pedidos.map(async (pedido) => {
+      let duracao = pedido.duracao_estimada;
+
+      if(!duracao){
+        duracao = await calcularTempoOSRM(pedido.morada_inicial_viagem.localizacao, pedido.morada_final_viagem.localizacao);
+      }
+
       const agora = new Date();
-      
-      // Verifica se a hora atual + duração estimada ultrapassa o fim do turno
-      const horaPrevisaoFim = new Date(agora.getTime() + tempoEstimadoViagem * 60000);
-      
-      return horaPrevisaoFim <= turnoAtivo.hora_fim;
-    });
+      const horaPrevisaoFim = new Date(agora.getTime() + duracao * 60000);
+      const fimTurno = new Date(turnoAtivo.hora_fim);
+
+      return {
+        ...pedido._doc,
+        duracao_calculada: duracao,
+        pode: horaPrevisaoFim <= fimTurno
+      };
+    }));
+
+    console.log(pedidosComTempo);
+
+    const pedidosFiltrados = pedidosComTempo.filter(p => p.pode);
+
+    console.log(pedidosFiltrados);
     
     res.status(200).json(pedidosFiltrados);
   } catch (error) {
@@ -402,7 +426,7 @@ function proximaMudancaTarifa(data) {
   return d;
 }
 
-//Tempo estimado de um lugar a outro -- Acho que dá pra fazer com o nominatim
+//Tempo estimado de um lugar a outro
 function calcularTempoEstimado(coordsInicio, coordsFim) {
   if (!coordsFim) return 10; 
   
@@ -411,3 +435,23 @@ function calcularTempoEstimado(coordsInicio, coordsFim) {
   const tempoHoras = distancia / velocidadeMedia;
   return Math.max(tempoHoras * 60, 5); 
 }
+
+//Para depois, quando o cliente fizer um pedido de viagem
+const calcularTempoOSRM = async (origem, destino) => {
+  try {
+    const coordsOrigem = `${origem.coordinates[1]},${origem.coordinates[0]}`; // Long,Lat
+    const coordsDestino = `${destino.coordinates[1]},${destino.coordinates[0]}`; // Long,Lat
+    
+    const url = `http://router.project-osrm.org/route/v1/driving/${coordsOrigem};${coordsDestino}?overview=false`;
+    
+    const response = await axios.get(url);
+    
+    if (response.data && response.data.routes.length > 0) {
+      return Math.round(response.data.routes[0].duration / 60);
+    }
+    return calcularTempoEstimado(coordsInicio, coordsFim);
+  } catch (error) {
+    console.error("Erro na API OSRM:", error.message);
+    return calcularTempoEstimado(coordsInicio, coordsFim);
+  }
+};

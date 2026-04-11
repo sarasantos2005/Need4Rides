@@ -1,30 +1,82 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/MotoristaHistorico.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import axios from 'axios';
 
-const allViagens = [
-  { id: 1,  from: 'Oriente',           to: 'Alfama',              date: '31 Mar 2026', time: '09:42', price: '€09.20',  km: 6,  passengers: 1, payment: 'Stripe',         status: 'Concluída' },
-  { id: 2,  from: 'Saldanha',          to: 'Aeroporto',           date: '31 Mar 2026', time: '08:15', price: '€22.00', km: 14, passengers: 2, payment: 'Stripe',         status: 'Concluída' },
-  { id: 3,  from: 'Belém',             to: 'Marquês de Pombal',   date: '30 Mar 2026', time: '17:30', price: '€14.60', km: 9,  passengers: 1, payment: 'Stripe',       status: 'Concluída' },
-  { id: 4,  from: 'Campo Grande',      to: 'Cascais',             date: '30 Mar 2026', time: '14:05', price: '€38.90', km: 28, passengers: 3, payment: 'Stripe',         status: 'Concluída' },
-  { id: 5,  from: 'Baixa-Chiado',      to: 'Parque das Nações',   date: '29 Mar 2026', time: '11:20', price: '€16.40', km: 11, passengers: 2, payment: 'Stripe',         status: 'Concluída' },
-  { id: 6,  from: 'Aeroporto',         to: 'Sintra',              date: '29 Mar 2026', time: '09:55', price: '€44.10', km: 32, passengers: 4, payment: 'Stripe',         status: 'Concluída' },
-  { id: 7,  from: 'Intendente',        to: 'Belém',               date: '28 Mar 2026', time: '16:40', price: '€12.30', km: 8,  passengers: 1, payment: 'Stripe',       status: 'Concluída' },
-  { id: 8,  from: 'Benfica',           to: 'Baixa-Chiado',        date: '28 Mar 2026', time: '13:10', price: '€10.80', km: 7,  passengers: 2, payment: 'Stripe',         status: 'Concluída' },
-  { id: 9,  from: 'Cascais',           to: 'Aeroporto',           date: '27 Mar 2026', time: '06:30', price: '€51.20', km: 37, passengers: 1, payment: 'Stripe',         status: 'Concluída' },
-  { id: 10, from: 'Rossio',            to: 'Campo Grande',        date: '27 Mar 2026', time: '19:50', price: '€11.60', km: 7,  passengers: 3, payment: 'Stripe',       status: 'Concluída' },
-];
-
-const totalGanhos = allViagens.reduce((acc, v) => acc + parseFloat(v.price.replace('€', '')), 0).toFixed(2);
-const totalKm     = allViagens.reduce((acc, v) => acc + v.km, 0);
+const formatarDataHora = (isoString) => {
+  if (!isoString) return { data: '---', hora: '---' };
+  const d = new Date(isoString);
+  return {
+    data: d.toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' }),
+    hora: d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
+  };
+};
 
 export default function MotoristaHistorico() {
   const navigate = useNavigate();
   const [filtro, setFiltro] = useState('todas');
+  const [historico, setHistorico] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
 
-  const viagens = filtro === 'todas' ? allViagens : allViagens.filter(v => v.date.includes(filtro));
+  useEffect(() => {
+      const storedUser = localStorage.getItem('user_logado');
+      const token = localStorage.getItem('token');
+  
+      if (!token || !storedUser) {
+        navigate('/login'); 
+      } else {
+        const user = JSON.parse(storedUser);
+        setUserData(user);
+  
+        const userId = user._id || user.id; 
+        if (userId && token) {
+          fetchDadosIniciais(token);
+        }
+      }
+    }, [navigate]);
+
+    const fetchDadosIniciais = async (token) => {
+    if (!token) {
+      console.error("Token ausente em fetchDadosIniciais");
+      return;
+    }
+    try {
+      setLoading(true);
+      
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      
+     const resHistorico = await axios.get(`http://localhost:3000/api/viagem/motorista`, config);
+
+      setHistorico(resHistorico.data);
+    } catch (err) {
+      console.error("Erro ao procurar dados na BD", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const viagensFiltradas = historico.filter(v => {
+    if (filtro === 'todas') return true;
+    const dataViagem = new Date(v.hora_inicial_viagem).toLocaleDateString('pt-PT', { 
+      day: '2-digit', month: 'short', year: 'numeric' 
+    });
+    return dataViagem.includes(filtro); 
+  });
+
+  //Estatisticas
+
+  const totalGanhos = historico.reduce((acc, v) => acc + (v.preco_viagem || 0), 0);
+
+  const totalKm = historico.reduce((acc, v) => acc + (v.km_percorridos || 0), 0);
+
+  const datasUnicas = [...new Set(historico.map(v => 
+    formatarDataHora(v.hora_inicial_viagem).data
+  ))];
+
+  const filtroDatas = ["todas", ...new Set(datasUnicas)];
 
   return (
     <div className="mhist-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -58,7 +110,7 @@ export default function MotoristaHistorico() {
         <div className="mhist-stats">
           <div className="mhist-stat">
             <span className="mhist-stat-label">Total de Viagens</span>
-            <span className="mhist-stat-value">{allViagens.length}</span>
+            <span className="mhist-stat-value">{historico.length}</span>
           </div>
           <div className="mhist-stat accent">
             <span className="mhist-stat-label">Total Ganho</span>
@@ -70,13 +122,13 @@ export default function MotoristaHistorico() {
           </div>
           <div className="mhist-stat">
             <span className="mhist-stat-label">Média por Viagem</span>
-            <span className="mhist-stat-value">€{(totalGanhos / allViagens.length).toFixed(2)}</span>
+            <span className="mhist-stat-value">{(totalGanhos / historico.length).toFixed(2)}€</span>
           </div>
         </div>
 
         {/* Filtros */}
         <div className="mhist-filters">
-          {['todas', '31 Mar 2026', '30 Mar 2026', '29 Mar 2026', '28 Mar 2026', '27 Mar 2026'].map(f => (
+          {filtroDatas.map(f => (
             <button
               key={f}
               className={`mhist-filter-btn ${filtro === f ? 'active' : ''}`}
@@ -90,20 +142,20 @@ export default function MotoristaHistorico() {
         {/* Tabela */}
         <div className="mhist-card">
           <div className="mhist-list">
-            {viagens.map(v => (
+            {viagensFiltradas.map(v => (
               <div className="mhist-row" key={v.id}>
                 <div className="mhist-route">
-                  <span className="mhist-from">{v.from}</span>
+                  <span className="mhist-from">{v.morada_inicial_viagem.morada}</span>
                   <span className="mhist-arrow">→</span>
-                  <span className="mhist-to">{v.to}</span>
+                  <span className="mhist-to">{v.morada_final_viagem.morada}</span>
                 </div>
                 <div className="mhist-meta">
-                  <span className="mhist-date">{v.date} · {v.time}</span>
-                  <span className="mhist-detail">{v.km} km</span>
-                  <span className="mhist-detail">{v.passengers} pax</span>
-                  <span className="mhist-detail">{v.payment}</span>
-                  <span className="mhist-status-badge">{v.status}</span>
-                  <span className="mhist-price">{v.price}</span>
+                  <span className="mhist-date">{formatarDataHora(v.hora_inicial_viagem).data} às {formatarDataHora(v.hora_inicial_viagem).hora}</span>
+                  <span className="mhist-detail">{v.km_percorridos} km</span>
+                  <span className="mhist-detail">{v.n_passageiros} pax</span>
+                  <span className="mhist-detail">{(new Date(v.hora_final_viagem) - new Date(v.hora_inicial_viagem)) / (1000 * 60)} min</span>
+                  <span className="mhist-status-badge">Concluída</span>
+                  <span className="mhist-price">{v.preco_viagem?.toFixed(2)}€</span>
                 </div>
               </div>
             ))}

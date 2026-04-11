@@ -31,7 +31,7 @@ async function runSeed() {
             { nome: "Leonor", email: "leonor@teste.com", tipo: "Cliente", nif: 222222222, senha_acesso_web: passwordHash, genero: "F", ano_nascimento: 1995 },
             { nome: "Maria", email: "maria@teste.com", tipo: "Motorista", nif: 333333333, senha_acesso_web: passwordHash, genero: "M", ano_nascimento: 1980, motorista: { n_carta_conducao: "ZA-12345 1", morada: { texto: "Rua Augusta, Lisboa", localizacao: { type: "Point", coordinates: [-9.1393, 38.7223] } }} },
             { nome: "Afonso", email: "afonso@teste.com", tipo: "Motorista", nif: 444444444, senha_acesso_web: passwordHash, genero: "F", ano_nascimento: 1988, motorista: { n_carta_conducao: "ZA-12345 2", morada: { texto: "Rua Augusta, Lisboa", localizacao: { type: "Point", coordinates: [-9.1393, 38.7223] } }} },
-            { nome: "Sara", email: "sara@teste.com", tipo: "Gestor", nif: 555555555, senha_acesso_web: passwordHash, genero: "M", ano_nascimento: 1995 },
+            { nome: "Sara", email: "sara@teste.com", tipo: "Cliente", nif: 555555555, senha_acesso_web: passwordHash, genero: "M", ano_nascimento: 1995 },
             { nome: "Cliente", email: "pessoa@need4rides.com", genero: "M", tipo: "Cliente", nif: 999999999, senha_acesso_web: passwordHash, ano_nascimento: 2005 },
             { nome: "Admin", email: "pessoa@need4rides.com", genero: "M", tipo: "Gestor", nif: 999999999, senha_acesso_web: passwordHash, ano_nascimento: 2005 },
             { nome: "Motorista", email: "pessoa@need4rides.com", genero: "M", tipo: "Motorista", nif: 999999999, senha_acesso_web: passwordHash, ano_nascimento: 2005, motorista: {n_carta_conducao: "ZA-12345 6", morada: { texto: "Rua Augusta, Lisboa", localizacao: { type: "Point", coordinates: [-9.1393, 38.7223] } }} }
@@ -76,20 +76,21 @@ async function runSeed() {
         const turno = await Turno.create(
             {
                 motorista: users[2]._id, 
-                hora_inicio: agora, 
-                hora_fim: daquiA8Horas, 
+                taxi: taxis[0]._id,
+                hora_inicio: agora.getTime() - 15 * 60000, 
+                hora_fim: daquiA8Horas.getTime() - 15 * 60000, 
                 estado: 'Ativo'
             },
             {
                 motorista: users[3]._id,
-                taxi: taxis[1]._id,      
+                taxi: taxis[2]._id,      
                 hora_inicio: daquiA2Horas, 
                 hora_fim: daquiA10Horas,
                 estado: 'Agendado'
             },
             {
                 motorista: users[2]._id, 
-                taxi: taxis[2]._id,      
+                taxi: taxis[1]._id,      
                 hora_inicio: ontem, 
                 hora_fim: ontemFim, 
                 estado: 'Terminado'
@@ -181,30 +182,155 @@ async function runSeed() {
             {
                 // Viagem Concluída (Para gerar fatura)
                 cliente: users[0]._id, // Guilherme
-                turno: turno[0]._id,   // Maria (Ativo)
+                turno: turno[0]._id,   // Maria (Terminado)
                 n_passageiros: 2,
                 nivel_conforto: "Luxuoso",
                 morada_inicial_viagem: { 
                     morada: "Rua Augusta, Lisboa", 
                     localizacao: { 
                         type: "Point",
-                        coordinates: [-9.1393, 38.7139] 
+                        coordinates: [38.7139, -9.1393] 
                     }
                 },
                 morada_final_viagem: { 
                     morada: "Saldanha, Lisboa", 
                     localizacao: { 
                         type: "Point",
-                        coordinates: [-9.1453, 38.7350] 
+                        coordinates: [38.7350, -9.1453] 
                     }
                 },
-                hora_inicial_viagem: new Date(agora.getTime() - 40 * 60000), // Há 40 min
-                hora_final_viagem: new Date(agora.getTime() - 20 * 60000),   // Há 20 min
+                hora_inicial_viagem: new Date(agora.getTime() - 10 * 60000), // Há 10 min
+                hora_final_viagem: new Date(agora.getTime() - 5 * 60000),   // Há 5 min
                 km_percorridos: 4.5,
-                preco_viagem: 15.50
+                preco_viagem: 6
             },
             {
-                // Pedido Pendente (Sem turno/motorista ainda)
+                // Viagem Concluída (para histórico completo)
+                cliente: users[0]._id, // Guilherme
+                turno: turno[2]._id,   // Maria (Terminado)
+                n_passageiros: 2,
+                nivel_conforto: "Luxuoso",
+                morada_inicial_viagem: { 
+                    morada: "Av. Dom João II Lote 1.16, Parque das Nações, 1990-083 Lisboa", 
+                    localizacao: { 
+                        type: "Point",
+                        coordinates: [38.76962002959662, -9.098032828203317] 
+                    }
+                },
+                morada_final_viagem: { 
+                    morada: "Escolas Gerais 38, 1100-216 Lisboa", 
+                    localizacao: { 
+                        type: "Point",
+                        coordinates: [38.713937090210436, -9.128641312853786] 
+                    }
+                },
+                hora_inicial_viagem: new Date(ontem.getTime() + 2 * 60000), 
+                hora_final_viagem: new Date(ontem.getTime() + 25 * 60000), 
+                km_percorridos: 9.1,
+                preco_viagem: 10.92
+            },
+            {
+                // Viagem Concluída (para histórico completo)
+                cliente: users[0]._id, // Guilherme
+                turno: turno[2]._id,   // Maria (Terminado)
+                n_passageiros: 2,
+                nivel_conforto: "Luxuoso",
+                morada_inicial_viagem: { 
+                    morada: "Saldanha Residence, Av. Fontes Pereira de Melo 42 E, 1050-250 Lisboa", 
+                    localizacao: { 
+                        type: "Point",
+                        coordinates: [38.73254380161429, -9.145537215731492] 
+                    }
+                },
+                morada_final_viagem: { 
+                    morada: "Aeroporto Internacional de Lisboa Humberto Delgado", 
+                    localizacao: { 
+                        type: "Point",
+                        coordinates: [38.779327804920236, -9.131926869721497] 
+                    }
+                },
+                hora_inicial_viagem: new Date(ontem.getTime() + 30 * 60000), 
+                hora_final_viagem: new Date(ontem.getTime() + 40 * 60000), 
+                km_percorridos: 5,
+                preco_viagem: 6
+            },
+            {
+                // Viagem Concluída (para histórico completo)
+                cliente: users[0]._id, // Guilherme
+                turno: turno[2]._id,   // Maria (Terminado)
+                n_passageiros: 2,
+                nivel_conforto: "Luxuoso",
+                morada_inicial_viagem: { 
+                    morada: "Aeroporto Internacional de Lisboa Humberto Delgado", 
+                    localizacao: { 
+                        type: "Point",
+                        coordinates: [38.779327804920236, -9.131926869721497] 
+                    }
+                },
+                morada_final_viagem: { 
+                    morada: "Alameda das Linhas de Torres, Lisboa", 
+                    localizacao: { 
+                        type: "Point",
+                        coordinates: [38.77339117824467, -9.155801591039156] 
+                    }
+                },
+                hora_inicial_viagem: new Date(ontem.getTime() + 45 * 60000), 
+                hora_final_viagem: new Date(ontem.getTime() + 55 * 60000), 
+                km_percorridos: 5,
+                preco_viagem: 12
+            },
+            {
+                // Viagem Concluída (para histórico completo)
+                cliente: users[0]._id, // Guilherme
+                turno: turno[2]._id,   // Maria (Terminado)
+                n_passageiros: 2,
+                nivel_conforto: "Luxuoso",
+                morada_inicial_viagem: { 
+                    morada: "Alameda das Linhas de Torres, Lisboa", 
+                    localizacao: { 
+                        type: "Point",
+                        coordinates: [38.77339117824467, -9.155801591039156] 
+                    }
+                },
+                morada_final_viagem: { 
+                    morada: "Campo Grande 016, 1749-016 Lisboa", 
+                    localizacao: { 
+                        type: "Point",
+                        coordinates: [38.756537778333794, -9.155319616979538] 
+                    }
+                },
+                hora_inicial_viagem: new Date(ontem.getTime() + 60 * 60000), 
+                hora_final_viagem: new Date(ontem.getTime() + 70 * 60000), 
+                km_percorridos: 5,
+                preco_viagem: 6
+            },
+            {
+                // Viagem Concluída (para histórico completo)
+                cliente: users[0]._id, // Guilherme
+                turno: turno[2]._id,   // Maria (Terminado)
+                n_passageiros: 2,
+                nivel_conforto: "Luxuoso",
+                morada_inicial_viagem: { 
+                    morada: "Estr. de Telheiras, Lisboa", 
+                    localizacao: { 
+                        type: "Point",
+                        coordinates: [38.75994598397486, -9.159915583957925] 
+                    }
+                },
+                morada_final_viagem: { 
+                    morada: "R. de Santa Cruz do Castelo, 1100-129 Lisboa", 
+                    localizacao: { 
+                        type: "Point",
+                        coordinates: [38.71435039979026, -9.133196831734294] 
+                    }
+                },
+                hora_inicial_viagem: new Date(ontem.getTime() + 80 * 60000), 
+                hora_final_viagem: new Date(ontem.getTime() + 90 * 60000), 
+                km_percorridos: 5,
+                preco_viagem: 6
+            },
+            {
+                // Pedido Pendente (Sem turno/motorista ainda) - Nivel de conforto errado (taxi é Luxuoso e cliente quer Básico)
                 cliente: users[1]._id, // Leonor
                 n_passageiros: 1,
                 nivel_conforto: "Básico",
@@ -212,14 +338,54 @@ async function runSeed() {
                     morada: "Cais do Sodré, Lisboa", 
                     localizacao: {
                         type: "Point",
-                        coordinates: [-9.1445, 38.7061] 
+                        coordinates: [38.7061, -9.1445] 
                     }
                 },
                 morada_final_viagem: { 
                     morada: "Belém, Lisboa", 
                     localizacao: {
                         type: "Point",
-                        coordinates: [-9.2120, 38.6970] 
+                        coordinates: [38.6970, -9.2120] 
+                    }
+                }
+            },
+            {
+                // Pedido Pendente (Sem turno/motorista ainda)
+                cliente: users[0]._id, // Guilherme
+                n_passageiros: 3,
+                nivel_conforto: "Luxuoso",
+                morada_inicial_viagem: { 
+                    morada: "Cais do Sodré, Lisboa", 
+                    localizacao: {
+                        type: "Point",
+                        coordinates: [38.7061, -9.1445] 
+                    }
+                },
+                morada_final_viagem: { 
+                    morada: "Belém, Lisboa", 
+                    localizacao: {
+                        type: "Point",
+                        coordinates: [38.6970, -9.2120] 
+                    }
+                }
+            },
+            {
+                // Pedido Pendente (Sem turno/motorista ainda) - Conforto correto, distância muito longe
+                cliente: users[4]._id, // Sara
+                n_passageiros: 3,
+                nivel_conforto: "Luxuoso",
+                morada_inicial_viagem: { 
+                    morada: "R. Prof. Armindo Ayres de Carvalho 11, 2640-453 Mafra", 
+                    localizacao: {
+                        type: "Point",
+                        coordinates: [38.94462824164272, -9.355216323661047] 
+                    }
+                },
+                morada_final_viagem: { 
+                    morada: "Belém, Lisboa", 
+                    localizacao: {
+                        type: "Point",
+                        coordinates: [38.6970, -9.2120] 
                     }
                 }
             },
@@ -228,19 +394,19 @@ async function runSeed() {
                 cliente: users[5]._id, // Cliente Need4Rides
                 turno: turno[6]._id,   // Motorista Need4Rides (Ativo)
                 n_passageiros: 3,
-                nivel_conforto: "Básico",
+                nivel_conforto: "Luxuoso",
                 morada_inicial_viagem: { 
                     morada: "Marquês de Pombal", 
                     localizacao: {
                         type: "Point",
-                        coordinates: [-9.1503, 38.7253]
+                        coordinates: [38.7253, -9.1503]
                     }
                 },
                 morada_final_viagem: { 
                     morada: "Amadora", 
                     localizacao: {
                         type: "Point",
-                        coordinates: [-9.2302, 38.7588] 
+                        coordinates: [38.7588, -9.2302] 
                     }
                 },
                 hora_inicial_viagem: agora
@@ -252,7 +418,7 @@ async function runSeed() {
             {
                 n_sequencial: 1,
                 ano: 2026,
-                data_emissao: new Date(agora.getTime() - 20 * 60000), // Hora do fim da viagem
+                data_emissao: new Date(agora.getTime() - 5 * 60000), // Hora do fim da viagem
                 viagem: viagens[0]._id
             }
         ]);

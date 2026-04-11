@@ -52,34 +52,38 @@ export default function MotoristaHome() {
   }, [navigate]);
 
   const fetchDadosIniciais = async (token) => {
-    if (!token) {
-      console.error("Token ausente em fetchDadosIniciais");
-      return;
-    }
-    try {
-      setLoading(true);
-      
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      
-      console.log("A enviar pedidos...");
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
 
-     const [resPendentes, resHistorico, resTurno] = await Promise.all([
-      axios.get(`http://localhost:3000/api/viagem/disponiveis`, config),
-      axios.get(`http://localhost:3000/api/viagem/motorista`, config),
-      axios.get(`http://localhost:3000/api/turno/atual`, config)
-    ]);
-
-      setViagensPendentes(resPendentes.data);
-      setHistorico(resHistorico.data);
-      setTurnoAtivo(resTurno.data);
-      if (resTurno.data && resTurno.data.taxi) {
-        setTaxi(resTurno.data.taxi);
+      if (!token) {
+        console.error("Token ausente");
+        return;
       }
-    } catch (err) {
-      console.error("Erro ao procurar dados na BD", err.response?.data || err.message);
-    } finally {
-      setLoading(false);
-    }
+      try {
+        setLoading(true);
+        
+        const config = { headers: { Authorization: `Bearer ${token}` }, params: { lat: latitude, lng: longitude } };
+        
+      const [resPendentes, resHistorico, resTurno] = await Promise.all([
+        axios.get(`http://localhost:3000/api/viagem/disponiveis`, config),
+        axios.get(`http://localhost:3000/api/viagem/motorista`, config),
+        axios.get(`http://localhost:3000/api/turno/atual`, config)
+      ]);
+
+        setViagensPendentes(resPendentes.data);
+        setHistorico(resHistorico.data);
+        setTurnoAtivo(resTurno.data);
+        if (resTurno.data && resTurno.data.taxi) {
+          setTaxi(resTurno.data.taxi);
+        }
+      } catch (err) {
+        console.error("Erro ao procurar dados na BD", err.response?.data || err.message);
+      } finally {
+        setLoading(false);
+      }
+    }, (error) => {
+      console.error("Erro ao obter GPS:", error);
+    });
   };
 
   //Estatisticas diarias
@@ -354,7 +358,7 @@ export default function MotoristaHome() {
                 <div className="mh-pedido-meta">
                   <span>{p.dist}</span>
                   <span>{p.n_passageiros} pax</span>
-                  <span className="mh-pedido-wait">⏱ {p.wait}</span>
+                  <span className="mh-pedido-wait">⏱ {p.duracao_calculada} min</span>
                   <span className="mh-pedido-price">{p.preco_viagem?.toFixed(2)}</span>
                 </div>
                 <div className="mh-pedido-actions">
@@ -373,7 +377,7 @@ export default function MotoristaHome() {
         <div className="mh-card">
           <div className="mh-section-header">
             <h3 className="mh-card-title">Histórico de Viagens</h3>
-            {historico.length > 0 && (
+            {historico.length > 5 && (
             <button className="mh-ver-historico-btn" onClick={() => navigate('/motorista/historico')}>
               Ver Histórico Completo
             </button>
@@ -389,7 +393,7 @@ export default function MotoristaHome() {
                   <span className="mh-hist-to">{v.morada_final_viagem.morada}</span>
                 </div>
                 <div className="mh-hist-meta">
-                  <span>{v.hora_inicial_viagem ? new Date(v.hora_inicial_viagem).toLocaleDateString() : 'Sem data'}</span>
+                  <span>{v.hora_inicial_viagem ? new Date(v.hora_inicial_viagem).toLocaleTimeString() : 'Sem data'}</span>
                   <span className="mh-hist-status">Concluída</span>
                   <span className="mh-hist-price">{v.preco_viagem?.toFixed(2)}€</span>
                 </div>
