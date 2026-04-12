@@ -148,12 +148,49 @@ export default function MotoristaHome() {
   const aceitarViagem = async (viagemId) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.patch(`http://localhost:3000/api/viagem/aceitar`, 
-        { motoristaId: userData._id },
+
+      if(!turnoAtivo || !turnoAtivo._id){
+        alert("Não podes aceitar viagens sem um turno ativo");
+        return;
+      }
+
+      const response = await axios.patch(`http://localhost:3000/api/viagem/aceitar`, 
+        { 
+          viagemId: viagemId,
+          turnoId: turnoAtivo._id
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      alert(response.data.message);
+
       // Refresh aos dados
-      fetchDadosIniciais(userData._id, token);
+      fetchDadosIniciais(token);
+    } catch (err) {
+      alert("Erro ao aceitar viagem");
+    }
+  };
+
+  const recusarViagem = async (viagemId) => {
+    try {
+      const token = localStorage.getItem('token');
+
+      if(!turnoAtivo || !turnoAtivo._id){
+        alert("Não podes aceitar viagens sem um turno ativo");
+        return;
+      }
+
+      const response = await axios.patch(`http://localhost:3000/api/viagem/recusar`, 
+        { 
+          viagemId: viagemId
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert(response.data.message);
+
+      // Refresh aos dados
+      fetchDadosIniciais(token);
     } catch (err) {
       alert("Erro ao aceitar viagem");
     }
@@ -362,8 +399,8 @@ export default function MotoristaHome() {
                   <span className="mh-pedido-price">{p.preco_viagem?.toFixed(2)}</span>
                 </div>
                 <div className="mh-pedido-actions">
-                  <button className="mh-btn-recusar">Recusar</button>
-                  <button className="mh-btn-aceitar">Aceitar</button>
+                  <button className="mh-btn-recusar" onClick={() => recusarViagem(p._id)}>Recusar</button>
+                  <button className="mh-btn-aceitar" onClick={() => aceitarViagem(p._id)}>Aceitar</button>
                 </div>
               </div>
             ))

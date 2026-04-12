@@ -64,7 +64,8 @@ exports.finalizarViagem = async (req, res) => {
               localizacao: { coordinates: [destino.long, destino.lat] }
             },
             km_percorridos: km,
-            preco_viagem: preco
+            preco_viagem: preco,
+            $unset: { motorista_proposto: "", motoristas_rejeitados: "" }
         },
         {new: true}
     );
@@ -170,6 +171,8 @@ exports.rejeitarMotorista = async (req, res) => {
     const pedidoReset = await Viagem.findByIdAndUpdate(
       viagemId,
       { $unset: { motorista_proposto: "" } },
+      { $addToSet: { motoristas_rejeitados: motoristaId } },
+      { strict: false },
       { new: true }
     );
 
@@ -186,6 +189,29 @@ exports.rejeitarMotorista = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+//Motorista rejeita pedido de viagem
+exports.recusarCliente = async (req, res) => {
+  try {
+    const { viagemId } = req.body;
+    const motoristaId = req.userId;
+
+    const viagem = await Viagem.findByIdAndUpdate(
+      viagemId,
+      { $addToSet: { motoristas_rejeitados: motoristaId } },
+      { strict: false }
+    );
+
+    if (!viagem) {
+      return res.status(404).json({ message: "Viagem não encontrada." });
+    }
+
+    res.status(200).json({ success: true, message: "Pedido ignorado." });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 
 // US7 - Motorista cancela a sua própria proposta por falta de resposta do cliente
 exports.cancelarAceitacaoMotorista = async (req, res) => {
@@ -254,6 +280,7 @@ exports.listarPedidosParaMotorista = async (req, res) => {
       turno: null,
       nivel_conforto: confortoDoTaxi,
       motorista_proposto: { $exists: false },
+      motoristas_rejeitados: { $ne: motoristaId },
       "morada_inicial_viagem.localizacao": {
         $nearSphere: {
           $geometry: {
@@ -285,11 +312,7 @@ exports.listarPedidosParaMotorista = async (req, res) => {
       };
     }));
 
-    console.log(pedidosComTempo);
-
     const pedidosFiltrados = pedidosComTempo.filter(p => p.pode);
-
-    console.log(pedidosFiltrados);
     
     res.status(200).json(pedidosFiltrados);
   } catch (error) {
@@ -312,10 +335,18 @@ exports.aceitarPedido = async (req, res) => {
     const pedido = await Viagem.findByIdAndUpdate(
       viagemId, 
       { motorista_proposto: turnoId }, 
-      { new: true }
-    ).populate({
+      { returnDocument: 'after', strict: false }
+    );
+
+    if (!pedido) {
+      return res.status(404).json({ message: "Pedido não encontrado." });
+    }
+
+    await pedido.populate({
       path: "motorista_proposto",
-      populate: { path: "motorista taxi" }
+      model: 'Viagem',
+      strictPopulate: false,
+      populate: {path: "motorista taxi"}
     });
 
     res.status(200).json({
@@ -324,6 +355,7 @@ exports.aceitarPedido = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("ERRO NO ACEITAR PEDIDO:", error);
     res.status(500).json({ success: false, message: "Erro ao aceitar pedido." });
   }
 };
