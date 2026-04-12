@@ -196,6 +196,43 @@ export default function MotoristaHome() {
     }
   };
 
+  const handleAlterarTurno = async() => {
+    try {
+      const token = localStorage.getItem('token');
+
+      if(turnoAtivo && turnoAtivo.estado === "Ativo"){
+        if (!window.confirm("Deseja encerrar o seu turno agora? Esta ação é irreversível.")) return;
+
+        try {
+          setLoading(true);
+
+          await axios.patch(`http://localhost:3000/api/turno/finalizar`, 
+            { turnoId: turnoAtivo._id },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          setTurnoAtivo(null);
+          setTaxi(null);
+          setViagensPendentes([]);
+          setEmTurno(false);
+          localStorage.removeItem('motoristataxi');
+        
+          alert("Turno encerrado com sucesso. Bom descanso!");
+          fetchDadosIniciais(token);
+        } catch (err) {
+          console.error("Erro ao finalizar turno:", err);
+          alert("Erro ao encerrar o turno no servidor.");
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        navigate('/motorista/requisitar-taxi');
+      }
+    } catch (err) {
+      alert("Erro ao alterar estado do turno.");
+    }
+  }
+
   useEffect(() => {
     const onStorage = () => {
       const saved = localStorage.getItem('motoristataxi');
@@ -249,16 +286,16 @@ export default function MotoristaHome() {
             <div>
               <p className="mh-welcome-sub">Bem-vindo de volta,</p>
               <h1 className="mh-welcome-name">{userData.nome.split(' ')[0]}</h1>
-              <span className={`mh-status-badge ${emTurno ? 'online' : 'offline'}`}>
+              <span className={`mh-status-badge ${turnoAtivo ? 'online' : 'offline'}`}>
                 {emTurno ? '● Em turno' : '○ Fora de turno'}
               </span>
             </div>
           </div>
           <button
-            className={`mh-turno-btn ${emTurno ? 'end' : 'start'}`}
-            onClick={() => setEmTurno(t => !t)}
+            className={`mh-turno-btn ${turnoAtivo ? 'end' : 'start'}`}
+            onClick={handleAlterarTurno}
           >
-            {emTurno ? 'Terminar Turno' : 'Entrar em Turno'}
+            {turnoAtivo ? 'Terminar Turno' : 'Iniciar Novo Turno'}
           </button>
         </div>
 

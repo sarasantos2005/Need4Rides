@@ -80,3 +80,32 @@ exports.devolverTaxiTurno = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.terminarTurno = async (req, res) => {
+  try {
+    const { turnoId } = req.body;
+    const agora = new Date();
+
+    if (!turnoId) {
+      return res.status(404).json({ message: "Turno não encontrado." });
+    }
+
+    const turnoOriginal = await Turno.findById(turnoId);
+
+    if(agora <= turnoOriginal.hora_inicio){
+      return res.status(400).json({ message: "Não pode terminar antes de começar." });
+    }
+    
+    await Turno.findByIdAndUpdate(
+      turnoId,
+      {
+        hora_fim: agora,
+        estado: "Terminado"
+      }
+    )
+
+    res.status(200).json({ message: "Turno terminado com sucesso", turno: turnoAtualizado });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
