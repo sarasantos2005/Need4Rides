@@ -248,3 +248,54 @@ exports.definirPreco = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.editarPerfil = async(req, res) => {
+  try {
+    const { email, genero, senha_acesso_web, nome } = req.body;
+    const userId = req.userId;
+
+    const updates = { email, nome };
+
+    if(genero){
+      if(!["M", "F"].includes(genero.toUpperCase())){
+        return res.status(400).json({ message: "Género inválido." });
+      }
+
+      updates.genero = genero.toUpperCase();
+    }
+
+    if (senha_acesso_web && senha_acesso_web.length > 0) {
+      const regexSenha = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+      if (!regexSenha.test(senha_acesso_web)) {
+        return res.status(400).json({ message: "A senha deve ter pelo menos 6 caracteres, com letras e números." });
+      }
+      updates.senha_acesso_web = await bcrypt.hash(senha_acesso_web, SALT_ROUNDS);
+    }
+
+    const userAtualizado = await User.findByIdAndUpdate(
+      userId,
+      {$set: updates},
+      {new: true, runValidators: true}
+    ).select("-senha_acesso_web");
+
+    res.status(200).json({
+      success: true,
+      message: "Perfil atualizado com sucesso!",
+      user: userAtualizado
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.get = async(req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-senha_acesso_web');
+    if (!user) return res.status(404).json({ message: "Utilizador não encontrado" });
+    
+    res.status(200).json(user);
+  } catch(error) {
+    res.status(500).json({ error: error.message });
+  }
+}

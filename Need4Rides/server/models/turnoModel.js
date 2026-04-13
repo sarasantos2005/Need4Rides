@@ -28,6 +28,6 @@ const turnoSchema = new mongoose.Schema({
     }
     
 
-}, { timestamps: true });
+});
 
 module.exports = mongoose.model("Turno", turnoSchema, "Turnos");

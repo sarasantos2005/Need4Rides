@@ -420,6 +420,26 @@ exports.historicoDeViagens = async (req, res) => {
   }
 };
 
+// Mostrar historico de viagens do cliente
+exports.historicoDeViagens_Cliente = async (req, res) => {
+  try {
+    const id = req.userId;
+
+    if (!id) {
+      return res.status(401).json({ message: "Utilizador não autenticado." });
+    }
+
+    const historico = await Viagem.find({
+      cliente: id,
+      hora_final_viagem: { $exists: true }
+    }).sort({ hora_inicial_viagem: -1 });
+
+    res.status(200).json(historico);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 function calcularPrecoViagem(inicio, fim, precoMinuto, agravamento) {
   const multiplicadorNoturno = 1 + agravamento / 100;
   let preco = 0;

@@ -13,5 +13,6 @@ router.get('/disponiveis', auth, viagemController.listarPedidosParaMotorista); /
 router.patch('/aceitar', auth, viagemController.aceitarPedido); // US7 - Motorista aceita um pedido de viagem
 router.get('/motorista', auth, viagemController.historicoDeViagens); 
 router.patch('/recusar', auth, viagemController.recusarCliente); // Motorista rejeita um pedido de viagem
+router.get("/historico/cliente", auth, viagemController.historicoDeViagens_Cliente);
 
 module.exports = router;
