@@ -1,12 +1,31 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Fatura.css';
+import { useState, useEffect } from "react";
+import axios from 'axios';
 
 export default function Fatura() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const [fatura, setFaturaDados] = useState([]);
   const trip = state?.trip;
   const client = state?.client ?? 'Cliente';
+
+  useEffect(() => {
+    const carregarFatura = async() => {
+      try {
+        const res = await axios.get(`http://localhost:3000/api/fatura/${trip._id}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+
+        setFaturaDados(res.data.fatura);
+      } catch (err) {
+        console.error("Fatura não encontrada na BD");
+      }
+    };
+
+    if (trip?._id) carregarFatura();
+  }, [trip]);
 
   if (!trip) {
     return (
@@ -20,23 +39,29 @@ export default function Fatura() {
     );
   }
 
-  const invoiceNumber = `N4R-2026-00${trip.id}`;
+  const nSequencial = fatura?.n_sequencial 
+    ? String(fatura.n_sequencial).padStart(3, '0') 
+    : '---';
+
+  const invoiceNumber = fatura?.ano ? `N4R-${fatura.ano}/${nSequencial}` : `A processar...`;
+  
+  const dataEmissao = fatura?.data_emissao ? new Date(fatura.data_emissao).toLocaleDateString() : new Date(trip.hora_inicial_viagem).toLocaleDateString();
 
   const handleDownload = () => {
     const content = `
 FATURA — Need4Rides
 ================================
 Nº Fatura:        ${invoiceNumber}
-Data:             ${trip.date} às ${trip.time}
+Data:             ${dataEmissao}
 ================================
 Cliente:          ${client}
-Motorista:        ${trip.driver}
+Motorista:        ${trip.turno?.motorista?.nome ?? "Não atribuído"}
 ================================
-Origem:           ${trip.from}
-Destino:          ${trip.to}
+Origem:           ${trip.morada_inicial_viagem?.morada}
+Destino:          ${trip.morada_final_viagem?.morada}
 ================================
-Método Pagamento: ${trip.payment}
-Total:            ${trip.price}
+Método Pagamento: Stripe
+Total:            ${trip.preco_viagem.toFixed(2)}
 ================================
 Obrigado por viajar com Need4Rides!
     `.trim();
@@ -87,15 +112,15 @@ Obrigado por viajar com Need4Rides!
             </div>
             <div className="fatura-section">
               <h3>Motorista</h3>
-              <p>{trip.driver}</p>
+              <p>{trip.turno?.motorista?.nome ?? "Não atribuído"}</p>
             </div>
             <div className="fatura-section">
               <h3>Data</h3>
-              <p>{trip.date}</p>
+              <p>{new Date(trip.hora_inicial_viagem).toLocaleDateString()}</p>
             </div>
             <div className="fatura-section">
               <h3>Hora</h3>
-              <p>{trip.time}</p>
+              <p>{new Date(trip.hora_inicial_viagem).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
             </div>
           </div>
 
@@ -107,7 +132,7 @@ Obrigado por viajar com Need4Rides!
               <span className="fatura-dot origin" />
               <div>
                 <span className="fatura-point-label">Origem</span>
-                <span className="fatura-point-value">{trip.from}</span>
+                <span className="fatura-point-value">{trip.morada_inicial_viagem?.morada}</span>
               </div>
             </div>
             <div className="fatura-line" />
@@ -115,7 +140,7 @@ Obrigado por viajar com Need4Rides!
               <span className="fatura-dot destination" />
               <div>
                 <span className="fatura-point-label">Destino</span>
-                <span className="fatura-point-value">{trip.to}</span>
+                <span className="fatura-point-value">{trip.morada_final_viagem?.morada}</span>
               </div>
             </div>
           </div>
@@ -126,11 +151,11 @@ Obrigado por viajar com Need4Rides!
           <div className="fatura-payment-row">
             <div className="fatura-section">
               <h3>Método de Pagamento</h3>
-              <p>{trip.payment}</p>
+              <p>Stripe</p>
             </div>
             <div className="fatura-total-box">
               <span className="fatura-total-label">Total</span>
-              <span className="fatura-total-value">{trip.price}</span>
+              <span className="fatura-total-value">{trip.preco_viagem?.toFixed(2)}€</span>
             </div>
           </div>
 

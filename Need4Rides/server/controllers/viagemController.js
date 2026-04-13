@@ -2,6 +2,7 @@ const Viagem = require('../models/viagemModel');
 const Turno = require('../models/turnoModel');
 const Pessoa = require('../models/userModel');
 const Preco = require('../models/precoModel');
+const Fatura = require('../models/faturaModel');
 const axios = require('axios');
 
 //Registar viagem -> Depois do cliente pedir, o motorista aceitar e o cliente confirmar
@@ -429,12 +430,29 @@ exports.historicoDeViagens_Cliente = async (req, res) => {
       return res.status(401).json({ message: "Utilizador não autenticado." });
     }
 
-    const historico = await Viagem.find({
+    const viagens = await Viagem.find({
       cliente: id,
       hora_final_viagem: { $exists: true }
-    }).sort({ hora_inicial_viagem: -1 });
+    }).populate({
+      path: 'turno',
+      populate: {
+        path: 'motorista', 
+        select: 'nome' 
+      }
+    })
+    .sort({ hora_inicial_viagem: -1 });
 
-    res.status(200).json(historico);
+    const faturas = await Fatura.find({ viagem: { $in: viagens.map(v => v._id) } });
+
+    const idsComFatura = faturas.map(f => f.viagem.toString());
+
+    const resposta = viagens.map(v => {
+      const vObj = v.toObject();
+      vObj.temFatura = idsComFatura.includes(v._id.toString());
+      return vObj;
+    });
+
+    res.status(200).json(resposta);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

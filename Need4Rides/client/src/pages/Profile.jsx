@@ -120,7 +120,7 @@ export default function Profile() {
               <img src={ddImg} alt="Avatar" className="profile-avatar" />
             </div>
             <div className="profile-info">
-              <h1>Guilherme Ribeiro</h1>
+              <h1>{userData.nome}</h1>
               <div className="profile-badges">
                 <span className="profile-badge">{userData.tipo} Verificado</span>
                 <span className="profile-badge">Membro desde {formatarData(userData.createdAt)}</span>
@@ -182,12 +182,16 @@ export default function Profile() {
                       <span className="trip-status">Concluída</span>
                     </div>
                   </div>
-                  <button
-                    className="trip-invoice-btn"
-                    onClick={() => navigate('/fatura', { state: { trip, client: 'Guilherme Ribeiro' } })}
-                  >
-                    Fatura
-                  </button>
+                  {trip.temFatura ? (
+                    <button
+                      className="trip-invoice-btn"
+                      onClick={() => navigate('/fatura', { state: { trip, client: formData.nome } })}
+                    >
+                      Fatura
+                    </button>
+                  ) : (
+                    <span style={{ color: '#999', fontSize: '0.8rem' }}>Processando Fatura...</span>
+                  )}
                 </div>
               ))
             ) : (

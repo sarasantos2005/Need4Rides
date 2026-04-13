@@ -23,6 +23,45 @@ exports.emitirFatura = async (req, res) => {
   }
 };
 
+exports.getFatura = async(req, res) => {
+  try {
+    const { viagemId } = req.params;
+
+    if (!viagemId) {
+      return res.status(400).json({ message: "ID da viagem não fornecido." });
+    }
+
+    const fatura = await Fatura.findOne({ viagem: viagemId })
+      .populate({
+        path: 'viagem',
+        populate: {
+          path: 'turno',
+          populate: { path: 'motorista', select: 'nome' }
+        }
+      });
+
+    if (!fatura) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Fatura ainda não emitida para esta viagem." 
+      });
+    }
+
+    const numeroFormatado = `N4R-${fatura.ano}/${String(fatura.n_sequencial).padStart(3, '0')}`;
+
+    res.status(200).json({
+      success: true,
+      fatura: {
+        ...fatura._doc,
+        numeroFormatado 
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 //RIA21 : As faturas emitidas num dado ano vão do número 1 em diante.
 async function gerarProximoNumeroSequencial() {
   const anoAtual = new Date().getFullYear();
