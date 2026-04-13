@@ -20,6 +20,7 @@ export default function MotoristaHistorico() {
   const [historico, setHistorico] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
       const storedUser = localStorage.getItem('user_logado');
@@ -82,18 +83,68 @@ export default function MotoristaHistorico() {
     <div className="mhist-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mhist-overlay" />
 
-      {/* Navbar */}
-      <nav className="mhist-navbar">
-        <span className="mhist-logo" onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>Need4Rides</span>
-        <ul className="mhist-nav-links">
-          <li><a onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>Dashboard</a></li>
-          <li><a onClick={() => navigate('/motorista/reabastecimento')} style={{ cursor: 'pointer' }}>Registar Reabastecimento</a></li>
-          <li><a className="active">Histórico</a></li>
-          <li><a onClick={() => navigate('/motorista/suporte')} style={{ cursor: 'pointer' }}>Suporte</a></li>
-          <li><a onClick={() => navigate('/motorista/viagem')} style={{ cursor: 'pointer' }}>Viagem</a></li>
-          <li><AvatarDropdown profilePath="/motorista/perfil" avatarClass="mhist-avatar" /></li>
-        </ul>
-      </nav>
+     <nav className="mh-navbar">
+       <span className="mh-logo">Need4Rides</span>
+     
+       {/* BOTÃO HAMBURGUER */}
+       <div 
+         className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
+         onClick={() => setMenuOpen(!menuOpen)}
+       >
+         <span></span>
+         <span></span>
+         <span></span>
+       </div>
+     
+       <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+         <li>
+           <a onClick={() => {
+             navigate('/motorista');
+             setMenuOpen(false);
+           }}>
+             Dashboard
+           </a>
+         </li>
+     
+         <li>
+          <a onClick={() => {
+             navigate('/motorista/reabastecimento');
+             setMenuOpen(false);
+           }}>
+           
+             Registar Reabastecimento
+           </a>
+         </li>
+     
+         <li>
+            <a className="active" onClick={() => setMenuOpen(false)}>
+             Histórico
+           </a>
+         </li>
+     
+         <li>
+           <a onClick={() => {
+             navigate('/motorista/suporte');
+             setMenuOpen(false);
+           }}>
+             Suporte
+           </a>
+         </li>
+     
+         <li>
+           <a onClick={() => {
+             navigate('/motorista/viagem');
+             setMenuOpen(false);
+           }}>
+             Viagem
+           </a>
+         </li>
+     
+         <li onClick={() => setMenuOpen(false)}>
+           <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+         </li>
+       </ul>
+     </nav>
 
       <div className="mhist-wrapper">
 

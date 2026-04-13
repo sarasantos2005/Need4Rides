@@ -15,9 +15,11 @@
 }
 
 /* ─── Navbar ────────────────────────────────────────────── */
-.mreab-navbar {
+.mh-navbar {
   position: fixed;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
@@ -28,23 +30,28 @@
   backdrop-filter: blur(10px);
 }
 
-.mreab-logo {
+.mh-logo {
   font-size: 1.4rem;
   font-weight: 700;
   color: #fff;
 }
 
-.mreab-nav-links {
+/* ─── Links desktop ─────────────────────────────────────── */
+.mh-nav-links {
   display: flex;
   align-items: center;
   gap: 2rem;
   list-style: none;
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
-.mreab-nav-links li { display: flex; align-items: center; }
+.mh-nav-links li {
+  display: flex;
+  align-items: center;
+}
 
-.mreab-nav-links a {
+.mh-nav-links a {
   color: #ddd;
   font-weight: 700;
   font-size: 0.95rem;
@@ -53,22 +60,55 @@
   transition: color 0.2s;
 }
 
-.mreab-nav-links a:hover,
-.mreab-nav-links a.active { color: #f5c518; }
+.mh-nav-links a:hover,
+.mh-nav-links a.active {
+  color: #f5c518;
+}
 
-.mreab-avatar {
-  width: 36px; height: 36px;
+/* ─── Avatar ────────────────────────────────────────────── */
+.mh-avatar {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #f5c518;
   cursor: pointer;
-  display: block;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.mreab-avatar:hover {
+.mh-avatar:hover {
   transform: scale(1.1);
   box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
+}
+
+/* ─── Hamburger ─────────────────────────────────────────── */
+.mh-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  z-index: 200;
+}
+
+.mh-hamburger span {
+  width: 25px;
+  height: 3px;
+  background: white;
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+/* animação X */
+.mh-hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.mh-hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.mh-hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
 }
 
 /* ─── Wrapper ───────────────────────────────────────────── */
@@ -97,13 +137,6 @@
   font-weight: 800;
   color: #e8d5a3;
   margin: 0 0 0.3rem;
-  letter-spacing: -0.5px;
-}
-
-.mreab-sub {
-  font-size: 0.88rem;
-  color: #666;
-  margin: 0;
 }
 
 .mreab-veiculo {
@@ -132,33 +165,16 @@
   border: 1px solid rgba(245, 197, 24, 0.25);
   border-radius: 4px;
   padding: 0.05rem 0.45rem;
-  letter-spacing: 0.5px;
 }
 
-.mreab-back-btn {
-  padding: 0.6rem 1.4rem;
-  border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.06);
-  color: #ccc;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  white-space: nowrap;
-}
-
-.mreab-back-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
-
-/* ─── Content (2 cols) ──────────────────────────────────── */
+/* ─── Content ───────────────────────────────────────────── */
 .mreab-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.4rem;
-  align-items: start;
 }
 
-/* ─── Shared card ───────────────────────────────────────── */
+/* ─── Cards ─────────────────────────────────────────────── */
 .mreab-card {
   background: rgba(18, 18, 26, 0.82);
   backdrop-filter: blur(18px);
@@ -173,8 +189,7 @@
   font-weight: 700;
   color: #888;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin: 0 0 1.4rem;
+  margin-bottom: 1.4rem;
 }
 
 /* ─── Form ──────────────────────────────────────────────── */
@@ -198,10 +213,8 @@
 
 .mreab-field label {
   font-size: 0.72rem;
-  font-weight: 600;
   color: #666;
   text-transform: uppercase;
-  letter-spacing: 0.7px;
 }
 
 .mreab-field input,
@@ -211,68 +224,10 @@
   border-radius: 12px;
   padding: 0.78rem 1rem;
   color: #f0f0f0;
-  font-size: 0.93rem;
   outline: none;
-  transition: border-color 0.2s, background 0.2s;
-  width: 100%;
-  box-sizing: border-box;
-  font-family: inherit;
 }
 
-.mreab-field input::placeholder,
-.mreab-field textarea::placeholder { color: #444; }
-
-.mreab-field input:focus,
-.mreab-field textarea:focus {
-  border-color: #f5a623;
-  background: rgba(255, 255, 255, 0.11);
-}
-
-.mreab-field textarea { resize: vertical; min-height: 80px; }
-
-/* input with unit suffix */
-.mreab-input-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.mreab-input-wrap input {
-  padding-right: 2.4rem;
-}
-
-.mreab-input-wrap input.has-left {
-  padding-left: 2.2rem;
-  padding-right: 1rem;
-}
-
-.mreab-unit {
-  position: absolute;
-  right: 0.9rem;
-  color: #666;
-  font-size: 0.85rem;
-  font-weight: 600;
-  pointer-events: none;
-}
-
-.mreab-unit.left {
-  right: auto;
-  left: 0.9rem;
-}
-
-/* ─── Calc hint ─────────────────────────────────────────── */
-.mreab-calc {
-  font-size: 0.8rem;
-  color: #888;
-  background: rgba(245, 166, 35, 0.08);
-  border: 1px solid rgba(245, 197, 24, 0.15);
-  border-radius: 10px;
-  padding: 0.5rem 0.9rem;
-}
-
-.mreab-calc strong { color: #f5c518; }
-
-/* ─── Submit ────────────────────────────────────────────── */
+/* ─── Button ────────────────────────────────────────────── */
 .mreab-btn-submit {
   width: 100%;
   padding: 0.88rem;
@@ -280,55 +235,15 @@
   border: none;
   background: linear-gradient(135deg, #f5a623, #f5c518);
   color: #111;
-  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  margin-top: 0.3rem;
-  transition: transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 4px 18px rgba(245, 166, 35, 0.4);
-}
-
-.mreab-btn-submit:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(245, 166, 35, 0.55);
 }
 
 .mreab-btn-submit:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
+  opacity: 0.4;
 }
 
-/* ─── Success ───────────────────────────────────────────── */
-.mreab-success {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.8rem;
-  padding: 2rem 0;
-  text-align: center;
-}
-
-.mreab-success-icon {
-  width: 56px; height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f5a623, #f5c518);
-  color: #111;
-  font-size: 1.6rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 18px rgba(245, 166, 35, 0.45);
-}
-
-.mreab-success p {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #f0f0f0;
-  margin: 0;
-}
-
-/* ─── Histórico reab ────────────────────────────────────── */
+/* ─── Histórico ─────────────────────────────────────────── */
 .mreab-hist-list {
   display: flex;
   flex-direction: column;
@@ -336,23 +251,12 @@
 
 .mreab-hist-row {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 1rem;
   padding: 0.9rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.mreab-hist-row:last-child { border-bottom: none; }
-
-.mreab-hist-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
 .mreab-hist-posto {
-  font-size: 0.88rem;
   font-weight: 600;
   color: #e0e0e0;
 }
@@ -362,35 +266,47 @@
   color: #666;
 }
 
-.mreab-hist-values {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  flex-shrink: 0;
-}
-
-.mreab-hist-litros {
-  font-size: 0.85rem;
-  color: #888;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.18rem 0.7rem;
-  border-radius: 50px;
-}
-
 .mreab-hist-valor {
-  font-size: 1rem;
-  font-weight: 800;
   color: #f5c518;
+  font-weight: 800;
 }
 
-/* ─── Responsive ────────────────────────────────────────── */
-@media (max-width: 760px) {
-  .mreab-content { grid-template-columns: 1fr; }
-  .mreab-form-row { grid-template-columns: 1fr; }
+/* ─── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 1060px) {
+  .mreab-content {
+    grid-template-columns: 1fr;
+  }
+
+  .mreab-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .mh-hamburger {
+    display: flex;
+  }
+
+  .mh-nav-links {
+    position: absolute;
+    top: 64px;
+    right: 0;
+    flex-direction: column;
+    background: rgba(10, 10, 10, 0.95);
+    width: 220px;
+    padding: 1rem;
+    display: none;
+  }
+
+  .mh-nav-links.active {
+    display: flex;
+  }
 }
 
 @media (max-width: 560px) {
-  .mreab-navbar { padding: 0 1.2rem; }
-  .mreab-wrapper { padding: 76px 1rem 2rem; }
-  .mreab-title { font-size: 1.5rem; }
+  .mreab-wrapper {
+    padding: 76px 1rem 2rem;
+  }
+
+  .mreab-title {
+    font-size: 1.5rem;
+  }
 }

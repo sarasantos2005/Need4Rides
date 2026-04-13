@@ -15,6 +15,7 @@ export default function MotoristaReabastecimento() {
   const [form, setForm] = useState({ litros: '', valor: '', data: '', hora: '', posto: '', obs: '' });
   const [submitted, setSubmitted] = useState(false);
   const [historico, setHistorico] = useState(mockHistReab);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -42,18 +43,67 @@ export default function MotoristaReabastecimento() {
     <div className="mreab-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mreab-overlay" />
 
-      {/* Navbar */}
-      <nav className="mreab-navbar">
-        <span className="mreab-logo" onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>Need4Rides</span>
-        <ul className="mreab-nav-links">
-          <li><a onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>Dashboard</a></li>
-          <li><a className="active">Registar Reabastecimento</a></li>
-          <li><a onClick={() => navigate('/motorista/historico')} style={{ cursor: 'pointer' }}>Histórico</a></li>
-          <li><a onClick={() => navigate('/motorista/suporte')} style={{ cursor: 'pointer' }}>Suporte</a></li>
-          <li><a onClick={() => navigate('/motorista/viagem')} style={{ cursor: 'pointer' }}>Viagem</a></li>
-          <li><AvatarDropdown profilePath="/motorista/perfil" avatarClass="mreab-avatar" /></li>
-        </ul>
-      </nav>
+     <nav className="mh-navbar">
+  <span className="mh-logo">Need4Rides</span>
+
+  {/* BOTÃO HAMBURGUER */}
+  <div 
+    className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
+    onClick={() => setMenuOpen(!menuOpen)}
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+    <li>
+      <a onClick={() => {
+        navigate('/motorista');
+        setMenuOpen(false);
+      }}>
+        Dashboard
+      </a>
+    </li>
+
+    <li>
+      <a className="active" onClick={() => setMenuOpen(false)}>
+        Registar Reabastecimento
+      </a>
+    </li>
+
+    <li>
+      <a onClick={() => {
+        navigate('/motorista/historico');
+        setMenuOpen(false);
+      }}>
+        Histórico
+      </a>
+    </li>
+
+    <li>
+      <a onClick={() => {
+        navigate('/motorista/suporte');
+        setMenuOpen(false);
+      }}>
+        Suporte
+      </a>
+    </li>
+
+    <li>
+      <a onClick={() => {
+        navigate('/motorista/viagem');
+        setMenuOpen(false);
+      }}>
+        Viagem
+      </a>
+    </li>
+
+    <li onClick={() => setMenuOpen(false)}>
+      <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+    </li>
+  </ul>
+</nav>
 
       <div className="mreab-wrapper">
 

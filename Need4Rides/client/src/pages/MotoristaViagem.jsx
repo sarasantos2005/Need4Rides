@@ -25,7 +25,7 @@ export default function MotoristaViagem() {
   const [estado, setEstado] = useState('pendente'); // 'pendente' | 'em_curso'
   const [segundos, setSegundos] = useState(0);
   const intervalRef = useRef(null);
-
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => () => clearInterval(intervalRef.current), []);
 
   function iniciarViagem() {
@@ -42,18 +42,68 @@ export default function MotoristaViagem() {
     <div className="mvg-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mvg-overlay" />
 
-      {/* Navbar */}
-      <nav className="mvg-navbar">
-        <span className="mvg-logo" onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>Need4Rides</span>
-        <ul className="mvg-nav-links">
-          <li><a onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>Dashboard</a></li>
-          <li><a onClick={() => navigate('/motorista/reabastecimento')} style={{ cursor: 'pointer' }}>Registar Reabastecimento</a></li>
-          <li><a onClick={() => navigate('/motorista/historico')} style={{ cursor: 'pointer' }}>Histórico</a></li>
-          <li><a onClick={() => navigate('/motorista/suporte')} style={{ cursor: 'pointer' }}>Suporte</a></li>
-          <li><a className="active">Viagem</a></li>
-          <li><AvatarDropdown profilePath="/motorista/perfil" avatarClass="mvg-avatar" /></li>
-        </ul>
-      </nav>
+      <nav className="mh-navbar">
+                   <span className="mh-logo">Need4Rides</span>
+                 
+                   {/* BOTÃO HAMBURGUER */}
+                   <div 
+                     className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
+                     onClick={() => setMenuOpen(!menuOpen)}
+                   >
+                     <span></span>
+                     <span></span>
+                     <span></span>
+                   </div>
+                 
+                   <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+                     <li>
+                       <a onClick={() => {
+                         navigate('/motorista');
+                         setMenuOpen(false);
+                       }}>
+                         Dashboard
+                       </a>
+                     </li>
+                 
+                     <li>
+                      <a onClick={() => {
+                         navigate('/motorista/reabastecimento');
+                         setMenuOpen(false);
+                       }}>
+                       
+                         Registar Reabastecimento
+                       </a>
+                     </li>
+                 
+                     <li>
+                       <a onClick={() => {
+                         navigate('/motorista/historico');
+                         setMenuOpen(false);
+                       }}>
+                         Histórico
+                       </a>
+                     </li>
+                 
+                     <li>
+                       <a onClick={() => {
+                         navigate('/motorista/suporte');
+                         setMenuOpen(false);
+                       }}>
+                         Suporte
+                       </a>
+                     </li>
+                
+                     <li>
+                       <a className="active" onClick={() => setMenuOpen(false)}>
+                         Viagem
+                       </a>
+                     </li>
+                 
+                     <li onClick={() => setMenuOpen(false)}>
+                       <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+                     </li>
+                   </ul>
+                 </nav>
 
       <div className="mvg-wrapper">
 

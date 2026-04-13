@@ -25,6 +25,7 @@ export default function MotoristaHome() {
   const [historico, setHistorico] = useState([]);
   const [turnoAtivo, setTurnoAtivo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [emTurno, setEmTurno] = useState(true);
   const [agora, setAgora] = useState(minutosAgora());
@@ -260,20 +261,30 @@ export default function MotoristaHome() {
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mh-overlay" />
 
-      {/* Navbar */}
       <nav className="mh-navbar">
-        <span className="mh-logo">Need4Rides</span>
-        <ul className="mh-nav-links">
-          <li><a className="active">Dashboard</a></li>
-          <li><a onClick={() => navigate('/motorista/reabastecimento')} style={{ cursor: 'pointer' }}>Registar Reabastecimento</a></li>
-          <li><a onClick={() => navigate('/motorista/historico')} style={{ cursor: 'pointer' }}>Histórico</a></li>
-          <li><a onClick={() => navigate('/motorista/suporte')} style={{ cursor: 'pointer' }}>Suporte</a></li>
-          <li><a onClick={() => navigate('/motorista/viagem')} style={{ cursor: 'pointer' }}>Viagem</a></li>
-          <li>
-            <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
-          </li>
-        </ul>
-      </nav>
+  <span className="mh-logo">Need4Rides</span>
+
+  {/* BOTÃO HAMBURGUER */}
+  <div 
+    className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
+    onClick={() => setMenuOpen(!menuOpen)}
+  >
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+    <li><a className="active">Dashboard</a></li>
+    <li><a onClick={() => navigate('/motorista/reabastecimento')}>Registar Reabastecimento</a></li>
+    <li><a onClick={() => navigate('/motorista/historico')}>Histórico</a></li>
+    <li><a onClick={() => navigate('/motorista/suporte')}>Suporte</a></li>
+    <li><a onClick={() => navigate('/motorista/viagem')}>Viagem</a></li>
+    <li>
+      <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+    </li>
+  </ul>
+</nav>
 
       <div className="mh-wrapper">
 

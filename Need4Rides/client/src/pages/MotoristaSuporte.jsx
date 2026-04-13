@@ -164,7 +164,7 @@ export default function MotoristaSuporte() {
   const navigate = useNavigate();
   const [topico, setTopico] = useState(null);
   const [query, setQuery] = useState('');
-
+  const [menuOpen, setMenuOpen] = useState(false);
   const topicoAtivo = TOPICOS.find(t => t.id === topico);
 
   const topicosFiltrados = query.trim()
@@ -181,18 +181,68 @@ export default function MotoristaSuporte() {
     <div className="ms-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="ms-overlay" />
 
-      {/* Navbar */}
-      <nav className="ms-navbar">
-        <span className="ms-logo" onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>Need4Rides</span>
-        <ul className="ms-nav-links">
-          <li><a onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>Dashboard</a></li>
-          <li><a onClick={() => navigate('/motorista/reabastecimento')} style={{ cursor: 'pointer' }}>Registar Reabastecimento</a></li>
-          <li><a onClick={() => navigate('/motorista/historico')} style={{ cursor: 'pointer' }}>Histórico</a></li>
-          <li><a className="active">Suporte</a></li>
-          <li><a onClick={() => navigate('/motorista/viagem')} style={{ cursor: 'pointer' }}>Viagem</a></li>
-          <li><AvatarDropdown profilePath="/motorista/perfil" avatarClass="ms-avatar" /></li>
-        </ul>
-      </nav>
+       <nav className="mh-navbar">
+             <span className="mh-logo">Need4Rides</span>
+           
+             {/* BOTÃO HAMBURGUER */}
+             <div 
+               className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
+               onClick={() => setMenuOpen(!menuOpen)}
+             >
+               <span></span>
+               <span></span>
+               <span></span>
+             </div>
+           
+             <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+               <li>
+                 <a onClick={() => {
+                   navigate('/motorista');
+                   setMenuOpen(false);
+                 }}>
+                   Dashboard
+                 </a>
+               </li>
+           
+               <li>
+                <a onClick={() => {
+                   navigate('/motorista/reabastecimento');
+                   setMenuOpen(false);
+                 }}>
+                 
+                   Registar Reabastecimento
+                 </a>
+               </li>
+           
+               <li>
+                 <a onClick={() => {
+                   navigate('/motorista/historico');
+                   setMenuOpen(false);
+                 }}>
+                   Histórico
+                 </a>
+               </li>
+           
+               <li>
+                 <a className="active" onClick={() => setMenuOpen(false)}>
+                   Suporte
+                 </a>
+               </li>
+           
+               <li>
+                 <a onClick={() => {
+                   navigate('/motorista/viagem');
+                   setMenuOpen(false);
+                 }}>
+                   Viagem
+                 </a>
+               </li>
+           
+               <li onClick={() => setMenuOpen(false)}>
+                 <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+               </li>
+             </ul>
+           </nav>
 
       <div className="ms-wrapper">
 
