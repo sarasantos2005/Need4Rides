@@ -5,7 +5,7 @@ import '../css/Login.css';
 
 function IconUser() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
     </svg>
@@ -14,7 +14,7 @@ function IconUser() {
 
 function IconLock() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
@@ -23,7 +23,7 @@ function IconLock() {
 
 function IconMail() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
       <polyline points="22,6 12,13 2,6" />
     </svg>
@@ -32,12 +32,14 @@ function IconMail() {
 
 export default function Login() {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const [mode, setMode] = useState(location.state?.mode || 'login');
   const [role, setRole] = useState('Cliente');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [erro, setErro] = useState('');
-  const navigate = useNavigate();
+
   const [regData, setRegData] = useState({
     tipo: 'Cliente',
     email: '',
@@ -45,37 +47,41 @@ export default function Login() {
     genero: '',
     nif: '',
     password: '',
-    ano_nascimento: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    ano_nascimento: ''
   });
+
+  useEffect(() => {
+    if (location.state?.mode) setMode(location.state.mode);
+  }, [location.state]);
+
+  const switchTo = (m) => {
+    setMode(m);
+    setErro('');
+  };
 
   const handleRegChange = (e) => {
     setRegData({ ...regData, [e.target.name]: e.target.value });
   };
 
-  useEffect(() => {
-    if (location.state?.mode) {
-      setMode(location.state.mode);
-    }
-  }, [location.state]);
-
-  const switchTo = (newMode) => { setMode(newMode); setErro(''); };
-
   const handleLogin = async (e) => {
     e.preventDefault();
     setErro('');
-    const body = { role, nif: identifier, senha_acesso_web: password };
 
     try {
       const res = await fetch('http://localhost:3000/api/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          role,
+          nif: identifier,
+          senha_acesso_web: password
+        }),
       });
-      const data = await res.json();
-      if (!res.ok) { setErro(data.message); return; }
 
-      //Guardar o login no localstorage
+      const data = await res.json();
+      if (!res.ok) return setErro(data.message);
+
       localStorage.setItem('token', data.token);
       localStorage.setItem('user_logado', JSON.stringify(data.user));
 
@@ -90,32 +96,30 @@ export default function Login() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setErro('');
-    
+
     if (regData.password !== regData.confirmPassword) {
       setErro('As passwords não coincidem!');
       return;
-    }
-
-    const body = {
-      tipo: 'Cliente',
-      email: regData.email,
-      nome: regData.nome,
-      genero: regData.genero === 'masculino' ? 'M' : 'F',
-      nif: regData.nif,
-      senha_acesso_web: regData.password,
-      ano_nascimento: new Date(regData.ano_nascimento).getFullYear(),
     }
 
     try {
       const res = await fetch('http://localhost:3000/api/user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          tipo: 'Cliente',
+          email: regData.email,
+          nome: regData.nome,
+          genero: regData.genero === 'masculino' ? 'M' : 'F',
+          nif: regData.nif,
+          senha_acesso_web: regData.password,
+          ano_nascimento: new Date(regData.ano_nascimento).getFullYear(),
+        }),
       });
-      const data = await res.json();
-      if (!res.ok) { setErro(data.message); return; }
 
-      //Guardar o login no localstorage
+      const data = await res.json();
+      if (!res.ok) return setErro(data.message);
+
       localStorage.setItem('token', data.token);
       localStorage.setItem('user_logado', JSON.stringify(data.user));
 
@@ -134,103 +138,130 @@ export default function Login() {
       <div className="lp-card">
 
         {mode === 'login' ? (
-          <div className="lp-form" key="login">
+          <div className="lp-form">
+
             <h1 className="lp-title">Login</h1>
 
-            {/* Selector de perfil */}
             <div className="lp-tabs">
               {['Cliente', 'Motorista', 'Gestor'].map((r) => (
                 <button
                   key={r}
                   type="button"
                   className={`lp-tab ${role === r ? 'active' : ''}`}
-                  onClick={() => { setRole(r); setIdentifier(''); setErro(''); }}
+                  onClick={() => { setRole(r); setIdentifier(''); }}
                 >
-                  {r.charAt(0).toUpperCase() + r.slice(1)}
+                  {r}
                 </button>
               ))}
             </div>
 
             <form onSubmit={handleLogin} style={{ display: 'contents' }}>
-              
-              <div className="lp-input-wrap">
-                <input type="text" placeholder="NIF" className="lp-input" maxLength={9}
-                  value={identifier} onChange={e => setIdentifier(e.target.value)} />
-                <span className="lp-icon"><IconUser /></span>
+
+              <div className="lp-field">
+                <span className="lp-label">NIF</span>
+                <div className="lp-input-wrap">
+                  <input
+                    className="lp-input"
+                    value={identifier}
+                    onChange={e => setIdentifier(e.target.value)}
+                    maxLength={9}
+                  />
+                  <span className="lp-icon"><IconUser /></span>
+                </div>
               </div>
 
-              <div className="lp-input-wrap">
-                <input type="password" placeholder="Password" className="lp-input"
-                  value={password} onChange={e => setPassword(e.target.value)} />
-                <span className="lp-icon"><IconLock /></span>
+              <div className="lp-field">
+                <span className="lp-label">Password</span>
+                <div className="lp-input-wrap">
+                  <input
+                    type="password"
+                    className="lp-input"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                  />
+                  <span className="lp-icon"><IconLock /></span>
+                </div>
               </div>
 
               {erro && <p className="lp-error">{erro}</p>}
 
-              <div className="lp-row">
-                <label className="lp-remember">
-                  <input type="checkbox" />
-                  <span>Lembrar-me</span>
-                </label>
-                <a href="#" className="lp-forgot">Esqueci-me da password</a>
-              </div>
-
-              <button type="submit" className="lp-btn">Entrar</button>
+              <button className="lp-btn">Entrar</button>
             </form>
 
             {role === 'Cliente' && (
               <p className="lp-switch">
-                Não tens conta?{' '}
-                <span onClick={() => switchTo('register')}>Criar conta</span>
+                Não tens conta? <span onClick={() => switchTo('register')}>Criar conta</span>
               </p>
             )}
           </div>
         ) : (
-          <div className="lp-form" key="register">
+          <div className="lp-form">
+
             <h1 className="lp-title">Criar Conta</h1>
 
-            <div className="lp-input-wrap">
-              <input type="text" placeholder="Nome" name="nome" className="lp-input" value={regData.nome} onChange={handleRegChange}/>
-              <span className="lp-icon"><IconUser /></span>
+            <div className="lp-field">
+              <span className="lp-label">Nome</span>
+              <div className="lp-input-wrap">
+                <input name="nome" className="lp-input" value={regData.nome} onChange={handleRegChange} />
+                <span className="lp-icon"><IconUser /></span>
+              </div>
             </div>
 
-            <div className="lp-input-wrap">
-              <input type="email" placeholder="Email" name="email" className="lp-input" value={regData.email} onChange={handleRegChange}/>
-              <span className="lp-icon"><IconMail /></span>
+            <div className="lp-field">
+              <span className="lp-label">Email</span>
+              <div className="lp-input-wrap">
+                <input name="email" type="email" className="lp-input" value={regData.email} onChange={handleRegChange} />
+                <span className="lp-icon"><IconMail /></span>
+              </div>
             </div>
 
-            <div className="lp-input-wrap">
-              <input type="password" placeholder="Password" name="password" className="lp-input" value={regData.password} onChange={handleRegChange}/>
-              <span className="lp-icon"><IconLock /></span>
+            <div className="lp-field">
+              <span className="lp-label">Password</span>
+              <div className="lp-input-wrap">
+                <input name="password" type="password" className="lp-input" value={regData.password} onChange={handleRegChange} />
+                <span className="lp-icon"><IconLock /></span>
+              </div>
             </div>
 
-            <div className="lp-input-wrap">
-              <input type="password" placeholder="Confirmar Password" name="confirmPassword" className="lp-input" value={regData.confirmPassword} onChange={handleRegChange}/>
-              <span className="lp-icon"><IconLock /></span>
+            <div className="lp-field">
+              <span className="lp-label">Confirmar</span>
+              <div className="lp-input-wrap">
+                <input name="confirmPassword" type="password" className="lp-input" value={regData.confirmPassword} onChange={handleRegChange} />
+                <span className="lp-icon"><IconLock /></span>
+              </div>
             </div>
 
-            <div className="lp-input-wrap">
-              <input type="date" placeholder="Data de Nascimento" className="lp-input" name="ano_nascimento" value={regData.ano_nascimento} onChange={handleRegChange}/>
+            <div className="lp-field">
+              <span className="lp-label">Nascimento</span>
+              <div className="lp-input-wrap">
+                <input name="ano_nascimento" type="date" className="lp-input" value={regData.ano_nascimento} onChange={handleRegChange} />
+              </div>
             </div>
 
-            <div className="lp-input-wrap">
-              <input type="text" placeholder="NIF" className="lp-input" name="nif" maxLength={9}  minLength={9} value={regData.nif} onChange={handleRegChange}/>
+            <div className="lp-field">
+              <span className="lp-label">NIF</span>
+              <div className="lp-input-wrap">
+                <input name="nif" className="lp-input" maxLength={9} value={regData.nif} onChange={handleRegChange} />
+              </div>
             </div>
 
-            <div className="lp-input-wrap">
-              <select className="lp-input lp-select" name="genero" defaultValue="" value={regData.genero} onChange={handleRegChange}>
-                <option value="" disabled>Género</option>
-                <option value="masculino">Masculino</option>
-                <option value="feminino">Feminino</option>
-              </select>
+            <div className="lp-field">
+              <span className="lp-label">Género</span>
+              <div className="lp-input-wrap">
+                <select name="genero" className="lp-input lp-select" value={regData.genero} onChange={handleRegChange}>
+                  <option value="">Selecionar</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="feminino">Feminino</option>
+                </select>
+              </div>
             </div>
 
             <button className="lp-btn" onClick={handleRegister}>Registar</button>
 
             <p className="lp-switch">
-              Já tens conta?{' '}
-              <span onClick={() => switchTo('login')}>Login</span>
+              Já tens conta? <span onClick={() => switchTo('login')}>Login</span>
             </p>
+
           </div>
         )}
 

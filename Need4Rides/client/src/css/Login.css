@@ -288,3 +288,62 @@
     font-size: 1.7rem;
   }
 }
+
+.lp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* 🔥 NOVO: linha label + input alinhados */
+.lp-field {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* 🔥 LABEL fixo alinhado */
+.lp-label {
+  width: 70px;
+  text-align: right;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* 🔥 input ocupa sempre o mesmo espaço */
+.lp-input-wrap {
+  position: relative;
+  flex: 1;
+  width: 100%;
+}
+
+/* 🔥 garante inputs todos alinhados igual */
+.lp-input {
+  width: 100%;
+  height: 42px;
+  padding: 0.85rem 3rem 0.85rem 1.2rem;
+  border-radius: 50px;
+  border: 1px solid rgba(245, 197, 24, 0.35);
+  background: rgba(245, 166, 35, 0.1);
+  color: #fff;
+  font-size: 0.93rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* select igual altura dos inputs */
+.lp-select {
+  height: 42px;
+  appearance: none;
+}
+
+/* ícone sempre alinhado */
+.lp-icon {
+  position: absolute;
+  right: 1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
