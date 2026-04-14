@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/GestorRegistarMotorista.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import '../css/MotoristaHome.css'; 
 
 export default function GestorRegistarMotorista() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function GestorRegistarMotorista() {
     codigoPostal: '',
   });
   const [sucesso, setSucesso] = useState(false);
-
+  const [menuOpen, setMenuOpen] = useState(false);
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = e => {
@@ -30,19 +31,41 @@ export default function GestorRegistarMotorista() {
     <div className="grm-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="grm-overlay" />
 
-      {/* Navbar */}
-      <nav className="gh-navbar">
-        <span className="gh-logo">Need4Rides</span>
-        <ul className="gh-nav-links">
-          <li><a style={{ cursor: 'pointer' }} onClick={() => navigate('/gestor')}>Dashboard</a></li>
-          <li><a style={{ cursor: 'pointer' }} onClick={() => navigate('/gestor/motoristas')}>Motoristas</a></li>
-          <li><a style={{ cursor: 'pointer' }} onClick={() => navigate('/gestor/taxis')}>Táxis</a></li>
-          <li><a className="active" style={{ cursor: 'pointer' }} onClick={() => navigate('/gestor/registar-motorista')}>Registar Motorista</a></li>
-          <li>
-            <AvatarDropdown profilePath="/gestor" avatarClass="gh-avatar" />
-          </li>
-        </ul>
-      </nav>
+       {/* NAVBAR  */}
+            <nav className="mh-navbar">
+              <span className="mh-logo">Need4Rides</span>
+      
+              <div
+                className={`mh-hamburger ${menuOpen ? 'open' : ''}`}
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+      
+              <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+                <li>
+                  <a onClick={() => navigate('/gestor')}>Dashboard</a>
+                </li>
+      
+                <li>
+                  <a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a>
+                </li>
+      
+                <li>
+                  <a onClick={() => navigate('/gestor/taxis')}>Táxis</a>
+                </li>
+      
+                <li>
+                  <a className="active" onClick={() => navigate('/gestor/registar-motorista')}>Registar Motorista</a>
+                </li>
+      
+                <li>
+                  <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+                </li>
+              </ul>
+            </nav>
 
       <div className="grm-wrapper">
         <div className="grm-card">
