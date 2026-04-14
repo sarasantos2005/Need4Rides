@@ -305,7 +305,7 @@
 
 .mvg-map-label {
   font-size: 0.78rem;
-  color: #555;
+  color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
@@ -394,4 +394,146 @@
   .mreab-title {
     font-size: 1.5rem;
   }
+}
+
+
+/* ─── LIGHT MODE ───────────────────────────────────────── */
+
+/* fundo geral */
+body.claro .mvg-page {
+  color: #111;
+}
+
+/* navbar */
+body.claro .mvg-navbar {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.claro .mvg-logo {
+  color: #111;
+}
+
+body.claro .mvg-nav-links a {
+  color: #444;
+}
+
+body.claro .mvg-nav-links a:hover,
+body.claro .mvg-nav-links a.active {
+  color: #f5c518;
+}
+
+/* wrapper */
+body.claro .mvg-wrapper {
+  color: #111;
+}
+
+/* títulos */
+body.claro .mvg-title {
+  color: #b08900;
+}
+
+/* status pill */
+body.claro .mvg-status-pill.pendente {
+  color: #e9e9e9;
+}
+
+body.claro .mvg-status-pill.em_curso {
+  background: rgba(67, 233, 123, 0.15);
+  border: 1px solid rgba(67, 233, 123, 0.35);
+  color: #1a7f3c;
+}
+
+/* cards */
+body.claro .mvg-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #111;
+}
+
+/* textos dentro dos cards */
+body.claro .mvg-card-title {
+  color: #111;
+}
+
+body.claro .mvg-point-name {
+  color: #111;
+}
+
+body.claro .mvg-point-label {
+  color: #666;
+}
+
+/* meta info */
+body.claro .mvg-meta-label {
+  color: #777;
+}
+
+body.claro .mvg-meta-val {
+  color: #222;
+}
+
+body.claro .mvg-meta-val.accent {
+  color: #b08900;
+}
+
+/* timer */
+body.claro .mvg-header-timer {
+  background: rgba(67, 233, 123, 0.12);
+  border: 1px solid rgba(67, 233, 123, 0.3);
+}
+
+body.claro .mvg-header-timer-label {
+  color: #333;
+}
+
+body.claro .mvg-header-timer-val {
+  color: #1a7f3c;
+}
+
+/* botões */
+body.claro .mvg-btn.start {
+  background: #f5c518;
+  color: #111;
+}
+
+body.claro .mvg-btn.end {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: #fff;
+}
+
+/* mapa */
+body.claro .mvg-map-placeholder {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px dashed rgba(245, 197, 24, 0.35);
+}
+
+body.claro .mvg-map-placeholder-title {
+  color: #111;
+}
+
+body.claro .mvg-map-placeholder-sub {
+  color: #666;
+}
+
+/* dots da rota */
+body.claro .mvg-route-line {
+  opacity: 0.6;
+}
+
+body.claro .av-item {
+  color: #ddd;
+}
+
+body.claro .av-item-logout {
+  color: #ff6b6b;
+}
+
+body.claro .mvg-sub{
+  color:#e9e9e9;
+}
+
+body.claro .mvg-map-label {
+  color: #ffffff;
 }

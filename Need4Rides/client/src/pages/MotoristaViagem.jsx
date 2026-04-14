@@ -26,6 +26,21 @@ export default function MotoristaViagem() {
   const [segundos, setSegundos] = useState(0);
   const intervalRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  /*Tema */
+  const [tema, setTema] = useState(() => {
+    return localStorage.getItem('tema') || 'escuro';
+  });
+
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+
+  const alternarTema = () => {
+    setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
+  };
+
   useEffect(() => () => clearInterval(intervalRef.current), []);
 
   function iniciarViagem() {
@@ -46,64 +61,34 @@ export default function MotoristaViagem() {
                    <span className="mh-logo">Need4Rides</span>
                  
                    {/* BOTÃO HAMBURGUER */}
-                   <div 
-                     className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
-                     onClick={() => setMenuOpen(!menuOpen)}
-                   >
-                     <span></span>
-                     <span></span>
-                     <span></span>
-                   </div>
-                 
-                   <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
-                     <li>
-                       <a onClick={() => {
-                         navigate('/motorista');
-                         setMenuOpen(false);
-                       }}>
-                         Dashboard
-                       </a>
-                     </li>
-                 
-                     <li>
-                      <a onClick={() => {
-                         navigate('/motorista/reabastecimento');
-                         setMenuOpen(false);
-                       }}>
-                       
-                         Registar Reabastecimento
-                       </a>
-                     </li>
-                 
-                     <li>
-                       <a onClick={() => {
-                         navigate('/motorista/historico');
-                         setMenuOpen(false);
-                       }}>
-                         Histórico
-                       </a>
-                     </li>
-                 
-                     <li>
-                       <a onClick={() => {
-                         navigate('/motorista/suporte');
-                         setMenuOpen(false);
-                       }}>
-                         Suporte
-                       </a>
-                     </li>
-                
-                     <li>
-                       <a className="active" onClick={() => setMenuOpen(false)}>
-                         Viagem
-                       </a>
-                     </li>
-                 
-                     <li>
-                        <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
-                      </li>
-                   </ul>
-                 </nav>
+                            <div 
+                              className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
+                              onClick={() => setMenuOpen(!menuOpen)}
+                            >
+                              <span></span>
+                              <span></span>
+                              <span></span>
+                            </div>
+                          
+                            <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+                              <li><a onClick={() => navigate('/motorista')}>Dashboard</a></li>
+                          
+                              <li><a onClick={() => navigate('/motorista/reabastecimento')}>Registar Reabastecimento</a></li>
+                              <li><a onClick={() => navigate('/motorista/historico')}>Histórico</a></li>
+                              <li><a onClick={() => navigate('/motorista/suporte')}>Suporte</a></li>
+                              <li><a className="active">Viagem</a></li>
+                          
+                              <li>
+                                <button className="mh-theme-btn" onClick={alternarTema}>
+                                  {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+                                </button>
+                              </li>
+                          
+                              <li>
+                                <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+                              </li>
+                            </ul>
+                          </nav>
 
       <div className="mvg-wrapper">
 
