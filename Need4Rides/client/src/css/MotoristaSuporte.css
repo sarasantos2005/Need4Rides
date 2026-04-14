@@ -102,7 +102,7 @@
 
 .ms-sub {
   font-size: 0.9rem;
-  color: #666;
+  color: #dadada;
   margin: 0;
 }
 
@@ -154,7 +154,7 @@
 .ms-search-clear {
   background: transparent;
   border: none;
-  color: #666;
+  color: #dadada;
   font-size: 0.85rem;
   cursor: pointer;
   transition: color 0.2s;
@@ -213,7 +213,7 @@
 
 .ms-topic-resumo {
   font-size: 0.8rem;
-  color: #666;
+  color: #dadada;
 }
 
 .ms-topic-arrow {
@@ -227,7 +227,7 @@
 .ms-empty {
   text-align: center;
   padding: 2.5rem 1rem;
-  color: #666;
+  color: #dadada;
 }
 
 .ms-empty p { font-size: 0.95rem; margin: 0 0 0.4rem; color: #888; }
@@ -331,7 +331,7 @@
 
 .ms-detalhe-resumo {
   font-size: 0.85rem;
-  color: #666;
+  color: #dadada;
   margin: 0;
 }
 

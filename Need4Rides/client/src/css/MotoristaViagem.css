@@ -102,7 +102,7 @@
 
 .mvg-sub {
   font-size: 0.9rem;
-  color: #666;
+  color: #dadada;
   margin: 0;
 }
 
@@ -200,7 +200,7 @@
 
 .mvg-point-label {
   font-size: 0.72rem;
-  color: #666;
+  color: #dadada;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }

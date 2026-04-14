@@ -229,7 +229,7 @@
 .mh-stat-label {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #666;
+  color: #dadada;
   text-transform: uppercase;
   letter-spacing: 0.7px;
 }
@@ -266,7 +266,7 @@
 .mh-car-label {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #666;
+  color: #dadada;
   text-transform: uppercase;
   letter-spacing: 0.6px;
 }
@@ -357,7 +357,7 @@
 
 .mh-turno-min-label {
   font-size: 0.65rem;
-  color: #666;
+  color: #dadada;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -591,7 +591,7 @@
   align-items: center;
   gap: 1rem;
   font-size: 0.8rem;
-  color: #666;
+  color: #dadada;
 }
 
 .mh-hist-status {

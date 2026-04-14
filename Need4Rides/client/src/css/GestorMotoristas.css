@@ -34,7 +34,7 @@
 
 .gm-subtitle {
   font-size: 0.85rem;
-  color: #666;
+  color: #dadada;
   margin: 0;
 }
 
@@ -78,7 +78,7 @@
   padding: 1rem 1.2rem;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #666;
+  color:#dadada;
   text-transform: uppercase;
   letter-spacing: 0.7px;
   white-space: nowrap;

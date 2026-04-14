@@ -102,7 +102,7 @@
 
 .mhist-sub {
   font-size: 0.88rem;
-  color: #666;
+  color:#dadada;
   margin: 0;
 }
 
@@ -144,7 +144,7 @@
 .mhist-stat-label {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #666;
+  color: #dadada;
   text-transform: uppercase;
   letter-spacing: 0.7px;
 }
@@ -232,7 +232,7 @@
   flex-wrap: wrap;
 }
 
-.mhist-date { font-size: 0.8rem; color: #666; }
+.mhist-date { font-size: 0.8rem; color: #dadada; }
 
 .mhist-detail {
   font-size: 0.78rem;
