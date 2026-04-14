@@ -2,20 +2,130 @@ import { useNavigate } from 'react-router-dom';
 import ddImg from '../assets/images/fennec.jpg';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Profile.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const mockViagens = [
-  { id: 1, from: 'Aeroporto de Lisboa', to: 'Baixa-Chiado',  date: '31 Mar 2026', time: '09:42', price: '€18.50', km: '14 km', passengers: 2 },
-  { id: 2, from: 'Parque das Nações',   to: 'Benfica',        date: '31 Mar 2026', time: '08:15', price: '€12.80', km: '9 km',  passengers: 1 },
-  { id: 3, from: 'Cascais',             to: 'Sintra',         date: '30 Mar 2026', time: '17:30', price: '€31.00', km: '22 km', passengers: 3 },
-];
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-geosearch/dist/geosearch.css';
+import L from 'leaflet';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+function SearchField({ onLocationSelected, searchText }) {
+    const map = useMap(); 
+    const searchControlRef = useRef(null);
+
+    useEffect(() => {
+        const provider = new OpenStreetMapProvider();
+        const searchControl = new GeoSearchControl({
+            provider,
+            style: "bar",
+            showMarker: false,
+            autoClose: true,
+            retainZoomLevel: false,
+        });
+
+        map.addControl(searchControl);
+        searchControlRef.current = searchControl;
+
+        map.on("geosearch/showlocation", (result) => {
+            onLocationSelected([result.location.y, result.location.x]);
+        });
+
+        return () => map.removeControl(searchControl);
+    }, [map, onLocationSelected]);
+
+    useEffect(() => {
+        if (searchText && searchControlRef.current) {
+            const input = document.querySelector('.glass'); 
+            if (input) {
+                input.value = searchText;
+            }
+        }
+    }, [searchText]);
+
+    return null;
+}
+
+function MapEventsHandler({ onMove }) {
+    useMapEvents({
+        click(e) {
+            onMove([e.latlng.lat, e.latlng.lng]);
+        },
+    });
+    return null;
+}
+
+function MapSelector({ coordsIniciais, moradaInicial, onConfirm, onClose }) {
+    const center = Array.isArray(coordsIniciais) && coordsIniciais.length === 2 
+        ? coordsIniciais 
+        : [38.7223, -9.1393];
+
+    const [position, setPosition] = useState(center);
+    const [addressText, setAddressText] = useState(moradaInicial || "");
+
+    const updateAddress = async (lat, lng) => {
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+            const data = await res.json();
+            setAddressText(data.display_name);
+        } catch (err) {
+            console.error("Erro no reverse geocoding");
+        }
+    };
+
+    return (
+        <div className="map-modal-overlay">
+            <div className="map-modal-content">
+                <div className="map-modal-header">
+                  <h3>Selecionar Localização</h3>
+                  <button className="map-close-btn" onClick={onClose}>&times;</button>
+                </div>
+
+                <div className="map-frame">
+                  <MapContainer 
+                    center={position} 
+                    zoom={13} 
+                    style={{ height: '400px', width: '100%' }}
+                  >
+                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                      <SearchField onLocationSelected={(coords) => {
+                            setPosition(coords);
+                            updateAddress(coords[0], coords[1]);
+                        }} 
+                        searchText={addressText} />
+                      <Marker position={position} />
+                      <MapEventsHandler onMove={(coords) => {
+                          setPosition(coords);
+                          updateAddress(coords[0], coords[1]);
+                      }} />
+                  </MapContainer>
+                </div>
+                
+                <div className="map-modal-actions">
+                  <button className="confirm-map-btn" onClick={() => onConfirm(position, addressText)}>
+                      Confirmar Localização
+                  </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 
 export default function MotoristaProfile() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [historico, setHistorico] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showMap, setShowMap] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -24,7 +134,8 @@ export default function MotoristaProfile() {
     ano_nascimento: '',
     n_carta_conducao: '',
     morada: '',
-    senha_acesso_web: ''
+    senha_acesso_web: '',
+    localizacao: ''
   });
 
   useEffect(() => {
@@ -71,7 +182,8 @@ export default function MotoristaProfile() {
         ano_nascimento: resUser.data.ano_nascimento || '',
         n_carta_conducao: resUser.data.motorista?.n_carta_conducao || '',
         morada: resUser.data.motorista?.morada?.texto || '',
-        senha_acesso_web: resUser.data.senha_acesso_web || ''
+        senha_acesso_web: resUser.data.senha_acesso_web || '',
+        localizacao: resUser.data.motorista?.morada?.localizacao?.coordinates ? [resUser.data.motorista.morada.localizacao.coordinates[1], resUser.data.motorista.morada.localizacao.coordinates[0]] : ''
       });
     } catch (err) {
       console.error("Erro ao carregar perfil:", err);
@@ -221,7 +333,10 @@ export default function MotoristaProfile() {
             </div>
             <div className="profile-field">
               <label>Morada</label>
-              <input type="text" name="morada" value={formData.morada} onChange={handleInputChange} />
+              <div className="lp-input-wrap" onClick={() => setShowMap(true)} style={{ cursor: 'pointer' }}>
+                <input type="text" className="lp-input" value={formData.morada} readOnly placeholder="Clique para selecionar no mapa"/>
+                <span className="lp-icon">📍</span>
+              </div>
             </div>
           </div>
 
@@ -268,6 +383,25 @@ export default function MotoristaProfile() {
         </div>
 
       </div>
+      {showMap && (
+        <MapSelector 
+          coordsIniciais={formData.localizacao}
+          moradaInicial={formData.morada} 
+          onClose={() => setShowMap(false)}
+          onConfirm={(coords, address) => {
+            try {
+              setFormData({
+                ...formData, 
+                morada: address, 
+                localizacao: [coords[0], coords[1]]
+              });
+              setShowMap(false);
+            } catch (err) {
+              alert("Erro ao obter morada.");
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

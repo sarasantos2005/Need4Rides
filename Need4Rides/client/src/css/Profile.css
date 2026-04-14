@@ -449,3 +449,89 @@ body.claro .trip-status {
   flex-shrink: 0;
   margin-left: auto;   /* <-- empurra sempre para a direita */
 }
+
+/* MAPAS */
+.map-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.map-modal-content {
+  background: #1e1e1e;
+  border-radius: 12px;
+  width: 600px;
+  max-width: 90vw;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 10000;
+}
+
+.map-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.map-modal-header h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 16px;
+}
+
+.map-close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.map-frame {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.confirm-map-btn {
+  background: #f5a623;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirm-map-btn:hover {
+  background: #e09510;
+}
+
+.leaflet-control-geosearch .results {
+  background: #fff;
+  color: #000;
+}
+
+.leaflet-control-geosearch .results > * {
+  color: #000 !important;
+  background: #fff;
+}
+
+.leaflet-control-geosearch .results > *:hover {
+  background: #f0f0f0;
+  color: #000 !important;
+}

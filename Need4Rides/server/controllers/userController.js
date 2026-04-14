@@ -269,12 +269,18 @@ exports.editarPerfil = async(req, res) => {
       if (updates.morada) {
         updateData["motorista.morada.texto"] = updates.morada;
       }
+
+      if(updates.localizacao){
+        const [lat, lng] = updates.localizacao.map(Number);
+        updateData["motorista.morada.localizacao.type"] = "Point";
+        updateData["motorista.morada.localizacao.coordinates"] = [lng, lat];
+      }
     }
 
     const userAtualizado = await User.findByIdAndUpdate(
       id,
       {$set: updateData},
-      {new: true, runValidators: true}
+      {returnDocument: 'after', runValidators: true}
     ).select("-senha_acesso_web");
 
     res.status(200).json({
@@ -283,9 +289,7 @@ exports.editarPerfil = async(req, res) => {
       user: userAtualizado
     });
 
-    res.status(200).json({ success: true, user: userAtualizado });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ success: false, message: "Erro ao atualizar." });
   }
 };
