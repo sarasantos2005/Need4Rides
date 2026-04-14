@@ -61,7 +61,6 @@ export default function MotoristaHome() {
         return;
       }
       try {
-        setLoading(true);
         
         const config = { headers: { Authorization: `Bearer ${token}` }, params: { lat: latitude, lng: longitude } };
         
@@ -260,7 +259,6 @@ export default function MotoristaHome() {
       const token = localStorage.getItem('token');
 
       try {
-          setLoading(true);
 
           await axios.post(`http://localhost:3000/api/fatura/emitir`, 
             { viagemId: viagemId },

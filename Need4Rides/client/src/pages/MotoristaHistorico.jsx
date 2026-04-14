@@ -59,6 +59,30 @@ export default function MotoristaHistorico() {
     }
   };
 
+  const gerarFatura = async(viagemId) => {
+    try {
+      const token = localStorage.getItem('token');
+
+      try {
+          setLoading(true);
+
+          await axios.post(`http://localhost:3000/api/fatura/emitir`, 
+            { viagemId: viagemId },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          alert("Fatura gerada com sucesso");
+          fetchDadosIniciais(token);
+        } catch (err) {
+          alert("Erro ao gerar fatura no servidor.");
+        } finally {
+          setLoading(false);
+        }
+    } catch (err) {
+      alert("Erro ao gerar fatura.");
+    }
+  }
+
   const viagensFiltradas = historico.filter(v => {
     if (filtro === 'todas') return true;
     const dataViagem = new Date(v.hora_inicial_viagem).toLocaleDateString('pt-PT', { 
@@ -195,17 +219,32 @@ export default function MotoristaHistorico() {
           <div className="mhist-list">
             {viagensFiltradas.map(v => (
               <div className="mhist-row" key={v.id}>
-                <div className="mhist-route">
-                  <span className="mhist-from">{v.morada_inicial_viagem.morada}</span>
-                  <span className="mhist-arrow">→</span>
-                  <span className="mhist-to">{v.morada_final_viagem.morada}</span>
+                <div className="mh-pedido-route">
+                  <div className="mh-pedido-point">
+                    <span className="mh-dot origin" />
+                    <span>{v.morada_inicial_viagem?.morada}</span>
+                  </div>
+                  <div className="mh-pedido-line" />
+                  <div className="mh-pedido-point">
+                    <span className="mh-dot dest" />
+                    <span>{v.morada_final_viagem?.morada}</span>
+                  </div>
                 </div>
                 <div className="mhist-meta">
                   <span className="mhist-date">{formatarDataHora(v.hora_inicial_viagem).data} às {formatarDataHora(v.hora_inicial_viagem).hora}</span>
                   <span className="mhist-detail">{v.km_percorridos} km</span>
                   <span className="mhist-detail">{v.n_passageiros} pax</span>
                   <span className="mhist-detail">{(new Date(v.hora_final_viagem) - new Date(v.hora_inicial_viagem)) / (1000 * 60)} min</span>
-                  <span className="mhist-status-badge">Concluída</span>
+                  {v.temFatura ? (
+                    <span className="mh-hist-status">Concluída</span>
+                    ) : (
+                      <button
+                        className="trip-invoice-btn"
+                        onClick={() => gerarFatura(v._id)}
+                      >
+                        Gerar Fatura
+                      </button>
+                    )}
                   <span className="mhist-price">{v.preco_viagem?.toFixed(2)}€</span>
                 </div>
               </div>
