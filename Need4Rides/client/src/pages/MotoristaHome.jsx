@@ -277,6 +277,21 @@ export default function MotoristaHome() {
     }
   }
 
+  /*Tema */
+  const [tema, setTema] = useState(() => {
+    return localStorage.getItem('tema') || 'escuro';
+  });
+
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+
+  const alternarTema = () => {
+    setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
+  };
+
+
   if (loading || !userData) return <div className="mh-loading">A carregar...</div>;
   return (
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -284,6 +299,8 @@ export default function MotoristaHome() {
 
       <nav className="mh-navbar">
   <span className="mh-logo">Need4Rides</span>
+
+  
 
   {/* BOTÃO HAMBURGUER */}
   <div 
@@ -297,10 +314,18 @@ export default function MotoristaHome() {
 
   <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
     <li><a className="active">Dashboard</a></li>
+
     <li><a onClick={() => navigate('/motorista/reabastecimento')}>Registar Reabastecimento</a></li>
     <li><a onClick={() => navigate('/motorista/historico')}>Histórico</a></li>
     <li><a onClick={() => navigate('/motorista/suporte')}>Suporte</a></li>
     <li><a onClick={() => navigate('/motorista/viagem')}>Viagem</a></li>
+
+    <li>
+      <button className="mh-theme-btn" onClick={alternarTema}>
+        {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+      </button>
+    </li>
+
     <li>
       <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
     </li>

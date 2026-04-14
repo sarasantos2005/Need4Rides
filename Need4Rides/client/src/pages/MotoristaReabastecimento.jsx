@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/MotoristaReabastecimento.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+
 
 const mockHistReab = [
   { id: 1, data: '28 Mar 2026', hora: '12:30', litros: 42, valor: '€63.00', posto: 'Galp — Marquês de Pombal' },
@@ -38,6 +39,19 @@ export default function MotoristaReabastecimento() {
   };
 
   const isValid = form.litros && form.valor && form.data;
+  /*Tema */
+    const [tema, setTema] = useState(() => {
+      return localStorage.getItem('tema') || 'escuro';
+    });
+  
+    useEffect(() => {
+      document.body.className = tema;
+      localStorage.setItem('tema', tema);
+    }, [tema]);
+  
+    const alternarTema = () => {
+      setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
+    };
 
   return (
     <div className="mreab-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -46,64 +60,33 @@ export default function MotoristaReabastecimento() {
      <nav className="mh-navbar">
   <span className="mh-logo">Need4Rides</span>
 
-  {/* BOTÃO HAMBURGUER */}
-  <div 
-    className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
-    onClick={() => setMenuOpen(!menuOpen)}
-  >
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
+ {/* BOTÃO HAMBURGUER */}
+   <div 
+     className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
+     onClick={() => setMenuOpen(!menuOpen)}
+   >
+     <span></span>
+     <span></span>
+     <span></span>
+   </div>
+ 
+   <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+     <li><a onClick={() => navigate('/motorista')}>Dashboard</a></li>
+     <li><a className="active">Registar Reabastecimento</a></li>
+     <li><a onClick={() => navigate('/motorista/historico')}>Histórico</a></li>
+     <li><a onClick={() => navigate('/motorista/suporte')}>Suporte</a></li>
+     <li><a onClick={() => navigate('/motorista/viagem')}>Viagem</a></li>
 
-  <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
-    <li>
-      <a onClick={() => {
-        navigate('/motorista');
-        setMenuOpen(false);
-      }}>
-        Dashboard
-      </a>
-    </li>
-
-    <li>
-      <a className="active" onClick={() => setMenuOpen(false)}>
-        Registar Reabastecimento
-      </a>
-    </li>
-
-    <li>
-      <a onClick={() => {
-        navigate('/motorista/historico');
-        setMenuOpen(false);
-      }}>
-        Histórico
-      </a>
-    </li>
-
-    <li>
-      <a onClick={() => {
-        navigate('/motorista/suporte');
-        setMenuOpen(false);
-      }}>
-        Suporte
-      </a>
-    </li>
-
-    <li>
-      <a onClick={() => {
-        navigate('/motorista/viagem');
-        setMenuOpen(false);
-      }}>
-        Viagem
-      </a>
-    </li>
-
-    <li>
-      <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
-    </li>
-  </ul>
-</nav>
+      <li>
+       <button className="mh-theme-btn" onClick={alternarTema}>
+         {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+       </button>
+     </li>
+     <li>
+       <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+     </li>
+   </ul>
+ </nav>
 
       <div className="mreab-wrapper">
 
