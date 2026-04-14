@@ -199,60 +199,62 @@ export default function Login() {
 
             <h1 className="lp-title">Criar Conta</h1>
 
-            <div className="lp-field">
-              <span className="lp-label">Nome</span>
-              <div className="lp-input-wrap">
-                <input name="nome" className="lp-input" value={regData.nome} onChange={handleRegChange} />
-                <span className="lp-icon"><IconUser /></span>
+            <div className="lp-grid-container">
+              <div className="lp-field">
+                <span className="lp-label">Nome</span>
+                <div className="lp-input-wrap">
+                  <input name="nome" className="lp-input" value={regData.nome} onChange={handleRegChange} />
+                  <span className="lp-icon"><IconUser /></span>
+                </div>
               </div>
-            </div>
 
-            <div className="lp-field">
-              <span className="lp-label">Email</span>
-              <div className="lp-input-wrap">
-                <input name="email" type="email" className="lp-input" value={regData.email} onChange={handleRegChange} />
-                <span className="lp-icon"><IconMail /></span>
+              <div className="lp-field">
+                <span className="lp-label">Email</span>
+                <div className="lp-input-wrap">
+                  <input name="email" type="email" className="lp-input" value={regData.email} onChange={handleRegChange} />
+                  <span className="lp-icon"><IconMail /></span>
+                </div>
               </div>
-            </div>
 
-            <div className="lp-field">
-              <span className="lp-label">Password</span>
-              <div className="lp-input-wrap">
-                <input name="password" type="password" className="lp-input" value={regData.password} onChange={handleRegChange} />
-                <span className="lp-icon"><IconLock /></span>
+              <div className="lp-field">
+                <span className="lp-label">Password</span>
+                <div className="lp-input-wrap">
+                  <input name="password" type="password" className="lp-input" value={regData.password} onChange={handleRegChange} />
+                  <span className="lp-icon"><IconLock /></span>
+                </div>
               </div>
-            </div>
 
-            <div className="lp-field">
-              <span className="lp-label">Confirmar</span>
-              <div className="lp-input-wrap">
-                <input name="confirmPassword" type="password" className="lp-input" value={regData.confirmPassword} onChange={handleRegChange} />
-                <span className="lp-icon"><IconLock /></span>
+              <div className="lp-field">
+                <span className="lp-label">Confirmar</span>
+                <div className="lp-input-wrap">
+                  <input name="confirmPassword" type="password" className="lp-input" value={regData.confirmPassword} onChange={handleRegChange} />
+                  <span className="lp-icon"><IconLock /></span>
+                </div>
               </div>
-            </div>
 
-            <div className="lp-field">
-              <span className="lp-label">Nascimento</span>
-              <div className="lp-input-wrap">
-                <input name="ano_nascimento" type="date" className="lp-input" value={regData.ano_nascimento} onChange={handleRegChange} />
+              <div className="lp-field">
+                <span className="lp-label">Nascimento</span>
+                <div className="lp-input-wrap">
+                  <input name="ano_nascimento" type="date" className="lp-input" value={regData.ano_nascimento} onChange={handleRegChange} />
+                </div>
               </div>
-            </div>
 
-            <div className="lp-field">
-              <span className="lp-label">NIF</span>
-              <div className="lp-input-wrap">
-                <input name="nif" className="lp-input" maxLength={9} value={regData.nif} onChange={handleRegChange} />
+              <div className="lp-field">
+                <span className="lp-label">NIF</span>
+                <div className="lp-input-wrap">
+                  <input name="nif" className="lp-input" maxLength={9} value={regData.nif} onChange={handleRegChange} />
+                </div>
               </div>
-            </div>
 
-            <div className="lp-field">
-              <span className="lp-label">Género</span>
-              <div className="lp-input-wrap">
-                <select name="genero" className="lp-input lp-select" value={regData.genero} onChange={handleRegChange}>
-                  <option value="">Selecionar</option>
-                  <option value="masculino">Masculino</option>
-                  <option value="feminino">Feminino</option>
-                </select>
+              <div className="lp-field full-width">
+                <span className="lp-label">Género</span>
+                <div className="lp-input-wrap">
+                  <select name="genero" className="lp-input lp-select" value={regData.genero} onChange={handleRegChange}>
+                    <option value="">Selecionar</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="feminino">Feminino</option>
+                  </select>
+                </div>
               </div>
             </div>
 

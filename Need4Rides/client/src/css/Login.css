@@ -22,7 +22,7 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 420px;
+  max-width: 600px;
   background: rgba(245, 166, 35, 0.06);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -278,15 +278,16 @@
   color: #ffd740;
 }
 
-/* ─── Responsive ────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .lp-form {
-    padding: 2rem 1.5rem 1.8rem;
-  }
+.lp-grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  gap: 15px 20px; 
+  width: 100%;
+  margin-bottom: 20px;
+}
 
-  .lp-title {
-    font-size: 1.7rem;
-  }
+.full-width {
+  grid-column: span 2;
 }
 
 .lp-form {
@@ -298,19 +299,21 @@
 /* 🔥 NOVO: linha label + input alinhados */
 .lp-field {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
   width: 100%;
 }
 
 /* 🔥 LABEL fixo alinhado */
 .lp-label {
-  width: 70px;
-  text-align: right;
+  width: 100%;
+  text-align: left;
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.75);
   font-weight: 600;
   flex-shrink: 0;
+  margin: 0 0 0 7px;
 }
 
 /* 🔥 input ocupa sempre o mesmo espaço */
@@ -346,4 +349,24 @@
   right: 1.1rem;
   top: 50%;
   transform: translateY(-50%);
+}
+
+/* ─── Responsive ────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .lp-form {
+    padding: 2rem 1.5rem 1.8rem;
+  }
+
+  .lp-title {
+    font-size: 1.7rem;
+  }
+
+  .lp-grid-container {
+    grid-template-columns: 1fr; 
+    gap: 15px; 
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
 }
