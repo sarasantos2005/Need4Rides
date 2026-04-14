@@ -99,7 +99,7 @@ export default function MotoristaReabastecimento() {
       </a>
     </li>
 
-    <li onClick={() => setMenuOpen(false)}>
+    <li>
       <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
     </li>
   </ul>

@@ -164,9 +164,9 @@ export default function MotoristaHistorico() {
            </a>
          </li>
      
-         <li onClick={() => setMenuOpen(false)}>
-           <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
-         </li>
+         <li>
+          <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+        </li>
        </ul>
      </nav>
 

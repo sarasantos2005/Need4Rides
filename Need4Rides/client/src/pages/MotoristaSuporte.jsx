@@ -238,9 +238,9 @@ export default function MotoristaSuporte() {
                  </a>
                </li>
            
-               <li onClick={() => setMenuOpen(false)}>
-                 <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
-               </li>
+               <li>
+                <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+              </li>
              </ul>
            </nav>
 
