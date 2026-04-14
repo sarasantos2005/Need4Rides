@@ -191,40 +191,6 @@ exports.delete = async (req, res) => {
   }
 };
 
-//US13 -Editar
-exports.update = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updates = req.body;
-
-    if (updates.senha_acesso_web) {
-      const regexSenha = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-      if (!regexSenha.test(updates.senha_acesso_web)) {
-        return res.status(400).json({ message: "Nova senha não cumpre requisitos (letras e números)." });
-      }
-      updates.senha_acesso_web = await bcrypt.hash(updates.senha_acesso_web, SALT_ROUNDS);
-    }
-
-    if (data.morada) updates["motorista.morada.texto"] = data.morada;
-    if (data.localizacao) {
-      updates["motorista.morada.localizacao.coordinates"] = [
-        parseFloat(data.localizacao.long), 
-        parseFloat(data.localizacao.lat)
-      ];
-    }
-
-    const userAtualizado = await User.findByIdAndUpdate(id, updates, { new: true });
-    
-    if (!userAtualizado) {
-      return res.status(404).json({ success: false, message: "Utilizador não encontrado." });
-    }
-
-    res.status(200).json({ success: true, user: userAtualizado });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Erro ao atualizar." });
-  }
-};
-
 //US3 - Definir preço por minuto
 exports.definirPreco = async (req, res) => {
   try {
@@ -249,32 +215,65 @@ exports.definirPreco = async (req, res) => {
   }
 };
 
+//US13
 exports.editarPerfil = async(req, res) => {
   try {
-    const { email, genero, senha_acesso_web, nome } = req.body;
-    const userId = req.userId;
+    const id = req.userId;
+    const updates = req.body;
 
-    const updates = { email, nome };
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "Utilizador não encontrado." });
 
-    if(genero){
-      if(!["M", "F"].includes(genero.toUpperCase())){
+    const updateData = {
+      nome: updates.nome,
+      email: updates.email,
+    };
+
+    if (updates.genero) {
+      if (!["M", "F"].includes(updates.genero.toUpperCase())) {
         return res.status(400).json({ message: "Género inválido." });
       }
-
-      updates.genero = genero.toUpperCase();
+      updateData.genero = updates.genero.toUpperCase();
     }
 
-    if (senha_acesso_web && senha_acesso_web.length > 0) {
+    if (updates.senha_acesso_web) {
       const regexSenha = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-      if (!regexSenha.test(senha_acesso_web)) {
-        return res.status(400).json({ message: "A senha deve ter pelo menos 6 caracteres, com letras e números." });
+      if (!regexSenha.test(updates.senha_acesso_web)) {
+        return res.status(400).json({ message: "Nova senha não cumpre requisitos (letras e números)." });
       }
-      updates.senha_acesso_web = await bcrypt.hash(senha_acesso_web, SALT_ROUNDS);
+      updateData.senha_acesso_web = await bcrypt.hash(updates.senha_acesso_web, SALT_ROUNDS);
+    }
+
+    if(user.tipo === "Motorista"){
+      if (updates.ano_nascimento) {
+        const anoAtual = new Date().getFullYear();
+        if (anoAtual - Number(updates.ano_nascimento) < 18) {
+          return res.status(400).json({ message: "Motorista deve ter 18 anos ou mais." });
+        }
+        updateData.ano_nascimento = Number(updates.ano_nascimento);
+      }
+
+      if (updates.n_carta_conducao) {
+        const regexCartaPortugal = /^([A-Z]{2}-\d{5} \d|[A-Z0-9]{7,12})$/;
+        const cartaFormatada = updates.n_carta_conducao.toUpperCase().trim();
+        if (!regexCartaPortugal.test(cartaFormatada)) {
+          return res.status(400).json({ 
+            success: false, 
+            message: "Formato da Carta de Condução inválido (Campo 5). Ex: LX-12345 6 ou Alfanumérico." 
+          });
+        }
+
+        updateData["motorista.n_carta_conducao"] = cartaFormatada;
+      }
+
+      if (updates.morada) {
+        updateData["motorista.morada.texto"] = updates.morada;
+      }
     }
 
     const userAtualizado = await User.findByIdAndUpdate(
-      userId,
-      {$set: updates},
+      id,
+      {$set: updateData},
       {new: true, runValidators: true}
     ).select("-senha_acesso_web");
 
@@ -284,8 +283,10 @@ exports.editarPerfil = async(req, res) => {
       user: userAtualizado
     });
 
+    res.status(200).json({ success: true, user: userAtualizado });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log(error);
+    res.status(500).json({ success: false, message: "Erro ao atualizar." });
   }
 };
 

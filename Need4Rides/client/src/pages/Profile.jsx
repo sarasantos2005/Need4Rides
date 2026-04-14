@@ -5,12 +5,6 @@ import '../css/Profile.css';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const mockTrips = [
-  { id: 1, from: 'Aeroporto de Lisboa', to: 'Baixa-Chiado', date: '28 Mar 2026', time: '14:35', price: '€18.50', status: 'Concluída', payment: 'Cartão de Crédito', driver: 'Carlos Silva' },
-  { id: 2, from: 'Parque das Nações', to: 'Cascais', date: '25 Mar 2026', time: '09:10', price: '€34.00', status: 'Concluída', payment: 'MB Way', driver: 'Ana Costa' },
-  { id: 3, from: 'Benfica', to: 'Oriente', date: '20 Mar 2026', time: '18:55', price: '€12.80', status: 'Concluída', payment: 'Dinheiro', driver: 'Rui Santos' },
-];
-
 export default function Profile() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
