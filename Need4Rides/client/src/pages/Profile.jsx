@@ -171,10 +171,16 @@ export default function Profile() {
               historico.map(trip => (
                 <div className="trip-card" key={trip._id}>
                   <div className="trip-main">
-                    <div className="trip-route">
-                      <span className="trip-from">{trip.morada_inicial_viagem?.morada}</span>
-                      <span className="trip-arrow">→</span>
-                      <span className="trip-to">{trip.morada_final_viagem?.morada}</span>
+                    <div className="mh-pedido-route">
+                      <div className="mh-pedido-point">
+                        <span className="mh-dot origin" />
+                        <span>{trip.morada_inicial_viagem?.morada}</span>
+                      </div>
+                      <div className="mh-pedido-line" />
+                      <div className="mh-pedido-point">
+                        <span className="mh-dot dest" />
+                        <span>{trip.morada_final_viagem?.morada}</span>
+                      </div>
                     </div>
                     <div className="trip-meta">
                       <span className="trip-date">{new Date(trip.hora_inicial_viagem).toLocaleDateString()} · {new Date(trip.hora_inicial_viagem).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>

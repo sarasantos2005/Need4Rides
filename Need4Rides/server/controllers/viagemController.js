@@ -411,12 +411,26 @@ exports.historicoDeViagens = async (req, res) => {
       hora_final_viagem: { $exists: true }
     })
     .populate('cliente', 'nome') 
+    .populate({
+      path: 'turno',
+      populate: { path: 'taxi', select: 'matricula' }
+    })
     .sort({ hora_inicial_viagem: -1 });
+    
+    const faturas = await Fatura.find({ viagem: { $in: historico.map(v => v._id) } });
 
-    const resultadoFiltrado = historico.filter(v => v.turno !== null);
+    const idsComFatura = faturas.map(f => f.viagem.toString());
 
-    res.json(resultadoFiltrado);
+    const resposta = historico.map(v => {
+      const vObj = v.toObject();
+      vObj.temFatura = idsComFatura.includes(v._id.toString());
+      return vObj;
+    });
+
+    res.status(200).json(resposta);
+
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };

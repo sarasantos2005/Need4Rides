@@ -255,8 +255,31 @@ export default function MotoristaHome() {
     return marcaEncontrada ? marcaEncontrada.nome : idBD;
   };
 
-  if (loading || !userData) return <div className="mh-loading">A carregar...</div>;
+  const gerarFatura = async(viagemId) => {
+    try {
+      const token = localStorage.getItem('token');
 
+      try {
+          setLoading(true);
+
+          await axios.post(`http://localhost:3000/api/fatura/emitir`, 
+            { viagemId: viagemId },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          alert("Fatura gerada com sucesso");
+          fetchDadosIniciais(token);
+        } catch (err) {
+          alert("Erro ao gerar fatura no servidor.");
+        } finally {
+          setLoading(false);
+        }
+    } catch (err) {
+      alert("Erro ao gerar fatura.");
+    }
+  }
+
+  if (loading || !userData) return <div className="mh-loading">A carregar...</div>;
   return (
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mh-overlay" />
@@ -479,7 +502,16 @@ export default function MotoristaHome() {
                 </div>
                 <div className="mh-hist-meta">
                   <span>{v.hora_inicial_viagem ? new Date(v.hora_inicial_viagem).toLocaleTimeString() : 'Sem data'}</span>
-                  <span className="mh-hist-status">Concluída</span>
+                  {v.temFatura ? (
+                    <span className="mh-hist-status">Concluída</span>
+                  ) : (
+                    <button
+                      className="trip-invoice-btn"
+                      onClick={() => gerarFatura(v._id)}
+                    >
+                      Gerar Fatura
+                    </button>
+                  )}
                   <span className="mh-hist-price">{v.preco_viagem?.toFixed(2)}€</span>
                 </div>
               </div>
