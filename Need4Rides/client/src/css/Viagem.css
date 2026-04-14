@@ -115,7 +115,7 @@
 .viagem-status-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
@@ -191,7 +191,7 @@
 
 .viagem-step-label {
   font-size: 0.72rem;
-  color: #dadada;
+  color: #e9e9e9;
   text-align: center;
   max-width: 80px;
   line-height: 1.3;
@@ -229,7 +229,7 @@
   border-radius: 6px;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.05);
-  color: #888;
+  color: #e9e9e9;
   font-size: 0.75rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -291,7 +291,7 @@
 .viagem-point-label {
   display: block;
   font-size: 0.7rem;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.7px;
 }
@@ -321,7 +321,7 @@
 
 .viagem-eta-label {
   font-size: 0.78rem;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.6px;
 }
@@ -374,7 +374,7 @@
 
 .viagem-driver-sub {
   font-size: 0.78rem;
-  color: #888;
+  color: #e9e9e9;
 }
 
 .viagem-driver-rating {
@@ -386,7 +386,7 @@
 }
 
 .viagem-driver-rating span {
-  color: #aaa;
+  color: #e9e9e9;
   font-weight: 600;
 }
 
@@ -440,7 +440,7 @@
 .viagem-map-inner span {
   font-size: 1rem;
   font-weight: 700;
-  color: #dadada;
+  color: #e9e9e9;
 }
 
 .viagem-map-inner p {

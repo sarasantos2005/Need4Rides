@@ -54,7 +54,7 @@
 
 .fatura-doc {
   font-size: 0.8rem;
-  color: #888;
+  color: #e9e9e9;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -68,7 +68,7 @@
 
 .fatura-label {
   font-size: 0.72rem;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
@@ -96,7 +96,7 @@
 .fatura-section h3 {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin: 0 0 0.3rem;
@@ -142,7 +142,7 @@
 .fatura-point-label {
   display: block;
   font-size: 0.72rem;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
@@ -177,7 +177,7 @@
 
 .fatura-total-label {
   font-size: 0.72rem;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }

@@ -310,7 +310,7 @@
 
 .services-subtitle {
   text-align: center;
-  color: #888;
+  color: #e9e9e9;
   font-size: 0.95rem;
   margin-bottom: 3rem;
 }
@@ -369,7 +369,7 @@
 
 .service-card p {
   font-size: 0.83rem;
-  color: #888;
+  color: #e9e9e9;
   margin: 0;
   line-height: 1.6;
 }
@@ -377,7 +377,7 @@
 /* ─── Footer ────────────────────────────────────────────── */
 .footer {
   background: #0a0a0a;
-  color: #888;
+  color: #e9e9e9;
   text-align: center;
   padding: 1.5rem;
   font-size: 0.85rem;

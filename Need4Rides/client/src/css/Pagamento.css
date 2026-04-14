@@ -129,7 +129,7 @@
 
 .pag-header p {
   font-size: 0.82rem;
-  color: #888;
+  color: #e9e9e9;
   margin: 0;
 }
 
@@ -141,7 +141,7 @@
 
 .pag-price-label {
   font-size: 0.7rem;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
@@ -176,7 +176,7 @@
 
 .pag-stripe-badge span {
   font-size: 0.82rem;
-  color: #aaa;
+  color: #e9e9e9;
 }
 
 /* ─── Form fields ───────────────────────────────────────── */
@@ -188,7 +188,7 @@
 
 .pag-method-desc {
   font-size: 0.85rem;
-  color: #888;
+  color: #e9e9e9;
   margin: 0;
   line-height: 1.6;
 }
@@ -202,7 +202,7 @@
 .pag-field label {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
@@ -276,7 +276,7 @@
 
 .pag-card-label-sm {
   font-size: 0.7rem;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
@@ -349,7 +349,7 @@
 }
 
 .pag-success p {
-  color: #888;
+  color: #e9e9e9;
   font-size: 0.9rem;
   margin: 0;
 }

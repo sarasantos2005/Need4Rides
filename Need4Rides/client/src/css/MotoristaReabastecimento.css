@@ -187,7 +187,7 @@
 .mreab-card-title {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #888;
+  color: #e9e9e9;
   text-transform: uppercase;
   margin-bottom: 1.4rem;
 }
@@ -213,7 +213,7 @@
 
 .mreab-field label {
   font-size: 0.72rem;
-  color: #dadada;
+  color: #e9e9e9;
   text-transform: uppercase;
 }
 
@@ -263,7 +263,7 @@
 
 .mreab-hist-date {
   font-size: 0.75rem;
-  color: #dadada;
+  color: #e9e9e9;
 }
 
 .mreab-hist-valor {
