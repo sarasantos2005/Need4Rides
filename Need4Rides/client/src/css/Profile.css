@@ -43,9 +43,9 @@
 /* ─── Header ────────────────────────────────────────────── */
 .profile-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1.5rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;   /* <-- era wrap, isso empurrava o botão */
 }
 
 .profile-avatar-ring {
@@ -67,6 +67,7 @@
 
 .profile-info {
   flex: 1;
+  min-width: 200px;
 }
 
 .profile-info h1 {
@@ -104,7 +105,6 @@
   font-size: 0.85rem;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
-  margin-left: auto;
 }
 
 .profile-back-btn:hover {
@@ -326,4 +326,126 @@
   border-radius: 50px;
   padding: 0.15rem 0.7rem;
   font-weight: 600;
+}
+/* ─────────────────────────────── */
+/* 🌞 PROFILE - MODO CLARO */
+/* ─────────────────────────────── */
+
+body.claro .profile-page {
+  color: #111;
+}
+
+body.claro .profile-card,
+body.claro .profile-trips {
+  background: rgba(255, 255, 255, 0.85);
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* textos */
+body.claro .profile-info h1 {
+  color: #111;
+}
+
+body.claro .profile-badge {
+  background: rgba(245, 197, 24, 0.15);
+  color: #b08900;
+  border: 1px solid rgba(245, 197, 24, 0.4);
+}
+
+/* inputs */
+body.claro .profile-field input,
+body.claro .profile-select {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #111;
+}
+
+body.claro .profile-field input:focus,
+body.claro .profile-select:focus {
+  border-color: #f5c518;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* botão voltar */
+body.claro .profile-back-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+body.claro .profile-back-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* botão tema */
+body.claro .profile-theme-btn {
+  background: rgba(0, 0, 0, 0.05);
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+body.claro .profile-theme-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* divider */
+body.claro .profile-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* viagens */
+body.claro .trip-card {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.claro .trip-card:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+body.claro .trip-date {
+  color: #444;
+}
+
+body.claro .trip-price {
+  color: #b08900;
+}
+
+body.claro .trip-status {
+  background: rgba(67, 233, 123, 0.12);
+  color: #1e7a3a;
+  border: 1px solid rgba(67, 233, 123, 0.3);
+}
+
+.profile-theme-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+.profile-back-btn {
+  align-self: flex-end;
+}
+
+.profile-theme-btn {
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: #ddd;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+  min-width: 120px;
+  flex-shrink: 0;
+  margin-left: auto;   /* <-- empurra sempre para a direita */
 }

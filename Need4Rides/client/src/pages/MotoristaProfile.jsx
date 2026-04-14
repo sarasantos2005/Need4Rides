@@ -137,6 +137,19 @@ export default function MotoristaProfile() {
     }
   }
 
+    const [tema, setTema] = useState(() => {
+      return localStorage.getItem('tema') || 'escuro';
+    });
+
+    useEffect(() => {
+      document.body.className = tema;
+      localStorage.setItem('tema', tema);
+    }, [tema]);
+
+    const alternarTema = () => {
+      setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
+    };
+
   if(!userData) return <div className="mh-loading">A carregar perfil...</div>;
 
   return (
@@ -160,9 +173,15 @@ export default function MotoristaProfile() {
                 <span className="profile-badge">Membro desde {formatarData(userData.createdAt)}</span>
               </div>
             </div>
-            <button className="profile-back-btn" onClick={() => navigate('/motorista')}>
-              ← Voltar
-            </button>
+            <div className="profile-actions">
+              <button className="profile-back-btn" onClick={() => navigate(-1)}>
+                Voltar
+              </button>
+
+              <button className="profile-theme-btn" onClick={alternarTema}>
+                {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+              </button>
+            </div>
           </div>
 
           <div className="profile-divider" />
