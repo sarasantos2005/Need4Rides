@@ -446,3 +446,84 @@
     pointer-events: auto;
   }
 }
+
+.mh-theme-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #ddd;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.mh-theme-btn:hover {
+  border-color: #f5c518;
+  color: #f5c518;
+}
+
+/* ─── MODO CLARO ───────────────────────────────────────── */
+
+body.claro .mh-navbar {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+body.claro .mh-logo {
+  color: #111;
+}
+
+body.claro .mh-nav-links a {
+  color: #333;
+}
+
+body.claro .mh-nav-links a:hover,
+body.claro .mh-nav-links a.active {
+  color: #f5c518;
+}
+
+body.claro .mh-card,
+body.claro .mh-stat-card {
+  background: rgba(255, 255, 255, 0.85);
+  color: #111;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+body.claro .mh-card-title,
+body.claro .mh-stat-label {
+  color: #444;
+}
+
+body.claro .mh-stat-value {
+  color: #111;
+}
+
+body.claro .mh-welcome-sub {
+  color: #ffffff;
+}
+
+body.claro .mh-welcome-name {
+  color: #ffffff;
+}
+
+body.claro .mh-hist-row,
+body.claro .mh-pedido-card {
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+body.claro .mh-car-value {
+  color: #111;
+}
+
+body.claro .mh-car-label {
+  color: #666;
+}
+
+body.claro .mh-hist-meta {
+  color: #555;
+}
+
+body.claro .mh-status-badge {
+  background: rgba(14, 13, 13, 0);
+  color: #6bb861;
+}

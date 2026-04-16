@@ -35,6 +35,21 @@ export default function GestorHome() {
     }
   }, [navigate]);
 
+  /*Tema */
+  const [tema, setTema] = useState(() => {
+    return localStorage.getItem('tema') || 'escuro';
+  });
+
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+
+  const alternarTema = () => {
+    setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
+  };
+
+
   return (
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mh-overlay" />
@@ -69,6 +84,11 @@ export default function GestorHome() {
             <a onClick={() => navigate('/gestor/registar-motorista')}>Registar Motorista</a>
           </li>
 
+          <li>
+            <button className="mh-theme-btn" onClick={alternarTema}>
+              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+            </button>
+          </li>
           <li>
             <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
           </li>

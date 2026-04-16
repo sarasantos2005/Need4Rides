@@ -370,3 +370,7 @@
     grid-column: span 1;
   }
 }
+
+body{
+  color:#fff !important; 
+}
