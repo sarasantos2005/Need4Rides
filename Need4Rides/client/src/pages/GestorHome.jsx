@@ -1,28 +1,20 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { jsPDF } from 'jspdf';
 import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
-import '../css/MotoristaHome.css'; 
+import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
-
-const mockViagensAtivas = [
-  { id: 1, cliente: 'Ana Silva', motorista: 'Carlos M.', from: 'Aeroporto', to: 'Baixa-Chiado', status: 'Em curso' },
-  { id: 2, cliente: 'Rui Fonseca', motorista: 'Pedro L.', from: 'Parque Nações', to: 'Benfica', status: 'Em curso' },
-  { id: 3, cliente: 'Marta Gomes', motorista: 'João R.', from: 'Cascais', to: 'Sintra', status: 'A aguardar' },
-];
-
-const mockMotoristas = [
-  { id: 1, nome: 'Carlos Mendes', estado: 'Em turno', viagens: 6, ganhos: '€97.70' },
-  { id: 2, nome: 'Pedro Lopes', estado: 'Em turno', viagens: 4, ganhos: '€63.20' },
-  { id: 3, nome: 'João Rodrigues', estado: 'Fora de turno', viagens: 0, ganhos: '€00.00' },
-  { id: 4, nome: 'Sara Costa', estado: 'Em turno', viagens: 8, ganhos: '€120.50' },
-];
 
 export default function GestorHome() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-
   const [userData, setUserData] = useState({ nome: 'Utilizador' });
+  const [relatoriosData, setRelatoriosData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [periodo, setPeriodo] = useState('hoje');
+  const [exporting, setExporting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user_logado');
@@ -32,10 +24,44 @@ export default function GestorHome() {
       navigate('/login');
     } else {
       setUserData(JSON.parse(storedUser));
+      fetchRelatorios();
     }
-  }, [navigate]);
+  }, [navigate, periodo]);
 
-  /*Tema */
+  const periodoOptions = [
+    { value: 'hoje', label: 'Hoje' },
+    { value: 'semana', label: '1 Semana' },
+    { value: 'mes', label: '1 Mês' },
+    { value: 'ano', label: '1 Ano' }
+
+  ];
+
+  const currentLabel = periodoOptions.find(opt => opt.value === periodo)?.label || 'Hoje';
+
+  const fetchRelatorios = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3000/api/relatorios/taxis-motoristas?periodo=${periodo}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setRelatoriosData(data);
+      } else {
+        console.error('Erro ao buscar relatórios');
+      }
+    } catch (error) {
+      console.error('Erro na requisição:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const [tema, setTema] = useState(() => {
     return localStorage.getItem('tema') || 'escuro';
   });
@@ -49,6 +75,121 @@ export default function GestorHome() {
     setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
   };
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user_logado');
+    const token = localStorage.getItem('token');
+
+    if (!token || !storedUser) {
+      navigate('/login');
+    } else {
+      setUserData(JSON.parse(storedUser));
+      fetchRelatorios();
+    }
+  }, [navigate, periodo]);
+
+
+  const exportarPDF = () => {
+    try {
+      setExporting(true);
+      if (!relatoriosData) {
+        throw new Error('Dados do relatório não disponíveis');
+      }
+
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const margin = 40;
+      const lineHeight = 18;
+      let y = margin;
+
+      doc.setFontSize(18);
+      doc.text('Relatório Need4Rides', margin, y);
+      y += lineHeight * 1.5;
+
+      doc.setFontSize(11);
+      doc.text(`Período: ${periodo}`, margin, y);
+      y += lineHeight;
+      doc.text(`Gerado em: ${new Date().toLocaleString('pt-PT')}`, margin, y);
+      y += lineHeight * 2;
+
+      doc.setFontSize(12);
+      doc.text('Resumo', margin, y);
+      y += lineHeight;
+
+      const resumo = relatoriosData.resumo;
+      const resumoItens = [
+        { label: 'Viagens', value: resumo.viagensHoje },
+        { label: 'Receita', value: `€${resumo.receitaHoje}` },
+        { label: 'Motoristas ativos', value: resumo.motoristasAtivos },
+        { label: 'Táxis em serviço', value: resumo.taxisEmServico }
+      ];
+
+      resumoItens.forEach(item => {
+        doc.text(`${item.label}: ${item.value}`, margin, y);
+        y += lineHeight;
+      });
+
+      y += lineHeight;
+      doc.text('Viagens em Curso', margin, y);
+      y += lineHeight;
+
+      if (relatoriosData.viagensEmCurso.length > 0) {
+        relatoriosData.viagensEmCurso.forEach((v, index) => {
+          if (y > 750) {
+            doc.addPage();
+            y = margin;
+          }
+          doc.text(`${index + 1}. ${v.cliente} → ${v.motorista}`, margin, y);
+          y += lineHeight;
+          doc.text(`Origem: ${v.origem}`, margin + 10, y);
+          y += lineHeight;
+          doc.text(`Destino: ${v.destino}`, margin + 10, y);
+          y += lineHeight;
+          doc.text(`Status: ${v.status}`, margin + 10, y);
+          y += lineHeight;
+        });
+      } else {
+        doc.text('Nenhuma viagem em curso', margin, y);
+        y += lineHeight;
+      }
+
+      y += lineHeight;
+      doc.text('Motoristas', margin, y);
+      y += lineHeight;
+
+      if (relatoriosData.motoristas.length > 0) {
+        relatoriosData.motoristas.slice(0, 20).forEach((m, index) => {
+          if (y > 750) {
+            doc.addPage();
+            y = margin;
+          }
+          doc.text(`${index + 1}. ${m.nome} — ${m.estado} — ${m.viagens} viagens — €${m.ganhos}`, margin, y);
+          y += lineHeight;
+        });
+      } else {
+        doc.text('Nenhum motorista encontrado', margin, y);
+        y += lineHeight;
+      }
+
+      doc.save(`relatorio-${periodo}-${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (error) {
+      console.error('Erro na exportação:', error);
+      alert('Falha ao gerar o PDF. Verifica a consola do navegador.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
+        <div className="mh-overlay" />
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'white' }}>
+          Carregando relatórios...
+        </div>
+      </div>
+    );
+  }
+
+  
 
   return (
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -116,34 +257,87 @@ export default function GestorHome() {
             </div>
           </div>
 
-          <button
-            className="mh-turno-btn end"
-            onClick={() => navigate('/login')}
-          >
-            Terminar Sessão
-          </button>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            {/* FILTROS */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <label style={{ fontSize: '12px', color: '#ddd', textTransform: 'uppercase' }}>Período</label>
+              <div className="custom-dropdown">
+                <div
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="custom-dropdown-button"
+                >
+                  {currentLabel}
+                  <span style={{ marginLeft: '8px' }}>▼</span>
+                </div>
+                {isOpen && (
+                  <div className="custom-dropdown-menu">
+                    {periodoOptions.map(option => (
+                      <div
+                        key={option.value}
+                        onClick={() => {
+                          setPeriodo(option.value);
+                          setIsOpen(false);
+                        }}
+                        className="custom-dropdown-option"
+                      >
+                        {option.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* BOTÃO EXPORTAR PDF */}
+            <button
+              onClick={exportarPDF}
+              disabled={exporting}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                border: 'none',
+                background: exporting ? '#666' : 'linear-gradient(135deg, #f5a623, #f5c518)',
+                color: '#111',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: exporting ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              {exporting ? '📄 Exportando...' : '📄 Exportar PDF'}
+            </button>
+
+            <button
+              className="mh-turno-btn end"
+              onClick={() => navigate('/login')}
+            >
+              Terminar Sessão
+            </button>
+          </div>
         </div>
 
         {/* STATS */}
         <div className="mh-stats-row">
           <div className="mh-stat-card">
-            <span className="mh-stat-label">Viagens hoje</span>
-            <span className="mh-stat-value">24</span>
+            <span className="mh-stat-label">Viagens no período</span>
+            <span className="mh-stat-value">{relatoriosData?.resumo?.viagensHoje || 0}</span>
           </div>
 
           <div className="mh-stat-card accent">
-            <span className="mh-stat-label">Receita hoje</span>
-            <span className="mh-stat-value">€381.40</span>
+            <span className="mh-stat-label">Receita no período</span>
+            <span className="mh-stat-value">€{relatoriosData?.resumo?.receitaHoje || '0.00'}</span>
           </div>
 
           <div className="mh-stat-card">
             <span className="mh-stat-label">Motoristas ativos</span>
-            <span className="mh-stat-value">3 / 4</span>
+            <span className="mh-stat-value">{relatoriosData?.resumo?.motoristasAtivos || '0 / 0'}</span>
           </div>
 
           <div className="mh-stat-card">
             <span className="mh-stat-label">Táxis em serviço</span>
-            <span className="mh-stat-value">3 / 6</span>
+            <span className="mh-stat-value">{relatoriosData?.resumo?.taxisEmServico || '0 / 0'}</span>
           </div>
         </div>
 
@@ -154,30 +348,36 @@ export default function GestorHome() {
           <div className="mh-card">
             <div className="mh-section-header">
               <h3 className="mh-card-title">Viagens em Curso</h3>
-              <span className="mh-badge">{mockViagensAtivas.length}</span>
+              <span className="mh-badge">{relatoriosData?.viagensEmCurso?.length || 0}</span>
             </div>
 
             <div>
-              {mockViagensAtivas.map(v => (
-                <div className="mh-pedido-card" key={v.id}>
-                  <div className="mh-pedido-route">
-                    <span className="mh-dot origin" />
-                    <span>{v.from}</span>
-                    <span className="mh-dot dest" />
-                    <span>{v.to}</span>
-                  </div>
+              {relatoriosData?.viagensEmCurso?.length > 0 ? (
+                relatoriosData.viagensEmCurso.map(v => (
+                  <div className="mh-pedido-card" key={v.id}>
+                    <div className="mh-pedido-route">
+                      <span className="mh-dot origin" />
+                      <span>{v.origem}</span>
+                      <span className="mh-dot dest" />
+                      <span>{v.destino}</span>
+                    </div>
 
-                  <div className="mh-pedido-meta">
-                    <span>{v.cliente}</span>
-                    <span>·</span>
-                    <span>{v.motorista}</span>
-                  </div>
+                    <div className="mh-pedido-meta">
+                      <span>{v.cliente}</span>
+                      <span>·</span>
+                      <span>{v.motorista}</span>
+                    </div>
 
-                  <span className="mh-status-badge online">
-                    {v.status}
-                  </span>
+                    <span className="mh-status-badge online">
+                      {v.status}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                  Nenhuma viagem em curso
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -188,21 +388,27 @@ export default function GestorHome() {
             </div>
 
             <div>
-              {mockMotoristas.map(m => (
-                <div className="mh-hist-row" key={m.id}>
-                  <div>
-                    <div className="mh-car-value">{m.nome}</div>
-                    <div className="mh-car-label">
-                      {m.estado}
+              {relatoriosData?.motoristas?.length > 0 ? (
+                relatoriosData.motoristas.map(m => (
+                  <div className="mh-hist-row" key={m.id}>
+                    <div>
+                      <div className="mh-car-value">{m.nome}</div>
+                      <div className="mh-car-label">
+                        {m.estado}
+                      </div>
+                    </div>
+
+                    <div className="mh-hist-meta">
+                      <span>{m.viagens} viagens</span>
+                      <span className="mh-hist-price">€{m.ganhos}</span>
                     </div>
                   </div>
-
-                  <div className="mh-hist-meta">
-                    <span>{m.viagens} viagens</span>
-                    <span className="mh-hist-price">{m.ganhos}</span>
-                  </div>
+                ))
+              ) : (
+                <div style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                  Nenhum motorista encontrado
                 </div>
-              ))}
+              )}
             </div>
           </div>
 

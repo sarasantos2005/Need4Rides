@@ -172,6 +172,15 @@
   transform: translateY(-2px);
 }
 
+option {
+  color: black;
+}
+
+option :hover {
+  background-color: pink;
+  color: black;
+}
+
 /* ─── Stats ─────────────────────────────────────────────── */
 .gh-stats-row {
   display: grid;
@@ -447,7 +456,7 @@
   }
 }
 
-.mh-theme-btn {
+.gh-theme-btn {
   background: transparent;
   border: 1px solid rgba(255,255,255,0.2);
   color: #ddd;
@@ -458,72 +467,122 @@
   transition: all 0.2s;
 }
 
-.mh-theme-btn:hover {
+.gh-theme-btn:hover {
   border-color: #f5c518;
   color: #f5c518;
 }
 
 /* ─── MODO CLARO ───────────────────────────────────────── */
 
-body.claro .mh-navbar {
+body.claro .gh-navbar {
   background: rgba(255, 255, 255, 0.85);
 }
 
-body.claro .mh-logo {
+body.claro .gh-logo {
   color: #111;
 }
 
-body.claro .mh-nav-links a {
+body.claro .gh-nav-links a {
   color: #333;
 }
 
-body.claro .mh-nav-links a:hover,
-body.claro .mh-nav-links a.active {
+body.claro .gh-nav-links a:hover,
+body.claro .gh-nav-links a.active {
   color: #f5c518;
 }
 
-body.claro .mh-card,
-body.claro .mh-stat-card {
+body.claro .gh-card,
+body.claro .gh-stat-card {
   background: rgba(255, 255, 255, 0.85);
   color: #111;
   border: 1px solid rgba(0,0,0,0.08);
 }
 
-body.claro .mh-card-title,
-body.claro .mh-stat-label {
+body.claro .gh-card-title,
+body.claro .gh-stat-label {
   color: #444;
 }
 
-body.claro .mh-stat-value {
+body.claro .gh-stat-value {
   color: #111;
 }
 
-body.claro .mh-welcome-sub {
+body.claro .gh-welcome-sub {
   color: #ffffff;
 }
 
-body.claro .mh-welcome-name {
+body.claro .gh-welcome-name {
   color: #ffffff;
 }
 
-body.claro .mh-hist-row,
-body.claro .mh-pedido-card {
+body.claro .gh-hist-row,
+body.claro .gh-pedido-card {
   border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
-body.claro .mh-car-value {
+body.claro .gh-car-value {
   color: #111;
 }
 
-body.claro .mh-car-label {
+body.claro .gh-car-label {
   color: #666;
 }
 
-body.claro .mh-hist-meta {
+body.claro .gh-hist-meta {
   color: #555;
 }
 
-body.claro .mh-status-badge {
+body.claro .gh-status-badge {
   background: rgba(14, 13, 13, 0);
   color: #6bb861;
+}
+
+/* ─── Custom Dropdown ───────────────────────────────────── */
+.custom-dropdown {
+  position: relative;
+}
+
+.custom-dropdown-button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.custom-dropdown-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.custom-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  z-index: 1000;
+  width: 120%;
+}
+
+.custom-dropdown-option {
+  padding: 8px 12px;
+  color: white;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: smaller;
+}
+
+.custom-dropdown-option:last-child {
+  border-bottom: none;
+}
+
+.custom-dropdown-option:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
