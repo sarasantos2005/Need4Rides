@@ -4,7 +4,7 @@ import '../css/GestorHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/GestorMotoristas.css';
 import '../css/MotoristaHome.css'; 
-import { useState } from 'react'; 
+import { useState, useEffect } from 'react';
 const mockMotoristas = [
   { id: 1, nome: 'Carlos Mendes',  nif: '123456789', carta: 'C-100001-1', genero: 'Masculino', localidade: 'Lisboa',  estado: 'Em turno',      viagens: 6,  ganhos: '€97.70' },
   { id: 2, nome: 'Pedro Lopes',    nif: '234567891', carta: 'C-100002-2', genero: 'Masculino', localidade: 'Sintra',  estado: 'Em turno',      viagens: 4,  ganhos: '€63.20' },
@@ -15,6 +15,20 @@ const mockMotoristas = [
 export default function GestorMotoristas() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const [tema, setTema] = useState(() => {
+      return localStorage.getItem('tema') || 'escuro';
+    });
+  
+    useEffect(() => {
+      document.body.className = tema;
+      localStorage.setItem('tema', tema);
+    }, [tema]);
+  
+    const alternarTema = () => {
+      setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
+    };
+
   return (
     <div className="gm-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="grm-overlay" />
@@ -47,6 +61,12 @@ export default function GestorMotoristas() {
       
                 <li>
                   <a onClick={() => navigate('/gestor/registar-motorista')}>Registar Motorista</a>
+                </li>
+
+                 <li>
+                  <button className="mh-theme-btn" onClick={alternarTema}>
+                    {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+                  </button>
                 </li>
       
                 <li>
