@@ -71,13 +71,6 @@ Abre em: http://localhost:5173
 
 ```bash
 cd server
-npm run dev 
-```
-
-OU 
-
-```bash
-cd server
 node index.js 
 ```
 

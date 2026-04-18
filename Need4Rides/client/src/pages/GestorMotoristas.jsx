@@ -5,16 +5,23 @@ import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/GestorMotoristas.css';
 import '../css/MotoristaHome.css'; 
 import { useState, useEffect } from 'react';
-const mockMotoristas = [
-  { id: 1, nome: 'Carlos Mendes',  nif: '123456789', carta: 'C-100001-1', genero: 'Masculino', localidade: 'Lisboa',  estado: 'Em turno',      viagens: 6,  ganhos: '€97.70' },
-  { id: 2, nome: 'Pedro Lopes',    nif: '234567891', carta: 'C-100002-2', genero: 'Masculino', localidade: 'Sintra',  estado: 'Em turno',      viagens: 4,  ganhos: '€63.20' },
-  { id: 3, nome: 'João Rodrigues', nif: '345678912', carta: 'C-100003-3', genero: 'Masculino', localidade: 'Cascais', estado: 'Fora de turno', viagens: 0,  ganhos: '€00.00' },
-  { id: 4, nome: 'Sara Costa',     nif: '456789123', carta: 'C-100004-4', genero: 'Feminino',  localidade: 'Almada',  estado: 'Em turno',      viagens: 8,  ganhos: '€120.50' },
-];
 
 export default function GestorMotoristas() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [motoristas, setMotoristas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/user')
+      .then(res => res.json())
+      .then(data => {
+        const apenasMotoristas = data.filter(u => u.tipo === 'Motorista');
+        setMotoristas(apenasMotoristas);
+      })
+      .catch(err => console.error('Erro ao carregar motoristas:', err))
+      .finally(() => setLoading(false));
+  }, []);
 
   const [tema, setTema] = useState(() => {
       return localStorage.getItem('tema') || 'escuro';
@@ -80,7 +87,7 @@ export default function GestorMotoristas() {
         <div className="gm-header">
           <div>
             <h1 className="gm-title">Motoristas</h1>
-            <p className="gm-subtitle">{mockMotoristas.length} motoristas registados</p>
+            <p className="gm-subtitle">{motoristas.length} motoristas registados</p>
           </div>
           <button className="gm-btn-registar" onClick={() => navigate('/gestor/registar-motorista')}>
             + Registar Motorista
@@ -102,20 +109,18 @@ export default function GestorMotoristas() {
               </tr>
             </thead>
             <tbody>
-              {mockMotoristas.map(m => (
-                <tr key={m.id}>
+              {loading ? (
+                <tr><td colSpan={8} style={{ textAlign: 'center' }}>A carregar...</td></tr>
+              ) : motoristas.map(m => (
+                <tr key={m._id}>
                   <td className="gm-nome">{m.nome}</td>
                   <td className="gm-muted">{m.nif}</td>
-                  <td className="gm-muted">{m.carta}</td>
-                  <td className="gm-muted">{m.genero}</td>
-                  <td className="gm-muted">{m.localidade}</td>
-                  <td>
-                    <span className={`gm-estado ${m.estado === 'Em turno' ? 'online' : 'offline'}`}>
-                      {m.estado === 'Em turno' ? '●' : '○'} {m.estado}
-                    </span>
-                  </td>
-                  <td className="gm-muted">{m.viagens}</td>
-                  <td className="gm-ganhos">{m.ganhos}</td>
+                  <td className="gm-muted">{m.motorista?.n_carta_conducao ?? '—'}</td>
+                  <td className="gm-muted">{m.genero === 'M' ? 'Masculino' : m.genero === 'F' ? 'Feminino' : m.genero ?? '—'}</td>
+                  <td className="gm-muted">{m.motorista?.morada?.texto ?? '—'}</td>
+                  <td><span className="gm-estado offline">○ —</span></td>
+                  <td className="gm-muted">—</td>
+                  <td className="gm-ganhos">—</td>
                 </tr>
               ))}
             </tbody>
