@@ -111,7 +111,7 @@ export default function AguardarTaxi() {
               <div className="agt-meta-item">
                 <span className="agt-meta-label">Conforto</span>
                 <span className="agt-meta-value">
-                  {form.comfort === 'luxury' ? 'Luxuoso' : form.comfort === 'basic' ? 'Básico' : '--'}
+                  {form.comfort === 'Luxuoso' ? 'Luxuoso' : form.comfort === 'Básico' ? 'Básico' : '--'}
                 </span>
               </div>
               <div className="agt-meta-item">

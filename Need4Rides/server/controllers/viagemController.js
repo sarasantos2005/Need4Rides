@@ -87,7 +87,8 @@ exports.finalizarViagem = async (req, res) => {
 //US6 - Pedir o Taxi
 exports.pedirTaxi = async (req, res) => {
   try{
-    const { clienteId, n_passageiros, nivel_conforto, origem, destino } = req.body;
+    const { n_passageiros, nivel_conforto, origem, destino, preco_estimado } = req.body;
+    const clienteId = req.userId;
     
     //RIA 12 e 13
     const cliente = await Pessoa.findById(clienteId);
@@ -108,12 +109,12 @@ exports.pedirTaxi = async (req, res) => {
 
     const pontoOrigem = {
       morada: origem.morada,
-      localizacao: { coordinates: [origem.long, origem.lat] }
+      localizacao: { type: "Point", coordinates: origem.localizacao.coordinates }
     };
-
+    
     const pontoDestino = {
       morada: destino.morada,
-      localizacao: { coordinates: [destino.long, destino.lat] }
+      localizacao: {type: "Point", coordinates: destino.localizacao.coordinates}
     };
 
     const novoPedido = new Viagem({
@@ -132,7 +133,7 @@ exports.pedirTaxi = async (req, res) => {
       pedido: {
         id: novoPedido._id,
         cliente: cliente.nome,
-        custo_estimado: "A calcular..." 
+        custo_estimado: preco_estimado
       }
     });
 
@@ -396,7 +397,6 @@ async function calcularPreco(nivelConforto, horaInicio, horaFim) {
     configuracaoPreco.acrescimo_noturno
   );
 }
-
 
 // Mostrar historico de viagens do motorista
 exports.historicoDeViagens = async (req, res) => {

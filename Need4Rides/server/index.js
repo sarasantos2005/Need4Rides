@@ -44,6 +44,10 @@ app.get('/', (req, res) => {
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/user', userRoutes);
 
+// Rotas de precos
+const precoRoutes = require('./routes/precoRoutes');
+app.use('/api/preco', precoRoutes);
+
 // Rotas de táxis
 const taxiRoutes = require('./routes/taxiRoutes');
 app.use('/api/taxi', taxiRoutes);

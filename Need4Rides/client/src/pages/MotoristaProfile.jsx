@@ -85,7 +85,7 @@ function MapSelector({ coordsIniciais, moradaInicial, onConfirm, onClose }) {
         <div className="map-modal-overlay">
             <div className="map-modal-content">
                 <div className="map-modal-header">
-                  <h3>Selecionar Localização</h3>
+                  <h3>Selecionar Morada</h3>
                   <button className="map-close-btn" onClick={onClose}>&times;</button>
                 </div>
 
