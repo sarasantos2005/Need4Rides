@@ -48,15 +48,13 @@ exports.create = async (req, res) => {
       });
     }
 
-    const passwordHash = await bcrypt.hash(senha_acesso_web, SALT_ROUNDS);
-
     const userData = {
       tipo,
       email,
       nome,
       genero,
       nif,
-      senha_acesso_web: passwordHash,
+      senha_acesso_web,
       ano_nascimento
     };
 
@@ -89,10 +87,15 @@ exports.create = async (req, res) => {
     const newUser = new User(userData);
     await newUser.save();
 
+    const user = await User.findOne({ nif: nif, tipo: tipo });
+    const payload = { id: user._id, tipo: tipo };
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXPIRATION });
+
     res.status(201).json({
       success: true,
       message: "Registo criado com sucesso.",
-      user: newUser
+      user: { id: user._id, nome: user.nome, tipo: tipo },
+      token
     });
 
   } catch (error) {

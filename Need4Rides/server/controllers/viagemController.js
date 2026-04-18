@@ -109,12 +109,12 @@ exports.pedirTaxi = async (req, res) => {
 
     const pontoOrigem = {
       morada: origem.morada,
-      localizacao: { type: "Point", coordinates: origem.localizacao.coordinates }
+      localizacao: { type: "Point", coordinates: [origem.localizacao.coordinates[1], origem.localizacao.coordinates[0]] }
     };
     
     const pontoDestino = {
       morada: destino.morada,
-      localizacao: {type: "Point", coordinates: destino.localizacao.coordinates}
+      localizacao: {type: "Point", coordinates: [destino.localizacao.coordinates[1], destino.localizacao.coordinates[0]]}
     };
 
     const novoPedido = new Viagem({
@@ -277,7 +277,6 @@ exports.listarPedidosParaMotorista = async (req, res) => {
     }
 
     const confortoDoTaxi = turnoAtivo.taxi.nivel_conforto;
-    
     const pedidos = await Viagem.find({
       turno: null,
       nivel_conforto: confortoDoTaxi,
@@ -293,7 +292,6 @@ exports.listarPedidosParaMotorista = async (req, res) => {
         }
       }
     }).populate('cliente', 'nome');
-
 
     // Filtrar pedidos que não podem ser satisfeitos no tempo restante do turno
     const pedidosComTempo = await Promise.all(pedidos.map(async (pedido) => {
