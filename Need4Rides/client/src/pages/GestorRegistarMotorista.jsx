@@ -3,28 +3,95 @@ import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/GestorRegistarMotorista.css';
 import AvatarDropdown from '../components/AvatarDropdown';
-import '../css/MotoristaHome.css'; 
+import '../css/MotoristaHome.css';
 
 export default function GestorRegistarMotorista() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    anaNascimento: '',
+    nome: '',
+    email: '',
+    ano_nascimento: '',
     nif: '',
     genero: '',
-    numeroCarta: '',
-    senha: '',
-    localidade: '',
-    morada: '',
+    n_carta_conducao: '',
+    senha_acesso_web: '',
     codigoPostal: '',
+    morada: '',
+    lat: '',
+    long: '',
   });
   const [sucesso, setSucesso] = useState(false);
+  const [erro, setErro] = useState('');
+  const [cpLoading, setCpLoading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-  const handleSubmit = e => {
+  const handleCodigoPostal = async e => {
+    const cp = e.target.value.trim();
+    setForm(f => ({ ...f, codigoPostal: cp, morada: '', lat: '', long: '' }));
+
+    if (!/^\d{4}-\d{3}$/.test(cp)) return; // só pesquisa quando formato completo
+
+    setCpLoading(true);
+    setErro('');
+    try {
+      const res = await fetch(`https://json.geoapi.pt/cp/${cp}`);
+      if (!res.ok) throw new Error('não encontrado');
+      const data = await res.json();
+      const localidade = [data.Localidade, data.Concelho].filter(Boolean).join(', ');
+      setForm(f => ({ ...f, morada: localidade, lat: String(data.centro[0]), long: String(data.centro[1]) }));
+    } catch {
+      setErro('Código postal não encontrado. Verifique e tente novamente.');
+    } finally {
+      setCpLoading(false);
+    }
+  };
+
+  const handleSubmit = async e => {
     e.preventDefault();
-    setSucesso(true);
-    setForm({ anaNascimento: '', nif: '', genero: '', numeroCarta: '', senha: '', localidade: '', morada: '', codigoPostal: '' });
+    setErro('');
+    setSucesso(false);
+
+    if (!form.lat || !form.long) {
+      setErro('Introduza um código postal válido para obter a localização.');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3000/api/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tipo: 'Motorista',
+          nome: form.nome,
+          email: form.email,
+          nif: form.nif,
+          genero: form.genero,
+          senha_acesso_web: form.senha_acesso_web,
+          ano_nascimento: Number(form.ano_nascimento),
+          n_carta_conducao: form.n_carta_conducao,
+          morada: form.morada,
+          localizacao: {
+            lat: parseFloat(form.lat),
+            long: parseFloat(form.long),
+          },
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErro(data.message || 'Erro ao registar motorista.');
+        return;
+      }
+
+      setSucesso(true);
+      setForm({ nome: '', email: '', ano_nascimento: '', nif: '', genero: '', n_carta_conducao: '', senha_acesso_web: '', codigoPostal: '', morada: '', lat: '', long: '' });
+
+    } catch {
+      setErro('Não foi possível ligar ao servidor.');
+    }
   };
 
   return (
@@ -34,7 +101,7 @@ export default function GestorRegistarMotorista() {
        {/* NAVBAR  */}
             <nav className="mh-navbar">
               <span className="mh-logo">Need4Rides</span>
-      
+
               <div
                 className={`mh-hamburger ${menuOpen ? 'open' : ''}`}
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -43,24 +110,24 @@ export default function GestorRegistarMotorista() {
                 <span></span>
                 <span></span>
               </div>
-      
+
               <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
                 <li>
                   <a onClick={() => navigate('/gestor')}>Dashboard</a>
                 </li>
-      
+
                 <li>
                   <a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a>
                 </li>
-      
+
                 <li>
                   <a onClick={() => navigate('/gestor/taxis')}>Táxis</a>
                 </li>
-      
+
                 <li>
                   <a className="active" onClick={() => navigate('/gestor/registar-motorista')}>Registar Motorista</a>
                 </li>
-      
+
                 <li>
                   <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
                 </li>
@@ -78,18 +145,49 @@ export default function GestorRegistarMotorista() {
             </div>
           )}
 
+          {erro && (
+            <div className="grm-erro">
+              {erro}
+            </div>
+          )}
+
           <form className="grm-form" onSubmit={handleSubmit}>
+
+            <div className="grm-row">
+              <div className="grm-field">
+                <label>Nome</label>
+                <input
+                  type="text"
+                  name="nome"
+                  placeholder="Nome completo"
+                  value={form.nome}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="grm-field">
+                <label>Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="email@exemplo.com"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
 
             <div className="grm-row">
               <div className="grm-field">
                 <label>Ano de Nascimento</label>
                 <input
                   type="number"
-                  name="anaNascimento"
+                  name="ano_nascimento"
                   placeholder="Ex: 1990"
                   min="1940"
                   max="2006"
-                  value={form.anaNascimento}
+                  value={form.ano_nascimento}
                   onChange={handleChange}
                   required
                 />
@@ -113,17 +211,17 @@ export default function GestorRegistarMotorista() {
                 <label>Género</label>
                 <select name="genero" value={form.genero} onChange={handleChange} required>
                   <option value="" disabled>Selecionar...</option>
-                  <option value="masculino">Masculino</option>
-                  <option value="feminino">Feminino</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Feminino</option>
                 </select>
               </div>
               <div className="grm-field">
                 <label>Nº Carta de Condução</label>
                 <input
                   type="text"
-                  name="numeroCarta"
-                  placeholder="Ex: C-123456-7"
-                  value={form.numeroCarta}
+                  name="n_carta_conducao"
+                  placeholder="Ex: ZA-12345 6"
+                  value={form.n_carta_conducao}
                   onChange={handleChange}
                   required
                 />
@@ -135,34 +233,9 @@ export default function GestorRegistarMotorista() {
                 <label>Senha</label>
                 <input
                   type="password"
-                  name="senha"
-                  placeholder="Senha de acesso"
-                  value={form.senha}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="grm-field">
-                <label>Localidade</label>
-                <input
-                  type="text"
-                  name="localidade"
-                  placeholder="Ex: Lisboa"
-                  value={form.localidade}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grm-row">
-              <div className="grm-field grm-field-wide">
-                <label>Morada</label>
-                <input
-                  type="text"
-                  name="morada"
-                  placeholder="Ex: Rua das Flores, 12"
-                  value={form.morada}
+                  name="senha_acesso_web"
+                  placeholder="Mínimo 6 caracteres (letras e números)"
+                  value={form.senha_acesso_web}
                   onChange={handleChange}
                   required
                 />
@@ -175,6 +248,19 @@ export default function GestorRegistarMotorista() {
                   placeholder="0000-000"
                   maxLength={8}
                   value={form.codigoPostal}
+                  onChange={handleCodigoPostal}
+                />
+              </div>
+            </div>
+
+            <div className="grm-row">
+              <div className="grm-field grm-field-wide">
+                <label>Morada {cpLoading && <span style={{ fontWeight: 'normal', fontSize: '0.8rem' }}>A procurar...</span>}</label>
+                <input
+                  type="text"
+                  name="morada"
+                  placeholder="Preenchida automaticamente pelo código postal"
+                  value={form.morada}
                   onChange={handleChange}
                   required
                 />

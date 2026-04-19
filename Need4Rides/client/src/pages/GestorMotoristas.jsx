@@ -16,7 +16,9 @@ export default function GestorMotoristas() {
     fetch('http://localhost:3000/api/user')
       .then(res => res.json())
       .then(data => {
-        const apenasMotoristas = data.filter(u => u.tipo === 'Motorista');
+        const apenasMotoristas = data
+          .filter(u => u.tipo === 'Motorista')
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setMotoristas(apenasMotoristas);
       })
       .catch(err => console.error('Erro ao carregar motoristas:', err))
