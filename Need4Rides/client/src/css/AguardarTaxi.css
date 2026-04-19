@@ -399,3 +399,254 @@
   .agt-bottom { grid-template-columns: 1fr; }
   .agt-navbar { padding: 0 1.2rem; }
 }
+
+/* =========================
+   🌞 MODO CLARO
+========================= */
+body.claro .agt-nav-links a:hover {
+  color: #f5a623;
+}
+
+/* Cards */
+body.claro .agt-status-card,
+body.claro .agt-details-card,
+body.claro .agt-map-placeholder {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* Textos */
+body.claro .agt-searching h2,
+body.claro .agt-found h2,
+body.claro .agt-details-card,
+body.claro .agt-point-value,
+body.claro .agt-meta-value {
+  color: #111;
+}
+
+body.claro .agt-searching p,
+body.claro .agt-found p,
+body.claro .agt-meta-label,
+body.claro .agt-point-label {
+  color: #555;
+}
+
+/* Divider */
+body.claro .agt-divider {
+  background: rgba(0,0,0,0.1);
+}
+
+/* Linha rota */
+body.claro .agt-route-line {
+  background: rgba(0,0,0,0.15);
+}
+
+/* Timer */
+body.claro .agt-timer {
+  color: #777;
+}
+
+/* Mapa */
+body.claro .agt-map-inner span {
+  color: #222;
+}
+
+body.claro .agt-map-inner p {
+  color: #666;
+}
+
+/* Cancel button */
+body.claro .agt-btn-cancel {
+  border: 1.5px solid rgba(255,80,80,0.4);
+  background: rgba(255,80,80,0.08);
+  color: #cc4444;
+}
+
+/* Spinner ajuste */
+body.claro .agt-spinner {
+  border: 3px solid rgba(0,0,0,0.1);
+  border-top-color: #f5a623;
+}
+
+
+/* container da imagem + texto */
+.profile-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* texto por baixo da imagem */
+.profile-avatar-info {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* estilo do "cliente - nome" */
+.profile-role {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #f5c518;
+  letter-spacing: 0.5px;
+  text-transform: capitalize;
+}
+
+/* ─── HAMBURGER ───────────────────────── */
+.agt-hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.agt-hamburger span {
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  transition: 0.3s;
+}
+
+/* animação */
+.agt-hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+.agt-hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+.agt-hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* botão tema */
+.agt-theme-btn {
+  background: transparent;
+  border: none;
+  color: #f5c518;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* RESPONSIVE MENU */
+@media (max-width: 768px) {
+  .agt-hamburger {
+    display: flex;
+  }
+
+  .agt-nav-links {
+    position: absolute;
+    top: 64px;
+    right: 0;
+    flex-direction: column;
+    background: rgba(10, 10, 10, 0.95);
+    width: 220px;
+    padding: 1rem;
+    display: none;
+  }
+
+  .agt-nav-links.active {
+    display: flex;
+  }
+}
+
+/* MOBILE NAVBAR FIX */
+@media (max-width: 768px) {
+  .agt-navbar {
+    padding: 0 1rem;
+  }
+
+  .agt-logo {
+    font-size: 1.1rem;
+  }
+
+  .agt-hamburger {
+    display: flex;
+  }
+
+  .agt-nav-links {
+    position: absolute;
+    top: 64px;
+    right: 0;
+    width: 220px;
+    flex-direction: column;
+    background: rgba(10, 10, 10, 0.96);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    border-radius: 0 0 0 12px;
+    display: none;
+    animation: slideIn 0.25s ease;
+  }
+
+  .agt-nav-links.active {
+    display: flex;
+  }
+
+  .agt-nav-links li {
+    width: 100%;
+  }
+
+  .agt-nav-links a,
+  .agt-theme-btn {
+    width: 100%;
+    text-align: left;
+    padding: 0.6rem 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .agt-wrapper {
+    padding: 80px 1rem 1.5rem;
+  }
+
+  .agt-bottom {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .agt-status-card {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+  }
+
+  .agt-searching h2,
+  .agt-found h2 {
+    font-size: 1.1rem;
+  }
+
+  .agt-spinner-ring {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+@media (max-width: 768px) {
+  .agt-details-card {
+    padding: 1.2rem;
+    border-radius: 16px;
+  }
+
+  .agt-meta-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .agt-meta-value {
+    font-size: 0.9rem;
+  }
+
+  .agt-point-value {
+    font-size: 0.85rem;
+  }
+}
