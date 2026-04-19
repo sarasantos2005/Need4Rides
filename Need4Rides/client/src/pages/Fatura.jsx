@@ -10,7 +10,15 @@ export default function Fatura() {
   const [fatura, setFaturaDados] = useState([]);
   const trip = state?.trip;
   const client = state?.client ?? 'Cliente';
+  const [tema, setTema] = useState(() => {
+    return localStorage.getItem('tema') || 'escuro';
+  });
 
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+  
   useEffect(() => {
     const carregarFatura = async() => {
       try {

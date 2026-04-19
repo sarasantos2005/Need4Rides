@@ -238,3 +238,65 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(245, 166, 35, 0.45);
 }
+
+/* ─────────────────────────────────────────────
+   LIGHT MODE
+───────────────────────────────────────────── */
+
+body.claro {
+  background: #f4f6fb;
+}
+
+/* card */
+body.claro .fatura-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0,0,0,0.08);
+  color: #111;
+}
+
+/* textos */
+body.claro .fatura-section h3,
+body.claro .fatura-label,
+body.claro .fatura-point-label {
+  color: #666;
+}
+
+body.claro .fatura-section p,
+body.claro .fatura-point-value {
+  color: #111;
+}
+
+/* divider */
+body.claro .fatura-divider {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* número fatura */
+body.claro .fatura-number {
+  color: #f5a623;
+}
+
+/* total */
+body.claro .fatura-total-value {
+  color: #f5a623;
+}
+
+/* botões */
+body.claro .fatura-btn.secondary {
+  background: rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.1);
+  color: #333;
+}
+
+body.claro .fatura-btn.secondary:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+body.claro .fatura-btn.email {
+  background: rgba(79, 172, 254, 0.1);
+}
+
+body.claro .fatura-btn.download {
+  background: linear-gradient(135deg, #f5a623, #f5c518);
+  color: #111;
+}
