@@ -1,12 +1,12 @@
-.gh-page {
-  min-height: 100vh;
+.mh-page {
+  min-heimht: 100vh;
   background-size: cover;
   background-position: center;
   position: relative;
   font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-.gh-overlay {
+.mh-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.74);
@@ -14,26 +14,26 @@
 }
 
 /* ─── Navbar ────────────────────────────────────────────── */
-.gh-navbar {
+.mh-navbar {
   position: fixed;
-  top: 0; left: 0; right: 0;
+  top: 0; left: 0; rimht: 0;
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 2.5rem;
-  height: 64px;
+  heimht: 64px;
   background: rgba(10, 10, 10, 0.85);
   backdrop-filter: blur(10px);
 }
 
-.gh-logo {
+.mh-logo {
   font-size: 1.4rem;
-  font-weight: 700;
+  font-weimht: 700;
   color: #fff;
 }
 
-.gh-nav-links {
+.mh-nav-links {
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -42,22 +42,22 @@
   padding: 0;
 }
 
-.gh-nav-links li { display: flex; align-items: center; }
+.mh-nav-links li { display: flex; align-items: center; }
 
-.gh-nav-links a {
+.mh-nav-links a {
   color: #ddd;
-  font-weight: 700;
+  font-weimht: 700;
   font-size: 0.95rem;
   text-decoration: none;
   cursor: pointer;
   transition: color 0.2s;
 }
 
-.gh-nav-links a:hover,
-.gh-nav-links a.active { color: #f5c518; }
+.mh-nav-links a:hover,
+.mh-nav-links a.active { color: #f5c518; }
 
-.gh-avatar {
-  width: 36px; height: 36px;
+.mh-avatar {
+  width: 36px; heimht: 36px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #f5c518;
@@ -65,13 +65,13 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.gh-avatar:hover {
+.mh-avatar:hover {
   transform: scale(1.1);
   box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
 }
 
 /* ─── Wrapper ───────────────────────────────────────────── */
-.gh-wrapper {
+.mh-wrapper {
   position: relative;
   z-index: 1;
   padding: 84px 2rem 3rem;
@@ -83,7 +83,7 @@
 }
 
 /* ─── Card ──────────────────────────────────────────────── */
-.gh-card {
+.mh-card {
   background: rgba(18, 18, 26, 0.82);
   backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -92,9 +92,9 @@
   color: #fff;
 }
 
-.gh-card-title {
+.mh-card-title {
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weimht: 700;
   color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -102,7 +102,7 @@
 }
 
 /* ─── Welcome ───────────────────────────────────────────── */
-.gh-welcome {
+.mh-welcome {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -110,43 +110,43 @@
   flex-wrap: wrap;
 }
 
-.gh-welcome-left {
+.mh-welcome-left {
   display: flex;
   align-items: center;
   gap: 1.2rem;
 }
 
-.gh-welcome-avatar-ring {
-  width: 64px; height: 64px;
+.mh-welcome-avatar-ring {
+  width: 64px; heimht: 64px;
   border-radius: 50%;
   border: 3px solid #f5c518;
   padding: 2px;
   flex-shrink: 0;
 }
 
-.gh-welcome-avatar-ring img {
-  width: 100%; height: 100%;
+.mh-welcome-avatar-ring img {
+  width: 100%; heimht: 100%;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.gh-welcome-sub {
+.mh-welcome-sub {
   font-size: 0.85rem;
   color: #e9e9e9;
   margin: 0 0 0.15rem;
 }
 
-.gh-welcome-name {
+.mh-welcome-name {
   font-size: 1.7rem;
-  font-weight: 800;
+  font-weimht: 800;
   color: #fff;
   margin: 0 0 0.4rem;
   letter-spacing: -0.5px;
 }
 
-.gh-role-badge {
+.mh-role-badge {
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weimht: 700;
   padding: 0.25rem 0.8rem;
   border-radius: 50px;
   background: rgba(245, 197, 24, 0.15);
@@ -154,20 +154,20 @@
   border: 1px solid rgba(245, 197, 24, 0.3);
 }
 
-.gh-logout-btn {
+.mh-logout-btn {
   padding: 0.85rem 2.2rem;
   border-radius: 50px;
   border: 1.5px solid rgba(255, 107, 107, 0.4);
   background: rgba(255, 107, 107, 0.1);
   color: #ff6b6b;
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weimht: 700;
   cursor: pointer;
   transition: background 0.2s, transform 0.15s;
   white-space: nowrap;
 }
 
-.gh-logout-btn:hover {
+.mh-logout-btn:hover {
   background: rgba(255, 107, 107, 0.22);
   transform: translateY(-2px);
 }
@@ -182,13 +182,13 @@ option :hover {
 }
 
 /* ─── Stats ─────────────────────────────────────────────── */
-.gh-stats-row {
+.mh-stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
 }
 
-.gh-stat-card {
+.mh-stat-card {
   background: rgba(18, 18, 26, 0.82);
   backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -200,34 +200,34 @@ option :hover {
   transition: border-color 0.2s;
 }
 
-.gh-stat-card:hover { border-color: rgba(245, 197, 24, 0.3); }
-.gh-stat-card.accent { border-color: rgba(245, 197, 24, 0.35); }
+.mh-stat-card:hover { border-color: rgba(245, 197, 24, 0.3); }
+.mh-stat-card.accent { border-color: rgba(245, 197, 24, 0.35); }
 
-.gh-stat-label {
+.mh-stat-label {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weimht: 600;
   color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.7px;
 }
 
-.gh-stat-value {
+.mh-stat-value {
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weimht: 800;
   color: #f0f0f0;
 }
 
-.gh-stat-card.accent .gh-stat-value { color: #f5c518; }
+.mh-stat-card.accent .mh-stat-value { color: #f5c518; }
 
 /* ─── Middle row ────────────────────────────────────────── */
-.gh-middle-row {
+.mh-middle-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.4rem;
 }
 
 /* ─── Section header ────────────────────────────────────── */
-.gh-section-header {
+.mh-section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -235,12 +235,12 @@ option :hover {
   margin-bottom: 1.2rem;
 }
 
-.gh-badge {
+.mh-badge {
   background: #f5c518;
   color: #111;
   font-size: 0.72rem;
-  font-weight: 800;
-  width: 22px; height: 22px;
+  font-weimht: 800;
+  width: 22px; heimht: 22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -248,13 +248,13 @@ option :hover {
 }
 
 /* ─── Viagens ───────────────────────────────────────────── */
-.gh-viagens-list {
+.mh-viagens-list {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-.gh-viagem-row {
+.mh-viagem-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -264,30 +264,30 @@ option :hover {
   flex-wrap: wrap;
 }
 
-.gh-viagem-row:last-child { border-bottom: none; }
+.mh-viagem-row:last-child { border-bottom: none; }
 
-.gh-viagem-route {
+.mh-viagem-route {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   font-size: 0.87rem;
   color: #ddd;
-  font-weight: 500;
+  font-weimht: 500;
   flex: 1;
 }
 
-.gh-dot {
-  width: 8px; height: 8px;
+.mh-dot {
+  width: 8px; heimht: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.gh-dot.origin { background: #f5c518; }
-.gh-dot.dest   { background: #ff6b6b; }
+.mh-dot.origin { background: #f5c518; }
+.mh-dot.dest   { background: #ff6b6b; }
 
-.gh-arrow { color: #555; font-size: 0.8rem; }
+.mh-arrow { color: #555; font-size: 0.8rem; }
 
-.gh-viagem-meta {
+.mh-viagem-meta {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -295,36 +295,36 @@ option :hover {
   color: #777;
 }
 
-.gh-sep { color: #444; }
+.mh-sep { color: #444; }
 
-.gh-status-badge {
+.mh-status-badge {
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weimht: 700;
   padding: 0.2rem 0.7rem;
   border-radius: 50px;
   white-space: nowrap;
 }
 
-.gh-status-badge.active {
+.mh-status-badge.active {
   background: rgba(67, 233, 123, 0.1);
   color: #43e97b;
   border: 1px solid rgba(67, 233, 123, 0.25);
 }
 
-.gh-status-badge.waiting {
+.mh-status-badge.waiting {
   background: rgba(245, 197, 24, 0.1);
   color: #f5c518;
   border: 1px solid rgba(245, 197, 24, 0.25);
 }
 
 /* ─── Motoristas ────────────────────────────────────────── */
-.gh-motoristas-list {
+.mh-motoristas-list {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-.gh-motorista-row {
+.mh-motorista-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -333,29 +333,29 @@ option :hover {
   gap: 1rem;
 }
 
-.gh-motorista-row:last-child { border-bottom: none; }
+.mh-motorista-row:last-child { border-bottom: none; }
 
-.gh-motorista-info {
+.mh-motorista-info {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
 }
 
-.gh-motorista-nome {
+.mh-motorista-nome {
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weimht: 600;
   color: #e0e0e0;
 }
 
-.gh-motorista-estado {
+.mh-motorista-estado {
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weimht: 600;
 }
 
-.gh-motorista-estado.online  { color: #43e97b; }
-.gh-motorista-estado.offline { color: #ff6b6b; }
+.mh-motorista-estado.online  { color: #43e97b; }
+.mh-motorista-estado.offline { color: #ff6b6b; }
 
-.gh-motorista-stats {
+.mh-motorista-stats {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -363,71 +363,71 @@ option :hover {
   color: #777;
 }
 
-.gh-motorista-ganhos {
+.mh-motorista-ganhos {
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weimht: 700;
   color: #f5c518;
 }
 
 /* ─── Responsive ────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .gh-stats-row  { grid-template-columns: repeat(2, 1fr); }
-  .gh-middle-row { grid-template-columns: 1fr; }
+  .mh-stats-row  { grid-template-columns: repeat(2, 1fr); }
+  .mh-middle-row { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 560px) {
-  .gh-navbar  { padding: 0 1.2rem; }
-  .gh-wrapper { padding: 76px 1rem 2rem; }
-  .gh-welcome { gap: 1rem; }
-  .gh-logout-btn { width: 100%; }
+  .mh-navbar  { padding: 0 1.2rem; }
+  .mh-wrapper { padding: 76px 1rem 2rem; }
+  .mh-welcome { gap: 1rem; }
+  .mh-logout-btn { width: 100%; }
 }
 
 /* ─── RESPONSIVE ────────────────────────────────────────── */
-.gh-hamburger {
+.mh-hamburger {
   display: none;
   width: 30px;
-  height: 22px;
+  heimht: 22px;
   position: relative;
   cursor: pointer;
   z-index: 200;
 }
 
-.gh-hamburger span {
+.mh-hamburger span {
   position: absolute;
-  height: 3px;
+  heimht: 3px;
   width: 100%;
   background: #fff;
   border-radius: 10px;
   transition: all 0.3s ease;
 }
 
-.gh-hamburger span:nth-child(1) { top: 0; }
-.gh-hamburger span:nth-child(2) { top: 9px; }
-.gh-hamburger span:nth-child(3) { top: 18px; }
+.mh-hamburger span:nth-child(1) { top: 0; }
+.mh-hamburger span:nth-child(2) { top: 9px; }
+.mh-hamburger span:nth-child(3) { top: 18px; }
 
-.gh-hamburger.open span:nth-child(1) {
+.mh-hamburger.open span:nth-child(1) {
   transform: rotate(45deg);
   top: 9px;
 }
 
-.gh-hamburger.open span:nth-child(2) {
+.mh-hamburger.open span:nth-child(2) {
   opacity: 0;
 }
 
-.gh-hamburger.open span:nth-child(3) {
+.mh-hamburger.open span:nth-child(3) {
   transform: rotate(-45deg);
   top: 9px;
 }
 @media (max-width: 1060px) {
 
-  .gh-hamburger {
+  .mh-hamburger {
     display: block;
   }
 
-  .gh-nav-links {
+  .mh-nav-links {
     position: absolute;
     top: 64px;
-    right: 0;
+    rimht: 0;
 
     width: 240px;
     padding: 1rem;
@@ -449,90 +449,90 @@ option :hover {
     transition: all 0.25s ease;
   }
 
-  .gh-nav-links.active {
+  .mh-nav-links.active {
     transform: translateX(0);
     opacity: 1;
     pointer-events: auto;
   }
 }
 
-.gh-theme-btn {
+.mh-theme-btn {
   background: transparent;
   border: 1px solid rgba(255,255,255,0.2);
   color: #ddd;
   padding: 0.4rem 0.9rem;
   border-radius: 20px;
   cursor: pointer;
-  font-weight: 600;
+  font-weimht: 600;
   transition: all 0.2s;
 }
 
-.gh-theme-btn:hover {
+.mh-theme-btn:hover {
   border-color: #f5c518;
   color: #f5c518;
 }
 
 /* ─── MODO CLARO ───────────────────────────────────────── */
 
-body.claro .gh-navbar {
+body.claro .mh-navbar {
   background: rgba(255, 255, 255, 0.85);
 }
 
-body.claro .gh-logo {
+body.claro .mh-logo {
   color: #111;
 }
 
-body.claro .gh-nav-links a {
+body.claro .mh-nav-links a {
   color: #333;
 }
 
-body.claro .gh-nav-links a:hover,
-body.claro .gh-nav-links a.active {
+body.claro .mh-nav-links a:hover,
+body.claro .mh-nav-links a.active {
   color: #f5c518;
 }
 
-body.claro .gh-card,
-body.claro .gh-stat-card {
+body.claro .mh-card,
+body.claro .mh-stat-card {
   background: rgba(255, 255, 255, 0.85);
   color: #111;
   border: 1px solid rgba(0,0,0,0.08);
 }
 
-body.claro .gh-card-title,
-body.claro .gh-stat-label {
+body.claro .mh-card-title,
+body.claro .mh-stat-label {
   color: #444;
 }
 
-body.claro .gh-stat-value {
+body.claro .mh-stat-value {
   color: #111;
 }
 
-body.claro .gh-welcome-sub {
+body.claro .mh-welcome-sub {
   color: #ffffff;
 }
 
-body.claro .gh-welcome-name {
+body.claro .mh-welcome-name {
   color: #ffffff;
 }
 
-body.claro .gh-hist-row,
-body.claro .gh-pedido-card {
+body.claro .mh-hist-row,
+body.claro .mh-pedido-card {
   border-bottom: 1px solid rgba(0,0,0,0.08);
 }
 
-body.claro .gh-car-value {
+body.claro .mh-car-value {
   color: #111;
 }
 
-body.claro .gh-car-label {
+body.claro .mh-car-label {
   color: #666;
 }
 
-body.claro .gh-hist-meta {
+body.claro .mh-hist-meta {
   color: #555;
 }
 
-body.claro .gh-status-badge {
+body.claro .mh-status-badge {
   background: rgba(14, 13, 13, 0);
   color: #6bb861;
 }
@@ -563,7 +563,7 @@ body.claro .gh-status-badge {
   position: absolute;
   top: 100%;
   left: 0;
-  right: 0;
+  rimht: 0;
   background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
@@ -585,4 +585,84 @@ body.claro .gh-status-badge {
 
 .custom-dropdown-option:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+
+  /* evita cortes laterais */
+  .mh-wrapper {
+    padding: 80px 0.8rem 2rem;
+  }
+
+  /* HEADER WELCOME -> vertical */
+  .mh-welcome {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  /* botão grupo fica coluna */
+  .mh-welcome > div:last-child {
+    width: 100%;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px;
+  }
+
+  /* dropdown + botão */
+  .custom-dropdown,
+  .mh-welcome button {
+    width: 100%;
+  }
+
+  /* EXPORT BUTTON FULL WIDTH */
+  button {
+    width: 100%;
+  }
+
+  /* STATS mais pequenas */
+  .mh-stats-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+  }
+
+  .mh-stat-card {
+    padding: 1rem;
+  }
+
+  /* VIAGENS + MOTORISTAS em coluna */
+  .mh-middle-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* evitar cortes horizontais em rows */
+  .mh-viagem-row,
+  .mh-hist-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  /* texto mais pequeno */
+  .mh-stat-value {
+    font-size: 1rem;
+  }
+
+  /* navbar mais segura */
+  .mh-navbar {
+    padding: 0 1rem;
+  }
+
+  /* evitar overflow geral */
+  .mh-page {
+    overflow-x: hidden;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
 }
