@@ -149,7 +149,13 @@ exports.confirmacaoCliente = async (req, res) => {
     const { viagemId, confirma, motoristaId } = req.body;
 
     if (!confirma) {
-      await Viagem.findByIdAndUpdate(viagemId, { $unset: { motorista_proposto: "" } }, { $addToSet: { motoristas_rejeitados: motoristaId } });
+      const turno = await Turno.findById(motoristaId);
+      if (!turno) return res.status(404).json({ message: "Turno não encontrado." });
+
+      await Viagem.findByIdAndUpdate(viagemId, {
+        $unset: { motorista_proposto: "" }, 
+        $addToSet: { motoristas_rejeitados: turno.motorista }
+      });
       return res.status(200).json({ message: "Motorista rejeitado. O pedido continua pendente. " });
     }
 

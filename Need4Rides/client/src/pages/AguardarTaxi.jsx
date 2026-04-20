@@ -94,7 +94,7 @@ export default function AguardarTaxi() {
         const data = response.data;
 
         setStatus(data.status); 
-        if (data.motorista) setMotorista(data.motorista); 
+        if (data.motorista) setDriver(data.motorista); 
       } catch (err) {
         console.error("Erro ao buscar status:", err.message);
       }
@@ -118,7 +118,8 @@ export default function AguardarTaxi() {
         },
         body: JSON.stringify({ 
           viagemId: viagemId, 
-          confirma: aceite 
+          confirma: aceite,
+          motoristaId: condutor?._id
         })
       });
 
