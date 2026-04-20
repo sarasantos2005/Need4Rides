@@ -220,6 +220,13 @@ export default function PedirTaxi() {
   const navigate = useNavigate();
   const [showMapOrigem, setShowMapOrigem] = useState(false);
   const [showMapDestino, setShowMapDestino] = useState(false);
+
+  const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+  const alternarTema = () => setTema(prev => prev === 'escuro' ? 'claro' : 'escuro');
   const [confirmed, setConfirmed] = useState(false);
   const [tabelaPrecos, setTabelaPrecos] = useState(null);
   const [form, setForm] = useState({
@@ -334,6 +341,11 @@ export default function PedirTaxi() {
         <span className="pt-logo" onClick={() => navigate('/home')}>Need4Rides</span>
         <ul className="pt-nav-links">
           <li><a onClick={() => navigate('/home')}>Home</a></li>
+          <li>
+            <button className="pt-theme-btn" onClick={alternarTema}>
+              {tema === 'escuro' ? '🌙 Escuro' : '☀️ Claro'}
+            </button>
+          </li>
           <li><AvatarDropdown profilePath="/profile" avatarClass="pt-avatar" /></li>
         </ul>
       </nav>

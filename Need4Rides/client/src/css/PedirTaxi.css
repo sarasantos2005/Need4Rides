@@ -329,6 +329,116 @@
   background: rgba(245, 166, 35, 0.2);
 }
 
+/* ─── Theme button ──────────────────────────────────────── */
+.pt-theme-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.pt-theme-btn:hover {
+  background: rgba(245, 197, 24, 0.2);
+}
+
+/* ─── Modo Claro ─────────────────────────────────────────── */
+body.claro .pt-overlay {
+  background: rgba(0, 0, 0, 0.74);
+}
+
+body.claro .pt-heading {
+  color: #111;
+}
+
+body.claro .pt-heading p {
+  color: #555;
+}
+
+body.claro .pt-form {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+body.claro .pt-field label {
+  color: #333;
+}
+
+body.claro .pt-field input {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #111;
+}
+
+body.claro .pt-field input::placeholder {
+  color: #999;
+}
+
+body.claro .pt-field input:focus {
+  border-color: #f5a623;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+body.claro .pt-pass-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #444;
+}
+
+body.claro .pt-pass-btn.active {
+  background: rgba(245, 166, 35, 0.18);
+  border-color: rgba(245, 197, 24, 0.55);
+  color: #b08900;
+}
+
+body.claro .pt-pass-btn:hover:not(.active) {
+  background: rgba(0, 0, 0, 0.08);
+  color: #111;
+}
+
+body.claro .pt-estimate {
+  background: rgba(245, 166, 35, 0.08);
+  border-color: rgba(245, 166, 35, 0.3);
+}
+
+body.claro .pt-estimate-label {
+  color: #555;
+}
+
+body.claro .pt-estimate-value {
+  color: #111;
+}
+
+body.claro .pt-estimate-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+body.claro .pt-confirmed p {
+  color: #111;
+}
+
+body.claro .pt-confirmed span {
+  color: #555;
+}
+
+body.claro .pt-theme-btn {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #fff;
+}
+
+body.claro .pt-heading {
+  color: #fff;
+}
+
+body.claro .pt-heading p {
+  color: #ccc;
+}
+
 /* ─── Responsive ────────────────────────────────────────── */
 @media (max-width: 480px) {
   .pt-navbar { padding: 0 1.2rem; }
