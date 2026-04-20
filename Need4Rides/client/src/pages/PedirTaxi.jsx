@@ -220,6 +220,7 @@ export default function PedirTaxi() {
   const navigate = useNavigate();
   const [showMapOrigem, setShowMapOrigem] = useState(false);
   const [showMapDestino, setShowMapDestino] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
   useEffect(() => {
@@ -339,8 +340,18 @@ export default function PedirTaxi() {
       {/* Navbar */}
       <nav className="pt-navbar">
         <span className="pt-logo" onClick={() => navigate('/home')}>Need4Rides</span>
-        <ul className="pt-nav-links">
-          <li><a onClick={() => navigate('/home')}>Home</a></li>
+
+        <div
+          className={`pt-hamburger ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <ul className={`pt-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li><a onClick={() => { navigate('/home'); setMenuOpen(false); }}>Home</a></li>
           <li>
             <button className="pt-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '🌙 Escuro' : '☀️ Claro'}
