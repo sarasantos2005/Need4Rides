@@ -362,7 +362,144 @@
   width: 100%;
 }
 
+/* ─── Theme button ──────────────────────────────────────── */
+.pag-theme-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.pag-theme-btn:hover {
+  background: rgba(245, 197, 24, 0.2);
+}
+
+/* ─── Hamburger ─────────────────────────────────────────── */
+.pag-hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.pag-hamburger span {
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  transition: 0.3s;
+}
+
+.pag-hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.pag-hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.pag-hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* ─── Modo Claro ─────────────────────────────────────────── */
+body.claro .pag-overlay {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+body.claro .pag-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  color: #111;
+}
+
+body.claro .pag-header h1 {
+  color: #111;
+}
+
+body.claro .pag-header p,
+body.claro .pag-price-label {
+  color: #555;
+}
+
+body.claro .pag-divider {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+body.claro .pag-field label {
+  color: #333;
+}
+
+body.claro .pag-field input {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #111 !important;
+}
+
+body.claro .pag-field input::placeholder {
+  color: #999;
+}
+
+body.claro .pag-field input:focus {
+  border-color: #f5a623;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+body.claro .pag-card-number,
+body.claro .pag-card-label-sm {
+  color: #fff;
+}
+
+body.claro .pag-stripe-badge span {
+  color: #333;
+}
+
+body.claro .pag-btn-back {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #444;
+}
+
+body.claro .pag-btn-back:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #111;
+}
+
+body.claro .pag-success h2 {
+  color: #111;
+}
+
+body.claro .pag-success p {
+  color: #555;
+}
+
 /* ─── Responsive ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .pag-hamburger {
+    display: flex;
+  }
+
+  .pag-nav-links {
+    position: absolute;
+    top: 64px;
+    right: 0;
+    flex-direction: column;
+    background: rgba(10, 10, 10, 0.95);
+    width: 220px;
+    padding: 1rem;
+    display: none;
+    gap: 1rem;
+  }
+
+  .pag-nav-links.active {
+    display: flex;
+  }
+}
+
 @media (max-width: 480px) {
   .pag-navbar { padding: 0 1.2rem; }
   .pag-card { padding: 1.5rem 1.2rem; }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import stripeImg from '../assets/images/stripe.png';
@@ -56,7 +56,15 @@ function StripeForm() {
 export default function Pagamento() {
   const navigate = useNavigate();
   const [paid, setPaid] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const price = '€18.50';
+
+  const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+  const alternarTema = () => setTema(prev => prev === 'escuro' ? 'claro' : 'escuro');
 
   return (
     <div className="pag-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -65,13 +73,26 @@ export default function Pagamento() {
       {/* Navbar */}
       <nav className="pag-navbar">
         <span className="pag-logo" onClick={() => navigate('/')}>Need4Rides</span>
-        <ul className="pag-nav-links">
-          <li><a onClick={() => navigate('/')}>Home</a></li>
-          <li><a onClick={() => navigate('/services')} style={{ cursor: 'pointer' }}>Serviços</a></li>
-          <li><a onClick={() => navigate('/pedir-taxi')}>Pedir Táxi</a></li>
-          <li><a onClick={() => navigate('/viagem')} style={{ cursor: 'pointer' }}>Viagem</a></li>
+
+        <div
+          className={`pag-hamburger ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <ul className={`pag-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li><a onClick={() => { navigate('/'); setMenuOpen(false); }}>Home</a></li>
+          <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
+          <li><a onClick={() => { navigate('/viagem'); setMenuOpen(false); }}>Viagem</a></li>
           <li><a className="active">Pagamento</a></li>
-          <li><button className="pag-login-btn" onClick={() => navigate('/login')}>Login</button></li>
+          <li>
+            <button className="pag-theme-btn" onClick={alternarTema}>
+              {tema === 'escuro' ? '🌙 Escuro' : '☀️ Claro'}
+            </button>
+          </li>
           <li><AvatarDropdown profilePath="/profile" avatarClass="pag-avatar" /></li>
         </ul>
       </nav>
