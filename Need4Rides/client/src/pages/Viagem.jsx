@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
@@ -11,6 +11,15 @@ export default function Viagem() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const [stage, setStage] = useState(1);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+
+  const alternarTema = () => setTema(prev => prev === 'escuro' ? 'claro' : 'escuro');
 
   const form = state?.form ?? {};
   const estimate = state?.estimate ?? {};
@@ -30,11 +39,26 @@ export default function Viagem() {
       {/* Navbar */}
       <nav className="viagem-navbar">
         <span className="viagem-logo" onClick={() => navigate('/home')}>Need4Rides</span>
-        <ul className="viagem-nav-links">
-          <li><a onClick={() => navigate('/home')}>Home</a></li>
-          <li><a onClick={() => navigate('/services')}>Serviços</a></li>
-          <li><a onClick={() => navigate('/pedir-taxi')}>Pedir Táxi</a></li>
+
+        <div
+          className={`viagem-hamburger ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <ul className={`viagem-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li><a onClick={() => { navigate('/home'); setMenuOpen(false); }}>Home</a></li>
+          <li><a onClick={() => { navigate('/services'); setMenuOpen(false); }}>Serviços</a></li>
+          <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
           <li><a className="active">Viagem</a></li>
+          <li>
+            <button className="viagem-theme-btn" onClick={alternarTema}>
+              {tema === 'escuro' ? '🌙 Escuro' : '☀️ Claro'}
+            </button>
+          </li>
           <li><AvatarDropdown profilePath="/profile" avatarClass="viagem-avatar" /></li>
         </ul>
       </nav>

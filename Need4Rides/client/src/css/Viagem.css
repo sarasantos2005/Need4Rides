@@ -321,6 +321,7 @@
 
 .viagem-eta-label {
   font-size: 0.78rem;
+  font-weight: 600;
   color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -449,8 +450,196 @@
   margin: 0;
 }
 
+/* ─── Theme button ──────────────────────────────────────── */
+.viagem-theme-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.viagem-theme-btn:hover {
+  background: rgba(245, 197, 24, 0.2);
+}
+
+/* ─── Hamburger ─────────────────────────────────────────── */
+.viagem-hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.viagem-hamburger span {
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  transition: 0.3s;
+}
+
+.viagem-hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.viagem-hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.viagem-hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* ─── Modo Claro ─────────────────────────────────────────── */
+body.claro .viagem-overlay {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+body.claro .viagem-status-card,
+body.claro .viagem-info-card,
+body.claro .viagem-driver-card,
+body.claro .viagem-map-placeholder {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+body.claro .viagem-status-label {
+  color: #555;
+}
+
+body.claro .viagem-step-label {
+  color: #444;
+}
+
+body.claro .viagem-step-label.current {
+  color: #b08900;
+}
+
+body.claro .viagem-step-dot {
+  border-color: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+body.claro .viagem-step-line {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+body.claro .viagem-stage-btn {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+  color: #444;
+}
+
+body.claro .viagem-stage-btn.active {
+  background: rgba(245, 166, 35, 0.15);
+  border-color: rgba(245, 197, 24, 0.4);
+  color: #b08900;
+}
+
+body.claro .viagem-point-label {
+  color: #555;
+}
+
+body.claro .viagem-point-value {
+  color: #111;
+}
+
+body.claro .viagem-route-line {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+body.claro .viagem-eta-label {
+  color: #555;
+}
+
+body.claro .viagem-driver-name {
+  color: #111;
+}
+
+body.claro .viagem-driver-sub {
+  color: #555;
+}
+
+body.claro .viagem-driver-rating span {
+  color: #444;
+}
+
+body.claro .viagem-map-inner span {
+  color: #333;
+}
+
+body.claro .viagem-map-inner p {
+  color: #888;
+}
+
+body.claro .viagem-eta-value {
+  color: #111;
+}
+
+body.claro .viagem-call-btn {
+  color: #111;
+  border-color: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+body.claro .viagem-call-btn:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+body.claro .viagem-status-label {
+  color: #111;
+  font-weight: 700;
+}
+
+body.claro .viagem-status-badge.active {
+  color: #b08900;
+  background: rgba(245, 166, 35, 0.15);
+  border-color: rgba(180, 130, 0, 0.4);
+}
+
 /* ─── Responsive ────────────────────────────────────────── */
 @media (max-width: 768px) {
   .viagem-bottom { grid-template-columns: 1fr; }
-  .viagem-navbar { padding: 0 1.2rem; gap: 1rem; }
+  .viagem-navbar { padding: 0 1.2rem; }
+
+  .viagem-hamburger {
+    display: flex;
+  }
+
+  .viagem-nav-links {
+    position: absolute;
+    top: 64px;
+    right: 0;
+    flex-direction: column;
+    background: rgba(10, 10, 10, 0.95);
+    width: 220px;
+    padding: 1rem;
+    display: none;
+    gap: 1rem;
+  }
+
+  .viagem-nav-links.active {
+    display: flex;
+  }
+
+  .viagem-driver-card {
+    flex-wrap: wrap;
+  }
+
+  .viagem-call-btn {
+    width: 100%;
+    text-align: center;
+    padding: 0.6rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .viagem-status-card { padding: 1.2rem 1rem; }
+  .viagem-info-card { padding: 1.2rem 1rem; }
+  .viagem-driver-card { padding: 1.2rem 1rem; }
+  .viagem-step-label { font-size: 0.65rem; max-width: 60px; }
 }
