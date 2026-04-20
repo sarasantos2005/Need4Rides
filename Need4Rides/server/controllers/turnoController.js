@@ -109,3 +109,41 @@ exports.terminarTurno = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+//Posição do motorista
+exports.atualizarPosicao = async(req, res) => {
+  try {
+    const motoristaId = req.userId;
+    const {lat, lng} = req.body;
+
+    const nLat = parseFloat(lat);
+    const nLng = parseFloat(lng);
+
+    if (isNaN(nLat) || isNaN(nLng)) {
+        return res.status(400).json({ message: "Coordenadas inválidas recebidas." });
+    }
+
+    const turno = await Turno.findOneAndUpdate(
+      { motorista: motoristaId, estado: 'Ativo' },
+      { 
+          $set: { 
+              localizacao_atual: { 
+                  type: "Point", 
+                  coordinates: [nLng, nLat] 
+              },
+              last_updated: new Date()
+          }
+      },
+      { returnDocument: 'after' }
+    );
+
+    if (!turno) {
+      return res.status(404).json({ message: "Nenhum turno ativo encontrado para este motorista." });
+    }
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error("ERRO NO POST POSIÇÃO:", err);
+    res.status(500).json({ err: "Erro ao atualizar posição." });
+  }
+};

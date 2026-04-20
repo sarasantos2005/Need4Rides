@@ -21,6 +21,7 @@ import GestorMotoristas from './pages/GestorMotoristas';
 import GestorTaxis from './pages/GestorTaxis';
 import GestorProfile from './pages/GestorProfile';
 import MotoristaRequisitarTaxi from './pages/MotoristaRequisitarTaxi';
+import MotoristaLayout from './layouts/MotoristaLayout';
 
 export default function App() {
   return (
@@ -35,19 +36,22 @@ export default function App() {
         <Route path="/viagem" element={<Viagem />} />
         <Route path="/pagamento" element={<Pagamento />} />
         <Route path="/aguardar-taxi" element={<AguardarTaxi />} />
-        <Route path="/motorista" element={<MotoristaHome />} />
-        <Route path="/motorista/perfil" element={<MotoristaProfile />} />
-        <Route path="/motorista/requisitar-taxi" element={<MotoristaRequisitarTaxi />} />
+        <Route element={<MotoristaLayout />}>
+          <Route path="/motorista" element={<MotoristaHome />} />
+          <Route path="/motorista/perfil" element={<MotoristaProfile />} />
+          <Route path="/motorista/requisitar-taxi" element={<MotoristaRequisitarTaxi />} />
+          <Route path="/motorista/historico" element={<MotoristaHistorico />} />
+          <Route path="/motorista/reabastecimento" element={<MotoristaReabastecimento />} />
+          <Route path="/motorista/suporte" element={<MotoristaSuporte />} />
+          <Route path="/motorista/viagem" element={<MotoristaViagem />} />
+          <Route path="/motorista/fatura-conf" element={<MotoristaFaturaConf />} />
+        </Route>
         <Route path="/gestor" element={<GestorHome />} />
         <Route path="/gestor/registar-motorista" element={<GestorRegistarMotorista />} />
         <Route path="/gestor/motoristas" element={<GestorMotoristas />} />
         <Route path="/gestor/taxis" element={<GestorTaxis />} />
         <Route path="/gestor/perfil" element={<GestorProfile />} />
-        <Route path="/motorista/historico" element={<MotoristaHistorico />} />
-        <Route path="/motorista/reabastecimento" element={<MotoristaReabastecimento />} />
-        <Route path="/motorista/suporte" element={<MotoristaSuporte />} />
-        <Route path="/motorista/viagem" element={<MotoristaViagem />} />
-        <Route path="/motorista/fatura-conf" element={<MotoristaFaturaConf />} />
+        
       </Routes>
     </BrowserRouter>
   );

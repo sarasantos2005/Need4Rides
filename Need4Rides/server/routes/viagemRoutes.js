@@ -14,5 +14,6 @@ router.get('/motorista', auth, viagemController.historicoDeViagens);
 router.patch('/recusar', auth, viagemController.recusarCliente); // Motorista rejeita um pedido de viagem
 router.get("/historico/cliente", auth, viagemController.historicoDeViagens_Cliente);
 router.get("/status/:viagemId", auth, viagemController.fetchViagemStatus);
+router.get("/espera", auth, viagemController.estimarTempoEspera);
 
 module.exports = router;

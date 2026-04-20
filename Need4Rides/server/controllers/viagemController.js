@@ -556,3 +556,52 @@ exports.fetchViagemStatus = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+//Tempo de espera (pedir taxi)
+exports.estimarTempoEspera = async (req, res) => {
+  try {
+    const { lat, lng } = req.query;
+
+    if (!lat || !lng) return res.status(400).json({ error: "Coordenadas em falta" });
+
+    //Motoristas ativos num raio de 10km
+    const motoristasAtivos = await Turno.find({ 
+      estado: "Ativo",
+      localizacao_atual: {
+          $nearSphere: {
+              $geometry: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] },
+              $maxDistance: 10000 
+          }
+      }
+    });
+
+    if(motoristasAtivos.length === 0) return res.status(200).json({ tempoEspera: 15, media: 15 });
+
+    let coordsStr = `${lng},${lat}`;
+    motoristasAtivos.forEach(m => {
+      const [mLng, mLat] = m.localizacao_atual.coordinates;
+      coordsStr += `;${mLng},${mLat}`;
+    });
+    
+    //OSRM Matrix
+    const sources = motoristasAtivos.map((_, index) => index + 1).join(';');
+    const url = `http://router.project-osrm.org/table/v1/driving/${coordsStr}?sources=${sources}&destinations=0`;
+    const response = await axios.get(url);
+
+    if (response.data && response.data.durations) {
+      const tempos = response.data.durations.map(d => d[0]/60); //minutos
+      const soma = tempos.reduce((a,b) => a + b, 0);
+      const media = soma / tempos.length;
+
+      res.status(200).json({ 
+          tempoEspera: Math.round(Math.min(...tempos)), //mais rapido
+          media: Math.round(media) //media de tempos de espera
+      });
+    } else {
+      res.status(200).json({ tempoEspera: 10, media: 10 });
+    }
+  } catch (err) {
+    console.error("DEBUG: ERRO NO BACKEND:", err); // ISTO VAI MOSTRAR O ERRO REAL
+    res.status(500).json({ err: "Erro ao calcular espera." });
+  }
+};

@@ -8,5 +8,6 @@ router.get('/atual', auth, turnoController.turnoAtual);
 router.post("/", turnoController.novoTurno);
 router.patch('/devolver', turnoController.devolverTaxiTurno);
 router.patch("/finalizar", turnoController.terminarTurno);
+router.post("/posicao", auth, turnoController.atualizarPosicao);
 
 module.exports = router;

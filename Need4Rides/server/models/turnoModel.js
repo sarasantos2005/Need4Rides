@@ -25,9 +25,18 @@ const turnoSchema = new mongoose.Schema({
         type: String, 
         enum: ['Agendado', 'Ativo', 'Terminado', 'Cancelado'], 
         default: 'Agendado' 
-    }
+    },
     
+    localizacao_atual: {
+        type: { type: String, default: 'Point' },
+        coordinates: { type: [Number] }
+    },
 
+    last_updated: { 
+        type: Date, 
+        default: Date.now 
+    }
 });
 
+turnoSchema.index({ localizacao_atual: "2dsphere" });
 module.exports = mongoose.model("Turno", turnoSchema, "Turnos");

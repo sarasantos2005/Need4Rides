@@ -187,7 +187,7 @@ export default function AguardarTaxi() {
 
               <h2>{DOTS[dotIdx]}</h2>
               <p>
-                Tempo de espera estimado: <strong>{estimate.wait} min</strong>
+                Tempo de espera estimado: <strong>{estimate.tempoMedio} min</strong>
               </p>
               <span className="agt-timer">{fmt(seconds)}</span>
             </div>

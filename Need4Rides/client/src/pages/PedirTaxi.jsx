@@ -183,38 +183,8 @@ function calcEstimate(origem, destino, passengers) {
   const seed = (origem.length + destino.length) * 1.3;
   const km = Math.max(2, Math.round(seed % 22) + 3);
   const price = (BASE_PRICE + km * PRICE_PER_KM * (passengers > 4 ? 1.2 : 1)).toFixed(2);
-  const wait = calcularTempoOSRM(origem, destino);
   return { wait, km, price };
 }
-
-//Tempo estimado de um lugar a outro
-function calcularTempoEstimado(coordsInicio, coordsFim) {
-  if (!coordsFim) return 10; 
-  
-  const distancia = calcularDistancia(coordsInicio.coordinates, coordsFim.coordinates || coordsFim);
-  const velocidadeMedia = 60; 
-  const tempoHoras = distancia / velocidadeMedia;
-  return Math.max(tempoHoras * 60, 5); 
-}
-
-const calcularTempoOSRM = async (origem, destino) => {
-  try {
-    const coordsOrigem = `${origem[1]},${origem[0]}`; // Long,Lat
-    const coordsDestino = `${destino[1]},${destino[0]}`; // Long,Lat
-    
-    const url = `http://router.project-osrm.org/route/v1/driving/${coordsOrigem};${coordsDestino}?overview=false`;
-    
-    const response = await axios.get(url);
-    
-    if (response.data && response.data.routes.length > 0) {
-      return Math.round(response.data.routes[0].duration / 60);
-    }
-    return calcularTempoEstimado(origem, destino);
-  } catch (error) {
-    console.error("Erro na API OSRM:", error.message);
-    return calcularTempoEstimado(origem, destino);
-  }
-};
 
 export default function PedirTaxi() {
   const navigate = useNavigate();
@@ -267,7 +237,7 @@ export default function PedirTaxi() {
   useEffect(() => {
   const calcularTudo = async () => {
     if (form.origem.localizacao && form.destino.localizacao && tabelaPrecos) {
-      const url = `https://router.project-osrm.org/route/v1/driving/${form.origem.localizacao[1]},${form.origem.localizacao[0]};${form.destino.localizacao[1]},${form.destino.localizacao[0]}?overview=false`;
+        const url = `https://router.project-osrm.org/route/v1/driving/${form.origem.localizacao[1]},${form.origem.localizacao[0]};${form.destino.localizacao[1]},${form.destino.localizacao[0]}?overview=false`;
         const res = await axios.get(url);
         const km = (res.data.routes[0].distance / 1000).toFixed(1);
         const tempo = Math.round(res.data.routes[0].duration / 60);
@@ -283,7 +253,20 @@ export default function PedirTaxi() {
           preco += (preco * precoConfig.acrescimo_noturno);
         }
 
-      setEstimate({ km, price: preco.toFixed(2), wait: tempo });
+        let tempoMedio = "--";
+        try {
+          const token = localStorage.getItem('token');
+          const respEsp = await axios.get(`http://localhost:3000/api/viagem/espera`, {
+            params: { lat: form.origem.localizacao[0], lng: form.origem.localizacao[1] },
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          tempoMedio = respEsp.data.media;
+        } catch (err) {
+          console.log(err);
+          console.error("Erro ao buscar tempo médio");
+        }
+
+      setEstimate({ km, price: preco.toFixed(2),wait: tempo, tempoMedio: tempoMedio });
     }
   };
   calcularTudo();
@@ -440,8 +423,8 @@ export default function PedirTaxi() {
                 </div>
                 <div className="pt-estimate-divider" />
                 <div className="pt-estimate-item">
-                  <span className="pt-estimate-label">Tempo de viagem</span>
-                  <span className="pt-estimate-value">{estimate.wait} min</span>
+                  <span className="pt-estimate-label">Tempo de espera</span>
+                  <span className="pt-estimate-value">{estimate.tempoMedio} min</span>
                 </div>
                 <div className="pt-estimate-divider" />
                 <div className="pt-estimate-item highlight">
