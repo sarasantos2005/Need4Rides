@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-leaflet/core": "^2.1.0",
+    "axios": "^1.15.1",
     "jspdf": "^4.2.1",
     "leaflet": "^1.9.4",
     "leaflet-geosearch": "^4.4.0",
