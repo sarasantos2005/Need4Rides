@@ -301,8 +301,6 @@ export default function PedirTaxi() {
 
       const token = localStorage.getItem("token");
 
-      console.log("Estado atual do form:", form);
-
       const dadosViagem = {
         n_passageiros: form.passengers,
         nivel_conforto: form.comfort,
@@ -317,15 +315,13 @@ export default function PedirTaxi() {
         custo_estimado: estimate.preco
       }
 
-      console.log("Enviando para a API:", dadosViagem);
-
       const response = await axios.post('http://localhost:3000/api/viagem/pedir', dadosViagem, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       if(response.data.success){
         setConfirmed(true);  
-        navigate('/aguardar-taxi', { state: { form, estimate } });
+        navigate('/aguardar-taxi', { state: { viagemId: response.data.pedido.id, form, estimate } });
       }
     } catch (err) {
       alert("Erro ao pedir o táxi: " + (err.response?.data?.message || "Erro desconhecido"));

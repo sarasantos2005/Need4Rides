@@ -143,13 +143,13 @@ exports.pedirTaxi = async (req, res) => {
   }
 }
 
-//US6 - Aceitar o motorista (Cliente)
+//US6/US7 - Aceitar ou rejeitar motorista (Cliente)
 exports.confirmacaoCliente = async (req, res) => {
   try {
-    const { viagemId, confirma } = req.body;
+    const { viagemId, confirma, motoristaId } = req.body;
 
     if (!confirma) {
-      await Viagem.findByIdAndUpdate(viagemId, { $unset: { motorista_proposto: "" } });
+      await Viagem.findByIdAndUpdate(viagemId, { $unset: { motorista_proposto: "" } }, { $addToSet: { motoristas_rejeitados: motoristaId } });
       return res.status(200).json({ message: "Motorista rejeitado. O pedido continua pendente. " });
     }
 
@@ -162,33 +162,6 @@ exports.confirmacaoCliente = async (req, res) => {
     res.status(200).json({ message: "Motorista confirmado! Aguarde a chegada. " });
   } catch (error) {
     res.status(500).json({ error: error.message });
-  }
-};
-
-// US6/US7 - Cliente rejeita o motorista proposto
-exports.rejeitarMotorista = async (req, res) => {
-  try {
-    const { viagemId } = req.body;
-
-    const pedidoReset = await Viagem.findByIdAndUpdate(
-      viagemId,
-      { $unset: { motorista_proposto: "" } },
-      { $addToSet: { motoristas_rejeitados: motoristaId } },
-      { strict: false },
-      { new: true }
-    );
-
-    if (!pedidoReset) {
-      return res.status(404).json({ success: false, message: "Pedido não encontrado." });
-    }
-
-    res.status(200).json({ 
-      success: true, 
-      message: "Motorista rejeitado. O seu pedido voltará a ser mostrado a outros condutores. " 
-    });
-
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -535,5 +508,45 @@ const calcularTempoOSRM = async (origem, destino) => {
   } catch (error) {
     console.error("Erro na API OSRM:", error.message);
     return calcularTempoEstimado(coordsInicio, coordsFim);
+  }
+};
+
+
+exports.fetchViagemStatus = async (req, res) => {
+  try {
+    const id = req.userId;
+    const { viagemId } = req.params;
+
+    if (!id) {
+      return res.status(401).json({ message: "Utilizador não autenticado." });
+    }
+
+    const viagem = await Viagem.findById(viagemId)
+    .populate("motorista_proposto", "nome")
+    .populate({
+      path: 'turno',
+      populate: {
+        path: 'motorista', 
+        select: 'nome' 
+      }
+    });
+
+    if(!viagem) return res.status(404).json({ message: "Viagem não encontrada." });
+
+    let status = 'procurando';
+    if(viagem.hora_final_viagem){
+      status = "finalizada";
+    } else if (viagem.turno && viagem.hora_inicial_viagem) {
+      status = "emCurso";
+    } else if (viagem.turno && !viagem.hora_inicial_viagem) {
+      status = "aguardandoInicio";
+    } else if (viagem.motorista_proposto) {
+      status = "aguardandoConfirmacao";
+    }
+
+    res.status(200).json({ status, motorista: viagem.motorista_proposto || viagem.turno?.motorista });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

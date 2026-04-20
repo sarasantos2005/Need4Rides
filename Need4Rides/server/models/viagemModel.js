@@ -69,9 +69,14 @@ const viagemSchema = new mongoose.Schema({
 
     motoristas_rejeitados: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: "Pessoa",
+        ref: "User",
         select: false,
         default: []
+    },
+
+    motorista_proposto: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Turno' 
     }
 });
 

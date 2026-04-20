@@ -4,6 +4,7 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/AguardarTaxi.css';
 import ddImg from '../assets/images/fennec.jpg';
 import AvatarDropdown from '../components/AvatarDropdown';
+import axios from "axios";
 const DOTS = [
   'A procurar motoristas',
   'A procurar motoristas.',
@@ -16,9 +17,10 @@ export default function AguardarTaxi() {
   const { state } = useLocation();
 
   const form = state?.form ?? {
-    origin: 'Ponto de Partida',
-    destination: 'Destino',
-    passengers: 1
+    origem: { morada: '', localizacao: null },
+    destino: { morada: '', localizacao: null },
+    passengers: 1,
+    comfort: ''
   };
 
   const estimate = state?.estimate ?? {
@@ -28,9 +30,11 @@ export default function AguardarTaxi() {
   };
 
   const [dotIdx, setDotIdx] = useState(0);
-  const [found, setFound] = useState(false);
+  const [status, setStatus] = useState("procurando");
+  const [condutor, setDriver] = useState(null);
   const [seconds, setSeconds] = useState(0);
   const [userData, setUserData] = useState(null);
+  const [viagemId, setViagemId] = useState(state?.viagemId);
 
   const [tema, setTema] = useState(() => {
     return localStorage.getItem('tema') || 'escuro';
@@ -59,17 +63,76 @@ export default function AguardarTaxi() {
   }, []);
 
   /* timer */
-  useEffect(() => {
-    if (found) return;
-    const t = setInterval(() => setSeconds(s => s + 1), 1000);
-    return () => clearInterval(t);
-  }, [found]);
+  // useEffect(() => {
+  //   if (found) return;
+  //   const t = setInterval(() => setSeconds(s => s + 1), 1000);
+  //   return () => clearInterval(t);
+  // }, [found]);
 
-  /* simulação */
+  // /* simulação */
+  // useEffect(() => {
+  //   const t = setTimeout(() => setFound(true), 8000);
+  //   return () => clearTimeout(t);
+  // }, []);
+
   useEffect(() => {
-    const t = setTimeout(() => setFound(true), 8000);
-    return () => clearTimeout(t);
-  }, []);
+    
+    if (!viagemId) {
+      return;
+    }
+
+    const buscarStatus = async() => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const response = await axios.get(`http://localhost:3000/api/viagem/status/${viagemId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = response.data;
+
+        setStatus(data.status); 
+        if (data.motorista) setMotorista(data.motorista); 
+      } catch (err) {
+        console.error("Erro ao buscar status:", err.message);
+      }
+    };
+
+    buscarStatus();
+    const interval = setInterval(buscarStatus, 3000);
+
+    return () => clearInterval(interval);
+    }, [viagemId]);
+
+  const handleConfirmacao = async(aceite) => {
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(`http://localhost:3000/api/viagem/confirmar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          viagemId: viagemId, 
+          confirma: aceite 
+        })
+      });
+
+      if(response.ok) {
+        if(aceite) {
+          setStatus("aguardandoInicio");
+        } else {
+          setStatus("procurando");
+        }
+      }
+    } catch (err) {
+      console.error("Erro ao confirmar:", err);
+    }
+  }
 
   const fmt = s =>
     `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
@@ -114,7 +177,7 @@ export default function AguardarTaxi() {
 
         {/* Status */}
         <div className="agt-status-card">
-          {!found ? (
+          {status === "procurando" && (
             <div className="agt-searching">
               <div className="agt-spinner-ring">
                 <div className="agt-spinner" />
@@ -127,21 +190,39 @@ export default function AguardarTaxi() {
               </p>
               <span className="agt-timer">{fmt(seconds)}</span>
             </div>
-          ) : (
+          )}
+
+          {status === "aguardandoConfirmacao" && (
             <div className="agt-found">
               <div className="agt-found-icon">✓</div>
               <h2>Motorista Encontrado!</h2>
-              <p>O teu táxi está a caminho</p>
+              <p>O motorista <strong>{condutor?.nome}</strong> aceitou o pedido.</p>
 
-              <button
-                className="agt-btn-primary"
-                onClick={() =>
-                  navigate('/viagem', { state: { form, estimate } })
-                }
-              >
-                Ver Viagem
-              </button>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                <button className="agt-btn-primary" onClick={() => handleConfirmacao(true)}>
+                  Aceitar
+                </button>
+                <button className="agt-btn-cancel" onClick={() => handleConfirmacao(false)}>
+                  Rejeitar
+                </button>
+              </div>
             </div>
+          )}
+
+          {status === "aguardandoInicio" && (
+            <div className="agt-found">
+              <div className="agt-found-icon">✓</div>
+                <h2>Viagem Confirmada!</h2>
+                <p>O teu táxi está a caminho</p>
+                <button
+                  className="agt-btn-primary"
+                  onClick={() =>
+                    navigate('/viagem', { state: { form, estimate } })
+                  }
+                >
+                  Ver Viagem
+                </button>
+              </div>
           )}
         </div>
 
@@ -156,7 +237,7 @@ export default function AguardarTaxi() {
                 <span className="agt-dot origin" />
                 <div>
                   <span className="agt-point-label">Origem</span>
-                  <span className="agt-point-value">{form.origin}</span>
+                  <span className="agt-point-value">{form.origem.morada}</span>
                 </div>
               </div>
 
@@ -166,7 +247,7 @@ export default function AguardarTaxi() {
                 <span className="agt-dot dest" />
                 <div>
                   <span className="agt-point-label">Destino</span>
-                  <span className="agt-point-value">{form.destination}</span>
+                  <span className="agt-point-value">{form.destino.morada}</span>
                 </div>
               </div>
             </div>
