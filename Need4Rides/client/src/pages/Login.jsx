@@ -30,6 +30,43 @@ function IconMail() {
   );
 }
 
+function IconEye({ open }) {
+  return open ? (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  );
+}
+
+function PasswordInput({ name, value, onChange, label }) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="lp-field">
+      <span className="lp-label">{label}</span>
+      <div className="lp-input-wrap">
+        <input
+          name={name}
+          type={visible ? 'text' : 'password'}
+          className="lp-input lp-input-pass"
+          value={value}
+          onChange={onChange}
+        />
+        
+        <span className="lp-eye" onClick={() => setVisible(v => !v)}>
+          <IconEye open={visible} />
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function Login() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -38,53 +75,34 @@ export default function Login() {
   const [role, setRole] = useState('Cliente');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [erro, setErro] = useState('');
 
   const [regData, setRegData] = useState({
-    tipo: 'Cliente',
-    email: '',
-    nome: '',
-    genero: '',
-    nif: '',
-    password: '',
-    confirmPassword: '',
-    ano_nascimento: ''
+    tipo: 'Cliente', email: '', nome: '', genero: '',
+    nif: '', password: '', confirmPassword: '', ano_nascimento: ''
   });
 
   useEffect(() => {
     if (location.state?.mode) setMode(location.state.mode);
   }, [location.state]);
 
-  const switchTo = (m) => {
-    setMode(m);
-    setErro('');
-  };
-
-  const handleRegChange = (e) => {
-    setRegData({ ...regData, [e.target.name]: e.target.value });
-  };
+  const switchTo = (m) => { setMode(m); setErro(''); };
+  const handleRegChange = (e) => setRegData({ ...regData, [e.target.name]: e.target.value });
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErro('');
-
     try {
       const res = await fetch('http://localhost:3000/api/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          role,
-          nif: identifier,
-          senha_acesso_web: password
-        }),
+        body: JSON.stringify({ role, nif: identifier, senha_acesso_web: password }),
       });
-
       const data = await res.json();
       if (!res.ok) return setErro(data.message);
-
       localStorage.setItem('token', data.token);
       localStorage.setItem('user_logado', JSON.stringify(data.user));
-
       if (data.user.tipo === 'Motorista') navigate('/motorista');
       else if (data.user.tipo === 'Gestor') navigate('/gestor');
       else navigate('/home');
@@ -96,12 +114,10 @@ export default function Login() {
   const handleRegister = async (e) => {
     e.preventDefault();
     setErro('');
-
     if (regData.password !== regData.confirmPassword) {
       setErro('As passwords não coincidem!');
       return;
     }
-
     try {
       const res = await fetch('http://localhost:3000/api/user', {
         method: 'POST',
@@ -116,13 +132,10 @@ export default function Login() {
           ano_nascimento: new Date(regData.ano_nascimento).getFullYear(),
         }),
       });
-
       const data = await res.json();
       if (!res.ok) return setErro(data.message);
-
       localStorage.setItem('token', data.token);
       localStorage.setItem('user_logado', JSON.stringify(data.user));
-
       if (data.user.tipo === 'Motorista') navigate('/motorista');
       else if (data.user.tipo === 'Gestor') navigate('/gestor');
       else navigate('/home');
@@ -139,7 +152,6 @@ export default function Login() {
 
         {mode === 'login' ? (
           <div className="lp-form">
-
             <h1 className="lp-title">Login</h1>
 
             <div className="lp-tabs">
@@ -174,17 +186,19 @@ export default function Login() {
                 <span className="lp-label">Password</span>
                 <div className="lp-input-wrap">
                   <input
-                    type="password"
-                    className="lp-input"
+                    type={showPassword ? 'text' : 'password'}
+                    className="lp-input lp-input-pass"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                   />
-                  <span className="lp-icon"><IconLock /></span>
+                  
+                  <span className="lp-eye" onClick={() => setShowPassword(v => !v)}>
+                    <IconEye open={showPassword} />
+                  </span>
                 </div>
               </div>
 
               {erro && <p className="lp-error">{erro}</p>}
-
               <button className="lp-btn">Entrar</button>
             </form>
 
@@ -194,12 +208,13 @@ export default function Login() {
               </p>
             )}
           </div>
+
         ) : (
           <div className="lp-form">
-
             <h1 className="lp-title">Criar Conta</h1>
 
             <div className="lp-grid-container">
+
               <div className="lp-field">
                 <span className="lp-label">Nome</span>
                 <div className="lp-input-wrap">
@@ -216,21 +231,19 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="lp-field">
-                <span className="lp-label">Password</span>
-                <div className="lp-input-wrap">
-                  <input name="password" type="password" className="lp-input" value={regData.password} onChange={handleRegChange} />
-                  <span className="lp-icon"><IconLock /></span>
-                </div>
-              </div>
+              <PasswordInput
+                name="password"
+                label="Password"
+                value={regData.password}
+                onChange={handleRegChange}
+              />
 
-              <div className="lp-field">
-                <span className="lp-label">Confirmar</span>
-                <div className="lp-input-wrap">
-                  <input name="confirmPassword" type="password" className="lp-input" value={regData.confirmPassword} onChange={handleRegChange} />
-                  <span className="lp-icon"><IconLock /></span>
-                </div>
-              </div>
+              <PasswordInput
+                name="confirmPassword"
+                label="Confirmar"
+                value={regData.confirmPassword}
+                onChange={handleRegChange}
+              />
 
               <div className="lp-field">
                 <span className="lp-label">Nascimento</span>
@@ -256,14 +269,16 @@ export default function Login() {
                   </select>
                 </div>
               </div>
+
             </div>
+
+            {erro && <p className="lp-error">{erro}</p>}
 
             <button className="lp-btn" onClick={handleRegister}>Registar</button>
 
             <p className="lp-switch">
               Já tens conta? <span onClick={() => switchTo('login')}>Login</span>
             </p>
-
           </div>
         )}
 

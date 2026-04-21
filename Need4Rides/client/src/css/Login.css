@@ -374,3 +374,36 @@
 body{
   color:#fff !important; 
 }
+
+/* ─── Password toggle ───────────────────────────────────── */
+.lp-input-pass {
+  padding-right: 4.5rem;
+}
+
+.lp-icon-lock {
+  pointer-events: none;
+}
+
+.lp-eye {
+  position: absolute;
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lp-eye:hover {
+  color: #f5c518;
+}
+
+.lp-eye svg {
+  width: 18px;
+  height: 18px;
+}
