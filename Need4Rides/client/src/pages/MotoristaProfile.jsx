@@ -82,38 +82,35 @@ function MapSelector({ coordsIniciais, moradaInicial, onConfirm, onClose }) {
     };
 
     return (
-        <div className="map-modal-overlay">
-            <div className="map-modal-content">
-                <div className="map-modal-header">
-                  <h3>Selecionar Morada</h3>
-                  <button className="map-close-btn" onClick={onClose}>&times;</button>
-                </div>
+        <div className="map-inline-container">
+            <div className="map-inline-header">
+                <h3>Selecionar Morada</h3>
+            </div>
 
-                <div className="map-frame">
-                  <MapContainer 
-                    center={position} 
-                    zoom={13} 
-                    style={{ height: '400px', width: '100%' }}
-                  >
-                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                      <SearchField onLocationSelected={(coords) => {
-                            setPosition(coords);
-                            updateAddress(coords[0], coords[1]);
-                        }} 
-                        searchText={addressText} />
-                      <Marker position={position} />
-                      <MapEventsHandler onMove={(coords) => {
-                          setPosition(coords);
-                          updateAddress(coords[0], coords[1]);
-                      }} />
-                  </MapContainer>
-                </div>
-                
-                <div className="map-modal-actions">
-                  <button className="confirm-map-btn" onClick={() => onConfirm(position, addressText)}>
-                      Confirmar Localização
-                  </button>
-                </div>
+            <div className="map-frame" style={{ borderRadius: '12px', overflow: 'hidden' }}>
+                <MapContainer
+                    center={position}
+                    zoom={13}
+                    style={{ height: '380px', width: '100%' }}
+                >
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <SearchField onLocationSelected={(coords) => {
+                        setPosition(coords);
+                        updateAddress(coords[0], coords[1]);
+                    }} searchText={addressText} />
+                    <Marker position={position} />
+                    <MapEventsHandler onMove={(coords) => {
+                        setPosition(coords);
+                        updateAddress(coords[0], coords[1]);
+                    }} />
+                </MapContainer>
+            </div>
+
+            <div className="map-inline-actions">
+                <button className="profile-back-btn" onClick={onClose}>Cancelar</button>
+                <button className="profile-save-btn" onClick={() => onConfirm(position, addressText)}>
+                    Confirmar Localização
+                </button>
             </div>
         </div>
     );
@@ -325,7 +322,12 @@ export default function MotoristaProfile() {
             </div>
             <div className="profile-field">
               <label>Ano de Nascimento</label>
-              <input type="number" name="ano_nascimento" min={new Date().getFullYear()-80} max={new Date().getFullYear()-18} minLength={4} maxLength={4} value={formData.ano_nascimento} onChange={handleInputChange}/>
+              <select className="profile-select" name="ano_nascimento" value={formData.ano_nascimento} onChange={handleInputChange}>
+                <option value="">Selecionar ano</option>
+                {Array.from({ length: 63 }, (_, i) => new Date().getFullYear() - 18 - i).map(ano => (
+                  <option key={ano} value={ano}>{ano}</option>
+                ))}
+              </select>
             </div>
             <div className="profile-field">
               <label>Nº Carta de Condução</label>
@@ -335,10 +337,26 @@ export default function MotoristaProfile() {
               <label>Morada</label>
               <div className="lp-input-wrap" onClick={() => setShowMap(true)} style={{ cursor: 'pointer' }}>
                 <input type="text" className="lp-input" value={formData.morada} readOnly placeholder="Clique para selecionar no mapa"/>
-                <span className="lp-icon">📍</span>
+                {!formData.morada && <span className="lp-icon">📍</span>}
               </div>
             </div>
           </div>
+
+          {showMap && (
+            <MapSelector
+              coordsIniciais={formData.localizacao}
+              moradaInicial={formData.morada}
+              onClose={() => setShowMap(false)}
+              onConfirm={(coords, address) => {
+                try {
+                  setFormData({ ...formData, morada: address, localizacao: [coords[0], coords[1]] });
+                  setShowMap(false);
+                } catch (err) {
+                  alert("Erro ao obter morada.");
+                }
+              }}
+            />
+          )}
 
           <button className="profile-save-btn" onClick={handleSave}>Guardar Alterações</button>
         </div>
@@ -383,25 +401,6 @@ export default function MotoristaProfile() {
         </div>
 
       </div>
-      {showMap && (
-        <MapSelector 
-          coordsIniciais={formData.localizacao}
-          moradaInicial={formData.morada} 
-          onClose={() => setShowMap(false)}
-          onConfirm={(coords, address) => {
-            try {
-              setFormData({
-                ...formData, 
-                morada: address, 
-                localizacao: [coords[0], coords[1]]
-              });
-              setShowMap(false);
-            } catch (err) {
-              alert("Erro ao obter morada.");
-            }
-          }}
-        />
-      )}
     </div>
   );
 }
