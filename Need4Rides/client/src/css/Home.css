@@ -398,3 +398,102 @@
     flex: 1 1 100%;
   }
 }
+
+
+/* ─── Navbar register btn ───────────────────────────────── */
+.navbar-register-btn {
+  background: transparent;
+  border: 1.5px solid #f5c518;
+  color: #f5c518;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.35rem 1rem;
+  border-radius: 50px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.navbar-register-btn:hover {
+  background: rgba(245, 197, 24, 0.12);
+}
+
+/* ─── Hamburger (reutiliza .mh-hamburger do MotoristaHome) ─ */
+.mh-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 110;
+}
+
+.mh-hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.mh-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.mh-hamburger.open span:nth-child(2) { opacity: 0; }
+.mh-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ─── Hero mobile ───────────────────────────────────────── */
+.hero-content {
+  padding: 0 1.2rem;
+  text-align: center;
+}
+
+.hero-auth-btns {
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.hero-btn,
+.hero-btn-register {
+  min-width: 120px;
+}
+
+@media (max-width: 400px) {
+  .hero-title {
+    margin-top:25px;
+    margin-bottom:-10px;
+    font-size: 2rem;
+  }
+
+  .navbar {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .service-card {
+    padding: 1.2rem 1.2rem;
+  }
+
+  .service-index {
+    display: inline-flex;
+    margin-bottom: 0;
+    margin-right: 0.6rem;
+    vertical-align: middle;
+  }
+
+  .service-card h3 {
+    display: inline;
+    vertical-align: middle;
+  }
+
+  .service-card > div:first-child,
+  .service-card > h3 {
+    display: inline;
+  }
+
+  .service-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+}
