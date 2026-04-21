@@ -549,6 +549,7 @@ exports.fetchViagemStatus = async (req, res) => {
     const { viagemId } = req.params;
 
     if (!id) {
+      
       return res.status(401).json({ message: "Utilizador não autenticado." });
     }
 
@@ -556,10 +557,16 @@ exports.fetchViagemStatus = async (req, res) => {
     .populate("motorista_proposto", "nome")
     .populate({
       path: 'turno',
-      populate: {
-        path: 'motorista', 
-        select: 'nome' 
-      }
+      populate: [
+        {
+          path: 'motorista', 
+          select: 'nome email'  
+        },
+        {
+          path: "taxi",
+          select: "marca modelo matricula"
+        }
+      ]      
     });
 
     if(!viagem) return res.status(404).json({ message: "Viagem não encontrada." });
@@ -575,7 +582,18 @@ exports.fetchViagemStatus = async (req, res) => {
       status = "aguardandoConfirmacao";
     }
 
-    res.status(200).json({ status, motorista: viagem.motorista_proposto || viagem.turno?.motorista });
+    const motoristaData = viagem.motorista_proposto || viagem.turno?.motorista;
+    const taxiData = viagem.turno?.taxi;
+
+    const info = motoristaData ? {
+      nome: motoristaData.nome,
+      email: motoristaData.email,
+      marca: taxiData?.marca || "N/A",
+      modelo: taxiData?.modelo || "N/A",
+      matricula: taxiData?.matricula || "N/A"
+    } : null;
+
+    res.status(200).json({ status, motorista: motoristaData, info });
 
   } catch (error) {
     res.status(500).json({ error: error.message });

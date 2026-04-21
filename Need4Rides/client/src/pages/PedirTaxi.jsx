@@ -353,9 +353,13 @@ export default function PedirTaxi() {
   };
 
   useEffect(() => {
-    const viagemAtiva = localStorage.getItem('viagemAtiva');
-    if (viagemAtiva) {
-      navigate('/aguardar-taxi'); 
+    const viagemAtiva = JSON.parse(localStorage.getItem('viagemAtiva'));
+    if (viagemAtiva?.viagemId) {
+      if(viagemAtiva.status === "emCurso"){
+        navigate("/viagem");
+      } else {
+        navigate('/aguardar-taxi');   
+      }
     }
   }, []);
 

@@ -71,12 +71,11 @@ export default function AguardarTaxi() {
     return () => clearInterval(t);
   }, []);
 
-  /* timer */
-  // useEffect(() => {
-  //   if (found) return;
-  //   const t = setInterval(() => setSeconds(s => s + 1), 1000);
-  //   return () => clearInterval(t);
-  // }, [found]);
+  useEffect(() => {
+    if (status !== 'procurando') return;
+    const t = setInterval(() => setSeconds(s => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [status]);
 
   // /* simulação */
   // useEffect(() => {
@@ -104,6 +103,19 @@ export default function AguardarTaxi() {
 
         setStatus(data.status); 
         if (data.motorista) setDriver(data.motorista); 
+
+        if(data.status === "emCurso"){
+          localStorage.setItem('viagemAtiva', JSON.stringify({
+            ...JSON.parse(localStorage.getItem('viagemAtiva')),
+            status: 'emCurso'
+          }));
+          clearInterval(interval);
+          navigate("/viagem");
+        } else if (data.status === 'finalizada') {
+          localStorage.removeItem('viagemAtiva');
+          clearInterval(interval);
+          navigate('/pedir-taxi');
+        } 
       } catch (err) {
         console.error("Erro ao buscar status:", err.message);
       }

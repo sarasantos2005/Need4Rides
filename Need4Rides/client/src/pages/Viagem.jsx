@@ -1,18 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
 import '../css/Viagem.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import axios from 'axios';
+import VEICULOS from "../../../server/data/marcasEmodelos";
 
 const STAGES = ['A aguardar motorista', 'Motorista a caminho', 'Em viagem', 'Concluída'];
 
+const getDadosMarca = (idBD) => {
+  const marcaEncontrada = VEICULOS.marcas.find(m => m.id === idBD);
+  return marcaEncontrada ? marcaEncontrada.nome : idBD;
+};
+
+
 export default function Viagem() {
   const navigate = useNavigate();
-  const { state } = useLocation();
   const [stage, setStage] = useState(1);
   const [menuOpen, setMenuOpen] = useState(false);
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+  const [motorista, setDriver] = useState(null);
+  const [info, setCarro] = useState(null);
+  const intervalRef = useRef(null); 
 
   useEffect(() => {
     document.body.className = tema;
@@ -21,15 +31,80 @@ export default function Viagem() {
 
   const alternarTema = () => setTema(prev => prev === 'escuro' ? 'claro' : 'escuro');
 
-  const form = state?.form ?? {};
-  const estimate = state?.estimate ?? {};
-  const comfort = form.comfort === 'luxury' ? 'Luxuoso' : form.comfort === 'basic' ? 'Básico' : '--';
+  const [viagemId, setViagemId] = useState(null);
+  
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem('viagemAtiva'));
+    if (!stored?.viagemId) { navigate('/pedir-taxi'); return; }
+    
+    setViagemId(stored.viagemId);
+    const id = stored.viagemId;
+
+    const buscarStatus = async() => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://localhost:3000/api/viagem/status/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = response.data;
+        if (data.motorista) setDriver(data.motorista); 
+        if (data.info) setCarro(data.info);
+
+        if(data.status === "finalizada"){
+          localStorage.removeItem('viagemAtiva');
+          clearInterval(intervalRef.current);
+          navigate('/pedir-taxi');
+        } else if (data.status === 'aguardandoConfirmacao' || data.status === 'procurando') {
+          clearInterval(intervalRef.current);
+          navigate('/aguardar-taxi');
+        } 
+
+        const stageMap = {
+          'procurando': 1,
+          'aguardandoConfirmacao': 1,
+          'aguardandoInicio': 2,   
+          'emCurso': 3,            
+          'finalizada': 4         
+        }; 
+
+        if (stageMap[data.status] !== undefined) setStage(stageMap[data.status]);
+
+      } catch (err) {
+        console.error("Erro ao buscar status:", err.message);
+      }
+    };
+
+    buscarStatus();
+    intervalRef.current = setInterval(buscarStatus, 3000);
+    return () => clearInterval(intervalRef.current);
+  }, []);
+  
+  const viagemAtiva = JSON.parse(localStorage.getItem('viagemAtiva')); 
+
+  const form = viagemAtiva?.form ?? {
+    origem: { morada: '', localizacao: null },
+    destino: { morada: '', localizacao: null },
+    passengers: 1,
+    comfort: ''
+  };
+
+  const estimate = viagemAtiva?.estimate ?? {
+    km: '--',
+    price: '--',
+    wait: '--'
+  };
+
+  const comfort = form.comfort === 'Luxuoso' ? 'Luxuoso' : form.comfort === 'Básico' ? 'Básico' : '--';
 
   const trip = {
-    from: form.origin || 'Aeroporto de Lisboa',
-    to: form.destination || 'Baixa-Chiado',
-    eta: estimate.wait ?? 12,
-    driver: { name: 'Carlos Silva', rating: 4.8, plate: '00-AA-00', car: 'Toyota Corolla' },
+    from: form.origem.morada,
+    to: form.destino.morada,
+    eta: estimate.wait,
+    driver: motorista,
+    info: info
   };
 
   return (
@@ -89,14 +164,14 @@ export default function Viagem() {
             ))}
           </div>
 
-          {/* Dev helper — remover em produção */}
+          {/* Dev helper — remover em produção
           <div className="viagem-stage-btns">
             {STAGES.map((_, i) => (
               <button key={i} className={`viagem-stage-btn ${stage === i ? 'active' : ''}`} onClick={() => setStage(i)}>
                 Etapa {i + 1}
               </button>
             ))}
-          </div>
+          </div> */}
         </div>
 
         <div className="viagem-bottom">
@@ -136,13 +211,14 @@ export default function Viagem() {
             </div>
 
             {/* Motorista */}
+            {trip.driver && (
             <div className="viagem-driver-card">
               <div className="viagem-driver-avatar-ring">
                 <img src={ddImg} alt="Cliente" />
               </div>
               <div className="viagem-driver-info">
-                <span className="viagem-driver-name">{trip.driver.name}</span>
-                <span className="viagem-driver-sub">{trip.driver.car} · {trip.driver.plate}</span>
+                <span className="viagem-driver-name">{trip.driver.nome}</span>
+                <span className="viagem-driver-sub">{getDadosMarca(trip.info.marca)} {trip.info.modelo} · {trip.info.matricula}</span>
                 <div className="viagem-driver-rating">
                   {'★'.repeat(Math.floor(trip.driver.rating))}
                   <span>{trip.driver.rating}</span>
@@ -150,7 +226,7 @@ export default function Viagem() {
               </div>
               <button className="viagem-call-btn">Contactar</button>
             </div>
-
+            )}
           </div>
 
           {/* Mapa placeholder */}
