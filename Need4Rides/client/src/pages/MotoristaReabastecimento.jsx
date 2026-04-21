@@ -17,6 +17,8 @@ export default function MotoristaReabastecimento() {
   const [submitted, setSubmitted] = useState(false);
   const [historico, setHistorico] = useState(mockHistReab);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [litrosFocused, setLitrosFocused] = useState(false);
+  const [valorFocused, setValorFocused] = useState(false);
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -100,7 +102,7 @@ export default function MotoristaReabastecimento() {
               <span className="mreab-veiculo-matricula">00-AA-00</span>
             </div>
           </div>
-          <button className="mreab-back-btn" onClick={() => navigate('/motorista')}>← Voltar</button>
+          <button className="mreab-back-btn" onClick={() => navigate('/motorista')}>Voltar</button>
         </div>
 
         <div className="mreab-content">
@@ -120,37 +122,40 @@ export default function MotoristaReabastecimento() {
                 <div className="mreab-form-row">
                   <div className="mreab-field">
                     <label>Litros *</label>
-                    <div className="mreab-input-wrap">
-                      <input
-                        type="number"
-                        name="litros"
-                        placeholder="0.00"
-                        step="0.01"
-                        min="0"
-                        value={form.litros}
-                        onChange={handleChange}
-                        required
-                      />
-                      <span className="mreab-unit">L</span>
-                    </div>
+                    <input
+                      type="text"
+                      name="litros"
+                      placeholder="0.00L"
+                      value={litrosFocused ? form.litros : (form.litros ? form.litros + 'L' : '')}
+                      onFocus={() => setLitrosFocused(true)}
+                      onBlur={() => setLitrosFocused(false)}
+                      onChange={e => {
+                        const raw = e.target.value.replace(/L/gi, '').trim();
+                        if (raw === '' || /^\d*\.?\d*$/.test(raw)) {
+                          setForm(f => ({ ...f, litros: raw }));
+                        }
+                      }}
+                      required
+                    />
                   </div>
 
                   <div className="mreab-field">
-                    <label>Valor Total *</label>
-                    <div className="mreab-input-wrap">
-                      <span className="mreab-unit left">€</span>
-                      <input
-                        type="number"
-                        name="valor"
-                        placeholder="0.00"
-                        step="0.01"
-                        min="0"
-                        value={form.valor}
-                        onChange={handleChange}
-                        className="has-left"
-                        required
-                      />
-                    </div>
+                    <label>Valor Total (€) *</label>
+                    <input
+                      type="text"
+                      name="valor"
+                      placeholder="€0.00"
+                      value={valorFocused ? form.valor : (form.valor ? '€' + form.valor : '')}
+                      onFocus={() => setValorFocused(true)}
+                      onBlur={() => setValorFocused(false)}
+                      onChange={e => {
+                        const raw = e.target.value.replace(/€/g, '').trim();
+                        if (raw === '' || /^\d*\.?\d*$/.test(raw)) {
+                          setForm(f => ({ ...f, valor: raw }));
+                        }
+                      }}
+                      required
+                    />
                   </div>
                 </div>
 
@@ -224,7 +229,7 @@ export default function MotoristaReabastecimento() {
                     <span className="mreab-hist-date">{r.data} · {r.hora}</span>
                   </div>
                   <div className="mreab-hist-values">
-                    <span className="mreab-hist-litros">{r.litros} L</span>
+                    <span className="mreab-hist-litros">{r.litros} Litros</span>
                     <span className="mreab-hist-valor">{r.valor}</span>
                   </div>
                 </div>
