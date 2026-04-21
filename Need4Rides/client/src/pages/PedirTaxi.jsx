@@ -339,13 +339,25 @@ export default function PedirTaxi() {
 
       if(response.data.success){
         setConfirmed(true);  
-        navigate('/aguardar-taxi', { state: { viagemId: response.data.pedido.id, form, estimate } });
+        localStorage.setItem('viagemAtiva', JSON.stringify({
+          viagemId: response.data.pedido.id,
+          form, 
+          estimate
+        }));
+        navigate('/aguardar-taxi');
       }
     } catch (err) {
       alert("Erro ao pedir o táxi: " + (err.response?.data?.message || "Erro desconhecido"));
     }
 
   };
+
+  useEffect(() => {
+    const viagemAtiva = localStorage.getItem('viagemAtiva');
+    if (viagemAtiva) {
+      navigate('/aguardar-taxi'); 
+    }
+  }, []);
 
   return (
     <div className="pt-page" style={{ backgroundImage: `url(${heroBg})` }}>

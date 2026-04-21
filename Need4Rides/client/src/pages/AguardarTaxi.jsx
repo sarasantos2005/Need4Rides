@@ -14,16 +14,25 @@ const DOTS = [
 
 export default function AguardarTaxi() {
   const navigate = useNavigate();
-  const { state } = useLocation();
+  const [viagemId, setViagemId] = useState(null);
 
-  const form = state?.form ?? {
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem('viagemAtiva'));
+    if (!stored?.viagemId) { navigate('/pedir-taxi'); return; }
+
+    setViagemId(stored.viagemId);
+  }, []);
+  
+  const viagemAtiva = JSON.parse(localStorage.getItem('viagemAtiva')); 
+
+  const form = viagemAtiva?.form ?? {
     origem: { morada: '', localizacao: null },
     destino: { morada: '', localizacao: null },
     passengers: 1,
     comfort: ''
   };
 
-  const estimate = state?.estimate ?? {
+  const estimate = viagemAtiva?.estimate ?? {
     km: '--',
     price: '--',
     wait: '--'
@@ -34,7 +43,7 @@ export default function AguardarTaxi() {
   const [condutor, setDriver] = useState(null);
   const [seconds, setSeconds] = useState(0);
   const [userData, setUserData] = useState(null);
-  const [viagemId, setViagemId] = useState(state?.viagemId);
+  
 
   const [tema, setTema] = useState(() => {
     return localStorage.getItem('tema') || 'escuro';
@@ -151,6 +160,8 @@ export default function AguardarTaxi() {
       });
 
       if(response.ok) {
+        localStorage.removeItem("viagemAtiva");
+        setViagemId(null);
         navigate('/pedir-taxi');
       }
 
@@ -242,7 +253,7 @@ export default function AguardarTaxi() {
                 <button
                   className="agt-btn-primary"
                   onClick={() =>
-                    navigate('/viagem', { state: { form, estimate } })
+                    navigate('/viagem')
                   }
                 >
                   Ver Viagem
