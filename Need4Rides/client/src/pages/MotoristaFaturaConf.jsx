@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/MotoristaFaturaConf.css';
+import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 
 const DRIVER_NAME = 'Carlos Silva';
@@ -28,6 +30,16 @@ export default function MotoristaFaturaConf() {
   const trip = state?.trip ?? DEFAULT_TRIP;
   const duracao = state?.duracao ?? 0;
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+
+  const alternarTema = () => setTema(prev => prev === 'escuro' ? 'claro' : 'escuro');
+
   const now = new Date();
   const dateStr = now.toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' });
   const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
@@ -37,16 +49,33 @@ export default function MotoristaFaturaConf() {
     <div className="mfc-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mfc-overlay" />
 
-      {/* Navbar */}
-      <nav className="mfc-navbar">
-        <span className="mfc-logo" onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>Need4Rides</span>
-        <ul className="mfc-nav-links">
-          <li><a onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>Dashboard</a></li>
-          <li><a onClick={() => navigate('/motorista/reabastecimento')} style={{ cursor: 'pointer' }}>Registar Reabastecimento</a></li>
-          <li><a onClick={() => navigate('/motorista/historico')} style={{ cursor: 'pointer' }}>Histórico</a></li>
-          <li><a onClick={() => navigate('/motorista/suporte')} style={{ cursor: 'pointer' }}>Suporte</a></li>
-          <li><a onClick={() => navigate('/motorista/viagem')} style={{ cursor: 'pointer' }}>Viagem</a></li>
-          <li><AvatarDropdown profilePath="/motorista/perfil" avatarClass="mfc-avatar" /></li>
+      {/* Navbar — reutiliza classes mh- */}
+      <nav className="mh-navbar">
+        <span className="mh-logo" onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>
+          Need4Rides
+        </span>
+
+        <div
+          className={`mh-hamburger ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li><a onClick={() => { navigate('/motorista'); setMenuOpen(false); }}>Dashboard</a></li>
+          <li><a onClick={() => { navigate('/motorista/reabastecimento'); setMenuOpen(false); }}>Reabastecimento</a></li>
+          <li><a onClick={() => { navigate('/motorista/historico'); setMenuOpen(false); }}>Histórico</a></li>
+          <li><a onClick={() => { navigate('/motorista/suporte'); setMenuOpen(false); }}>Suporte</a></li>
+          <li><a className="active" onClick={() => { navigate('/motorista/viagem'); setMenuOpen(false); }}>Viagem</a></li>
+          <li>
+            <button className="mh-theme-btn" onClick={alternarTema}>
+              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+            </button>
+          </li>
+          <li><AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" /></li>
         </ul>
       </nav>
 
@@ -80,38 +109,14 @@ export default function MotoristaFaturaConf() {
           <div className="mfc-divider" />
 
           <div className="mfc-rows">
-            <div className="mfc-row">
-              <span className="mfc-row-label">Motorista</span>
-              <span className="mfc-row-val">{DRIVER_NAME}</span>
-            </div>
-            <div className="mfc-row">
-              <span className="mfc-row-label">Cliente</span>
-              <span className="mfc-row-val">{trip.clientName}</span>
-            </div>
-            <div className="mfc-row">
-              <span className="mfc-row-label">Origem</span>
-              <span className="mfc-row-val">{trip.from}</span>
-            </div>
-            <div className="mfc-row">
-              <span className="mfc-row-label">Destino</span>
-              <span className="mfc-row-val">{trip.to}</span>
-            </div>
-            <div className="mfc-row">
-              <span className="mfc-row-label">Distância</span>
-              <span className="mfc-row-val">{trip.dist}</span>
-            </div>
-            <div className="mfc-row">
-              <span className="mfc-row-label">Duração</span>
-              <span className="mfc-row-val">{formatDuracao(duracao)}</span>
-            </div>
-            <div className="mfc-row">
-              <span className="mfc-row-label">Passageiros</span>
-              <span className="mfc-row-val">{trip.passengers}</span>
-            </div>
-            <div className="mfc-row">
-              <span className="mfc-row-label">Pagamento</span>
-              <span className="mfc-row-val">Stripe</span>
-            </div>
+            <div className="mfc-row"><span className="mfc-row-label">Motorista</span><span className="mfc-row-val">{DRIVER_NAME}</span></div>
+            <div className="mfc-row"><span className="mfc-row-label">Cliente</span><span className="mfc-row-val">{trip.clientName}</span></div>
+            <div className="mfc-row"><span className="mfc-row-label">Origem</span><span className="mfc-row-val">{trip.from}</span></div>
+            <div className="mfc-row"><span className="mfc-row-label">Destino</span><span className="mfc-row-val">{trip.to}</span></div>
+            <div className="mfc-row"><span className="mfc-row-label">Distância</span><span className="mfc-row-val">{trip.dist}</span></div>
+            <div className="mfc-row"><span className="mfc-row-label">Duração</span><span className="mfc-row-val">{formatDuracao(duracao)}</span></div>
+            <div className="mfc-row"><span className="mfc-row-label">Passageiros</span><span className="mfc-row-val">{trip.passengers}</span></div>
+            <div className="mfc-row"><span className="mfc-row-label">Pagamento</span><span className="mfc-row-val">Stripe</span></div>
           </div>
 
           <div className="mfc-divider" />

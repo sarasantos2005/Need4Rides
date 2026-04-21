@@ -14,63 +14,6 @@
   z-index: 0;
 }
 
-/* ─── Navbar ────────────────────────────────────────────── */
-.mfc-navbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2.5rem;
-  height: 64px;
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-.mfc-logo {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.mfc-nav-links {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  list-style: none;
-  margin: 0; padding: 0;
-}
-
-.mfc-nav-links li { display: flex; align-items: center; }
-
-.mfc-nav-links a {
-  color: #ddd;
-  font-weight: 700;
-  font-size: 0.95rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.mfc-nav-links a:hover,
-.mfc-nav-links a.active { color: #f5c518; }
-
-.mfc-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #f5c518;
-  cursor: pointer;
-  display: block;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.mfc-avatar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
-}
-
 /* ─── Wrapper ───────────────────────────────────────────── */
 .mfc-wrapper {
   position: relative;
@@ -153,7 +96,7 @@
 
 .mfc-invoice-date span {
   font-size: 0.82rem;
-  color:#e9e9e9;
+  color: #e9e9e9;
 }
 
 .mfc-divider {
@@ -163,11 +106,7 @@
 }
 
 /* ─── Invoice rows ──────────────────────────────────────── */
-.mfc-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-}
+.mfc-rows { display: flex; flex-direction: column; gap: 0.7rem; }
 
 .mfc-row {
   display: flex;
@@ -176,18 +115,8 @@
   gap: 1rem;
 }
 
-.mfc-row-label {
-  font-size: 0.85rem;
-  color: #555;
-  font-weight: 500;
-}
-
-.mfc-row-val {
-  font-size: 0.88rem;
-  color: #d0d0d0;
-  font-weight: 600;
-  text-align: right;
-}
+.mfc-row-label { font-size: 0.85rem; color: #aeaeae; font-weight: 500; }
+.mfc-row-val   { font-size: 0.88rem; color: #d0d0d0; font-weight: 600; text-align: right; }
 
 /* ─── Total ─────────────────────────────────────────────── */
 .mfc-total-row {
@@ -197,24 +126,11 @@
   gap: 1rem;
 }
 
-.mfc-total-label {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #e0e0e0;
-}
-
-.mfc-total-val {
-  font-size: 1.7rem;
-  font-weight: 800;
-  color: #f5c518;
-}
+.mfc-total-label { font-size: 1rem; font-weight: 700; color: #e0e0e0; }
+.mfc-total-val   { font-size: 1.7rem; font-weight: 800; color: #f5c518; }
 
 /* ─── Actions ───────────────────────────────────────────── */
-.mfc-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
+.mfc-actions { display: flex; flex-direction: column; gap: 0.8rem; }
 
 .mfc-btn {
   width: 100%;
@@ -225,16 +141,11 @@
   font-weight: 700;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.15s;
-  letter-spacing: 0.2px;
 }
 
-.mfc-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.mfc-btn:hover  { opacity: 0.88; transform: translateY(-1px); }
 .mfc-btn:active { transform: translateY(0); }
-
-.mfc-btn.confirm {
-  background: #f5c518;
-  color: #111;
-}
+.mfc-btn.confirm { background: #f5c518; color: #111; }
 
 .mfc-btn.problem {
   background: rgba(231, 76, 60, 0.1);
@@ -242,16 +153,40 @@
   border: 1px solid rgba(231, 76, 60, 0.28);
 }
 
-.mfc-btn.problem:hover {
-  background: rgba(231, 76, 60, 0.2);
-  opacity: 1;
+.mfc-btn.problem:hover { background: rgba(231, 76, 60, 0.2); opacity: 1; }
+
+/* ─── MODO CLARO ────────────────────────────────────────── */
+body.claro .mfc-invoice-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+body.claro .mfc-invoice-title { color: #111; }
+body.claro .mfc-invoice-date span { color: #555; }
+body.claro .mfc-row-label { color: #585858; }
+body.claro .mfc-row-val   { color: #222; }
+body.claro .mfc-total-label { color: #111; }
+body.claro .mfc-divider { background: rgba(0, 0, 0, 0.08); }
+
+body.claro .mfc-thanks {
+  background: rgba(245, 197, 24, 0.08);
+  border-color: rgba(245, 197, 24, 0.3);
+}
+
+body.claro .mfc-total-val{
+  color: #111;
+}
+
+body.claro .mfc-invoice-nr{
+  color: #f5c518;
+}
 /* ─── Responsive ────────────────────────────────────────── */
 @media (max-width: 560px) {
-  .mfc-navbar { padding: 0 1.2rem; }
   .mfc-wrapper { padding: 76px 1rem 2rem; }
+  .mfc-thanks { flex-direction: column; gap: 0.8rem; padding: 1.2rem; }
   .mfc-thanks-title { font-size: 1.3rem; }
   .mfc-invoice-header { flex-direction: column; }
   .mfc-invoice-date { align-items: flex-start; }
+  .mfc-invoice-card { padding: 1.2rem; }
 }
+
