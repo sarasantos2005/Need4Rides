@@ -227,6 +227,31 @@ exports.cancelarAceitacaoMotorista = async (req, res) => {
   }
 };
 
+exports.cancelarViagem = async(req, res) => {
+  try {
+    const { viagemId } = req.body;
+    const clienteId = req.userId;
+
+    const cliente = await Pessoa.findById(clienteId);
+    if (!cliente || cliente.tipo !== 'Cliente') {
+      return res.status(404).json({ success: false, message: "Cliente não encontrado ou inválido." });
+    }
+
+    try {
+      await Viagem.findByIdAndDelete(viagemId);  
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ success: false, message: "Ocorreu um erro ao tentar eliminar a viagem."});
+    }
+    
+    
+    res.status(200).json({ success: true, message: "Pedido ignorado." });
+  } catch (error) {
+    console.log("1:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
 //US7 - Mostrar viagens ao motorista
 exports.listarPedidosParaMotorista = async (req, res) => {
   try {
