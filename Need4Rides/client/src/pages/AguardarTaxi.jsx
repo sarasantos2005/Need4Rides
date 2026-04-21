@@ -135,6 +135,30 @@ export default function AguardarTaxi() {
     }
   }
 
+  const handleCancelar = async() => {
+    try {
+      const token = localStorage.getItem('token');
+
+      const response = await fetch(`http://localhost:3000/api/viagem/cancelar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          viagemId: viagemId
+        })
+      });
+
+      if(response.ok) {
+        navigate('/pedir-taxi');
+      }
+
+    }  catch (err) {
+      console.error("Erro ao cancelar viagem:", err);
+    }
+  }
+
   const fmt = s =>
     `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
@@ -281,7 +305,7 @@ export default function AguardarTaxi() {
 
             <button
               className="agt-btn-cancel"
-              onClick={() => navigate('/pedir-taxi')}
+              onClick={handleCancelar}
             >
               Cancelar Viagem
             </button>
