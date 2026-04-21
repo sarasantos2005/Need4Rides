@@ -1271,13 +1271,12 @@
 
 .mh-hist-route {
   flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  gap: 0.5rem;
-  font-size: 0.88rem;
-  color: #ddd;
-  flex-wrap: wrap;
+  white-space: normal;   
+  overflow: visible;
+  text-overflow: unset;
+  display: flex;
+  flex-wrap: wrap;      
+  gap: 0.4rem;
 }
 
 .mh-hist-from { font-weight: 600; }

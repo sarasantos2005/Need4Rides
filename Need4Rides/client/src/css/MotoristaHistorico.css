@@ -361,14 +361,14 @@ body.claro .mhist-sub {
 }
 
 body.claro .mhist-back-btn {
-  background: rgba(0,0,0,0.04);
-  border: 1px solid rgba(0,0,0,0.1);
-  color: #333;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 body.claro .mhist-back-btn:hover {
-  background: rgba(0,0,0,0.08);
-  color: #000;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e6d059;
 }
 
 /* stats cards */
@@ -392,9 +392,9 @@ body.claro .mhist-stat.accent .mhist-stat-value {
 
 /* filtros */
 body.claro .mhist-filter-btn {
-  background: rgba(0,0,0,0.04);
-  border: 1px solid rgba(0,0,0,0.1);
-  color: #333;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 body.claro .mhist-filter-btn:not(.active):hover {
@@ -449,4 +449,14 @@ body.claro .av-item {
 
 body.claro .av-item-logout {
   color: #ff6b6b;
+}
+
+.trip-invoice-btn{
+  background: rgba(233, 189, 67, 0.1);
+  color: #e9ba43;
+  border: 1px solid rgba(233, 197, 67, 0.2);
+  padding: 0.2rem 0.65rem;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 600;
 }
