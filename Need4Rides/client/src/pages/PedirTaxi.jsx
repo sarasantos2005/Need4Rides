@@ -333,7 +333,7 @@ export default function PedirTaxi() {
           <li><a onClick={() => { navigate('/home'); setMenuOpen(false); }}>Home</a></li>
           <li>
             <button className="pt-theme-btn" onClick={alternarTema}>
-              {tema === 'escuro' ? '🌙 Escuro' : '☀️ Claro'}
+              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
           <li><AvatarDropdown profilePath="/profile" avatarClass="pt-avatar" /></li>

@@ -112,7 +112,7 @@ export default function MotoristaRequisitarTaxi() {
           <li><a className="active">Requisitar Táxi</a></li>
           <li>
             <button className="mh-theme-btn" onClick={alternarTema}>
-              {tema === 'escuro' ? '🌙 Escuro' : '☀️ Claro'}
+              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
           <li>

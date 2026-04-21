@@ -56,7 +56,7 @@ export default function Viagem() {
           <li><a className="active">Viagem</a></li>
           <li>
             <button className="viagem-theme-btn" onClick={alternarTema}>
-              {tema === 'escuro' ? '🌙 Escuro' : '☀️ Claro'}
+              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
           <li><AvatarDropdown profilePath="/profile" avatarClass="viagem-avatar" /></li>

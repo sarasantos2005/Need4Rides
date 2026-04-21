@@ -90,7 +90,7 @@ export default function Pagamento() {
           <li><a className="active">Pagamento</a></li>
           <li>
             <button className="pag-theme-btn" onClick={alternarTema}>
-              {tema === 'escuro' ? '🌙 Escuro' : '☀️ Claro'}
+              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
           <li><AvatarDropdown profilePath="/profile" avatarClass="pag-avatar" /></li>
