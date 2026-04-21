@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import ddImg from '../assets/images/fennec.jpg';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Profile.css';
+import { useState, useEffect } from 'react';
 
 const mockAtividade = [
   { id: 1, acao: 'Motorista registado', detalhe: 'Carlos Mendes adicionado à plataforma', data: '31 Mar 2026', hora: '10:12' },
@@ -11,6 +12,15 @@ const mockAtividade = [
 
 export default function GestorProfile() {
   const navigate = useNavigate();
+
+  const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+
+  const alternarTema = () => setTema(prev => prev === 'escuro' ? 'claro' : 'escuro');
 
   return (
     <div className="profile-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -33,9 +43,14 @@ export default function GestorProfile() {
                 <span className="profile-badge">Membro desde Janeiro de 2024</span>
               </div>
             </div>
-            <button className="profile-back-btn" onClick={() => navigate('/gestor')}>
-              ← Voltar
-            </button>
+            <div className="profile-actions">
+              <button className="profile-theme-btn" onClick={alternarTema}>
+                {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+              </button>
+              <button className="profile-back-btn" onClick={() => navigate('/gestor')}>
+                ← Voltar
+              </button>
+            </div>
           </div>
 
           <div className="profile-divider" />

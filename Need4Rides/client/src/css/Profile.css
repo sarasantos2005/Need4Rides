@@ -1,4 +1,4 @@
-/* ─── Page ──────────────────────────────────────────────── */
+/* ─── Page ─────────────────────────────────────────────── */
 .profile-page {
   min-height: 100vh;
   background-size: cover;
@@ -35,7 +35,7 @@
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
-  padding: 2.5rem 2.5rem 2rem;
+  padding: 2rem 2rem 1.8rem;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   color: #fff;
 }
@@ -44,13 +44,13 @@
 .profile-header {
   display: flex;
   align-items: flex-start;
-  gap: 1.5rem;
-  flex-wrap: nowrap;   /* <-- era wrap, isso empurrava o botão */
+  gap: 1.2rem;
+  flex-wrap: wrap;
 }
 
 .profile-avatar-ring {
-  width: 88px;
-  height: 88px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   padding: 3px;
   background: linear-gradient(135deg, #f5a623, #f5c518);
@@ -67,11 +67,11 @@
 
 .profile-info {
   flex: 1;
-  min-width: 200px;
+  min-width: 160px;
 }
 
 .profile-info h1 {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 800;
   margin: 0 0 0.4rem;
   color: #fff;
@@ -91,20 +91,31 @@
   border: 1px solid rgba(245, 166, 35, 0.4);
   border-radius: 50px;
   padding: 0.2rem 0.9rem;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.5px;
+}
+
+/* ─── Actions (tema + voltar) ───────────────────────────── */
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .profile-back-btn {
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #ccc;
-  padding: 0.5rem 1.2rem;
+  padding: 0.45rem 1.1rem;
   border-radius: 50px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
 }
 
 .profile-back-btn:hover {
@@ -112,17 +123,35 @@
   color: #fff;
 }
 
+.profile-theme-btn {
+  padding: 0.45rem 1.1rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #ddd;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.profile-theme-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
 /* ─── Divider ───────────────────────────────────────────── */
 .profile-divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
-  margin: 1.8rem 0;
+  margin: 1.6rem 0;
 }
 
 /* ─── Fields ────────────────────────────────────────────── */
 .profile-details {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.2rem;
 }
 
@@ -133,7 +162,7 @@
 }
 
 .profile-field label {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   color: #e9e9e9;
   text-transform: uppercase;
@@ -144,9 +173,9 @@
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-  padding: 0.7rem 1rem;
+  padding: 0.65rem 1rem;
   color: #f0f0f0;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   outline: none;
   transition: border-color 0.2s, background 0.2s;
 }
@@ -156,52 +185,15 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.profile-select {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 0.7rem 1rem;
-  color: #f0f0f0;
-  font-size: 0.9rem;
-  outline: none;
-  cursor: pointer;
-  appearance: none;
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.profile-select:focus {
-  border-color: #f5a623;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.profile-select option {
-  background: #1a1a2e;
-  color: #fff;
-}
-
-.profile-section-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #e9e9e9;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin: 0 0 1.2rem;
-}
-
-.profile-readonly {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .profile-save-btn {
-  margin-top: 1.8rem;
-  padding: 0.8rem 2.5rem;
+  margin-top: 1.6rem;
+  padding: 0.75rem 2.2rem;
   border-radius: 50px;
   border: none;
   background: linear-gradient(135deg, #f5a623, #f5c518);
   color: #111;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
   box-shadow: 0 4px 18px rgba(245, 166, 35, 0.4);
@@ -219,13 +211,13 @@
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
-  padding: 2rem 2.5rem;
+  padding: 1.8rem 2rem;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   color: #fff;
 }
 
 .profile-trips h2 {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #f5a623;
   margin: 0 0 1.2rem;
@@ -258,34 +250,15 @@
 .trip-main {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex: 1;
-}
-
-.trip-invoice-btn {
-  flex-shrink: 0;
-  padding: 0.5rem 1.1rem;
-  border-radius: 50px;
-  border: 1.5px solid rgba(245, 197, 24, 0.5);
-  background: rgba(245, 197, 24, 0.1);
-  color: #f5c518;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
-  white-space: nowrap;
-}
-
-.trip-invoice-btn:hover {
-  background: rgba(245, 197, 24, 0.22);
-  transform: translateY(-1px);
 }
 
 .trip-route {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  font-size: 0.9rem;
+  gap: 0.5rem;
+  font-size: 0.88rem;
   flex-wrap: wrap;
 }
 
@@ -300,50 +273,79 @@
   font-weight: 700;
 }
 
-.trip-meta {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
 .trip-date {
-  font-size: 0.8rem;
-  color: #e9e9e9;
+  font-size: 0.78rem;
+  color: #aaa;
 }
 
-.trip-price {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #f5c518;
+/* ─── MOBILE ────────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .profile-page {
+    padding: 70px 1rem 2.5rem;
+  }
+
+  .profile-card,
+  .profile-trips {
+    padding: 1.4rem 1.2rem;
+    border-radius: 18px;
+  }
+
+  .profile-header {
+    gap: 1rem;
+  }
+
+  .profile-avatar-ring {
+    width: 64px;
+    height: 64px;
+  }
+
+  .profile-info h1 {
+    font-size: 1.15rem;
+  }
+
+  .profile-actions {
+    flex-direction: row;
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+    order: 3;
+  }
+
+  .profile-details {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-save-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .trip-route {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+
+  .trip-arrow {
+    display: none;
+  }
+
+  .trip-to {
+    color: #aaa;
+    font-weight: 400;
+    font-size: 0.82rem;
+  }
 }
 
-.trip-status {
-  font-size: 0.75rem;
-  background: rgba(67, 233, 123, 0.15);
-  color: #43e97b;
-  border: 1px solid rgba(67, 233, 123, 0.3);
-  border-radius: 50px;
-  padding: 0.15rem 0.7rem;
-  font-weight: 600;
-}
-/* ─────────────────────────────── */
-/* 🌞 PROFILE - MODO CLARO */
-/* ─────────────────────────────── */
-
-body.claro .profile-page {
-  color: #111;
-}
-
+/* ─── MODO CLARO ────────────────────────────────────────── */
 body.claro .profile-card,
 body.claro .profile-trips {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.92);
   color: #111;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
-/* textos */
 body.claro .profile-info h1 {
   color: #111;
 }
@@ -354,79 +356,47 @@ body.claro .profile-badge {
   border: 1px solid rgba(245, 197, 24, 0.4);
 }
 
-/* inputs */
-body.claro .profile-field input,
-body.claro .profile-select {
+body.claro .profile-field label {
+  color: #444;
+}
+
+body.claro .profile-field input {
   background: rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.15);
   color: #111;
 }
 
-body.claro .profile-field input:focus,
-body.claro .profile-select:focus {
+body.claro .profile-field input:focus {
   border-color: #f5c518;
   background: rgba(0, 0, 0, 0.06);
 }
 
-/* botão voltar */
 body.claro .profile-back-btn {
   background: rgba(0, 0, 0, 0.05);
-  color: #111;
+  color: #333;
   border: 1px solid rgba(0, 0, 0, 0.15);
-}
-
-/* ─── Responsivo mobile ─────────────────────────────────── */
-@media (max-width: 480px) {
-  .profile-header {
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .profile-info {
-    min-width: 0;
-    flex: 1 1 calc(100% - 100px);
-  }
-
-  .profile-badges {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.4rem;
-  }
-
-  .profile-badge {
-    width: fit-content;
-    white-space: normal;
-    word-break: break-word;
-  }
-
-  .profile-actions {
-    width: 100%;
-    display: flex;
-    gap: 0.5rem;
-  }
 }
 
 body.claro .profile-back-btn:hover {
   background: rgba(0, 0, 0, 0.1);
+  color: #111;
 }
 
-/* botão tema */
 body.claro .profile-theme-btn {
   background: rgba(0, 0, 0, 0.05);
-  color: #111;
+  color: #333;
   border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
 body.claro .profile-theme-btn:hover {
   background: rgba(0, 0, 0, 0.1);
+  color: #111;
 }
 
-/* divider */
 body.claro .profile-divider {
   background: rgba(0, 0, 0, 0.1);
 }
 
-/* viagens */
 body.claro .trip-card {
   background: rgba(0, 0, 0, 0.03);
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -436,133 +406,15 @@ body.claro .trip-card:hover {
   background: rgba(0, 0, 0, 0.06);
 }
 
+body.claro .trip-from,
+body.claro .trip-to {
+  color: #222;
+}
+
 body.claro .trip-date {
-  color: #444;
+  color: #666;
 }
 
-body.claro .trip-price {
-  color: #b08900;
-}
-
-body.claro .trip-status {
-  background: rgba(67, 233, 123, 0.12);
-  color: #1e7a3a;
-  border: 1px solid rgba(67, 233, 123, 0.3);
-}
-
-.profile-theme-btn:hover {
-  background: rgba(255,255,255,0.12);
-  color: #fff;
-}
-
-.profile-back-btn {
-  align-self: flex-end;
-}
-
-.profile-theme-btn {
-  padding: 0.5rem 1.2rem;
-  border-radius: 50px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.06);
-  color: #ddd;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.profile-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.6rem;
-  min-width: 120px;
-  flex-shrink: 0;
-  margin-left: auto;   /* <-- empurra sempre para a direita */
-}
-
-/* MAPAS */
-.map-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.map-modal-content {
-  background: #1e1e1e;
-  border-radius: 12px;
-  width: 600px;
-  max-width: 90vw;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 10000;
-}
-
-.map-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.map-modal-header h3 {
-  margin: 0;
-  color: #fff;
-  font-size: 16px;
-}
-
-.map-close-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 22px;
-  cursor: pointer;
-  line-height: 1;
-}
-
-.map-frame {
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.map-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.confirm-map-btn {
-  background: #f5a623;
-  color: #000;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 20px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.confirm-map-btn:hover {
-  background: #e09510;
-}
-
-.leaflet-control-geosearch .results {
-  background: #fff;
-  color: #000;
-}
-
-.leaflet-control-geosearch .results > * {
-  color: #000 !important;
-  background: #fff;
-}
-
-.leaflet-control-geosearch .results > *:hover {
-  background: #f0f0f0;
-  color: #000 !important;
+body.claro .profile-avatar {
+  border-color: #fff;
 }
