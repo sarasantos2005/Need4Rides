@@ -14,6 +14,15 @@ export default function MotoristaRequisitarTaxi() {
   const [loading, setLoading] = useState(true);
   const [turnoAtivo, setTurnoAtivo] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+
+  const alternarTema = () => setTema(prev => prev === 'escuro' ? 'claro' : 'escuro');
 
   useEffect(() => {
       const storedUser = localStorage.getItem('user_logado');
@@ -86,10 +95,26 @@ export default function MotoristaRequisitarTaxi() {
       {/* Navbar */}
       <nav className="mh-navbar">
         <span className="mh-logo">Need4Rides</span>
-        <ul className="mh-nav-links">
-          <li><a style={{ cursor: 'pointer' }} onClick={() => navigate('/motorista')}>Dashboard</a></li>
-          <li><a onClick={() => navigate('/motorista/historico')} style={{ cursor: 'pointer' }}>Histórico</a></li>
-          <li><a onClick={() => navigate('/motorista/suporte')} style={{ cursor: 'pointer' }}>Suporte</a></li>
+
+        <div
+          className={`mh-hamburger ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li><a style={{ cursor: 'pointer' }} onClick={() => { navigate('/motorista'); setMenuOpen(false); }}>Dashboard</a></li>
+          <li><a onClick={() => { navigate('/motorista/historico'); setMenuOpen(false); }} style={{ cursor: 'pointer' }}>Histórico</a></li>
+          <li><a onClick={() => { navigate('/motorista/suporte'); setMenuOpen(false); }} style={{ cursor: 'pointer' }}>Suporte</a></li>
+          <li><a className="active">Requisitar Táxi</a></li>
+          <li>
+            <button className="mh-theme-btn" onClick={alternarTema}>
+              {tema === 'escuro' ? '🌙 Escuro' : '☀️ Claro'}
+            </button>
+          </li>
           <li>
             <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
           </li>
