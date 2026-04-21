@@ -28,8 +28,8 @@ const turnoSchema = new mongoose.Schema({
     },
     
     localizacao_atual: {
-        type: { type: String, default: 'Point' },
-        coordinates: { type: [Number] }
+        type: { type: String, enum: ['Point'] },
+        coordinates: { type: [Number], default: undefined }
     },
 
     last_updated: { 
@@ -38,5 +38,5 @@ const turnoSchema = new mongoose.Schema({
     }
 });
 
-turnoSchema.index({ localizacao_atual: "2dsphere" });
+turnoSchema.index({ localizacao_atual: "2dsphere" }, { sparse: true });
 module.exports = mongoose.model("Turno", turnoSchema, "Turnos");

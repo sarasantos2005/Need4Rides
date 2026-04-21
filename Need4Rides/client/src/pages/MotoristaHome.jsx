@@ -18,6 +18,53 @@ function formatHora(minutos) {
   return `${h}:${m}`;
 }
 
+const getCoords = () =>
+  new Promise((resolve, reject) =>
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve(pos.coords),
+      (err) => reject(err)
+    )
+  );
+
+const fetchViagensPendentes = async (token, setViagensPendentes) => {
+  if (!token) { console.error("Token ausente"); return; }
+  try {
+    const { latitude, longitude } = await getCoords();
+    const config = { headers: { Authorization: `Bearer ${token}` }, params: { lat: latitude, lng: longitude } };
+    const res = await axios.get(`http://localhost:3000/api/viagem/disponiveis`, config);
+    setViagensPendentes(res.data);
+  } catch (err) {
+    console.error("Erro ao procurar viagens pendentes", err.response?.data || err.message);
+  }
+};
+
+const fetchHistorico = async (token, setHistorico) => {
+  if (!token) { console.error("Token ausente"); return; }
+  try {
+    const { latitude, longitude } = await getCoords();
+    const config = { headers: { Authorization: `Bearer ${token}` }, params: { lat: latitude, lng: longitude } };
+    const res = await axios.get(`http://localhost:3000/api/viagem/motorista`, config);
+    setHistorico(res.data);
+  } catch (err) {
+    console.error("Erro ao procurar histórico", err.response?.data || err.message);
+  }
+};
+
+const fetchTurnoAtual = async (token, setTurnoAtivo, setTaxi) => {
+  if (!token) { console.error("Token ausente"); return; }
+  try {
+    const { latitude, longitude } = await getCoords();
+    const config = { headers: { Authorization: `Bearer ${token}` }, params: { lat: latitude, lng: longitude } };
+    const res = await axios.get(`http://localhost:3000/api/turno/atual`, config);
+    setTurnoAtivo(res.data);
+    if (res.data && res.data.taxi) {
+      setTaxi(res.data.taxi);
+    }
+  } catch (err) {
+    console.error("Erro ao procurar turno atual", err.response?.data || err.message);
+  }
+};
+
 export default function MotoristaHome() {
   const navigate = useNavigate();
 
@@ -45,46 +92,16 @@ export default function MotoristaHome() {
       const user = JSON.parse(storedUser);
       setUserData(user);
 
-      const userId = user._id || user.id; 
+      const userId = user._id || user.id;
       if (userId && token) {
-        fetchDadosIniciais(token);
+        Promise.all([
+          fetchViagensPendentes(token, setViagensPendentes),
+          fetchHistorico(token, setHistorico),
+          fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+        ]).finally(() => setLoading(false));
       }
     }
   }, [navigate]);
-
-  const fetchDadosIniciais = async (token) => {
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const { latitude, longitude } = position.coords;
-
-      if (!token) {
-        console.error("Token ausente");
-        return;
-      }
-      try {
-        
-        const config = { headers: { Authorization: `Bearer ${token}` }, params: { lat: latitude, lng: longitude } };
-        
-      const [resPendentes, resHistorico, resTurno] = await Promise.all([
-        axios.get(`http://localhost:3000/api/viagem/disponiveis`, config),
-        axios.get(`http://localhost:3000/api/viagem/motorista`, config),
-        axios.get(`http://localhost:3000/api/turno/atual`, config)
-      ]);
-
-        setViagensPendentes(resPendentes.data);
-        setHistorico(resHistorico.data);
-        setTurnoAtivo(resTurno.data);
-        if (resTurno.data && resTurno.data.taxi) {
-          setTaxi(resTurno.data.taxi);
-        }
-      } catch (err) {
-        console.error("Erro ao procurar dados na BD", err.response?.data || err.message);
-      } finally {
-        setLoading(false);
-      }
-    }, (error) => {
-      console.error("Erro ao obter GPS:", error);
-    });
-  };
 
   //Estatisticas diarias
   const viagensHoje = historico.filter(v => {
@@ -135,8 +152,11 @@ export default function MotoristaHome() {
       localStorage.removeItem('motoristataxi');
       setTaxi(null);
       
-      const userId = userData._id || userData.id;
-      fetchDadosIniciais(userId, token);
+      await Promise.all([
+        fetchViagensPendentes(token, setViagensPendentes),
+        fetchHistorico(token, setHistorico),
+        fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+      ]);
 
       alert("Táxi devolvido com sucesso!");
     } catch (err) {
@@ -165,7 +185,11 @@ export default function MotoristaHome() {
       alert(response.data.message);
 
       // Refresh aos dados
-      fetchDadosIniciais(token);
+      await Promise.all([
+        fetchViagensPendentes(token, setViagensPendentes),
+        fetchHistorico(token, setHistorico),
+        fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+      ]);
     } catch (err) {
       alert("Erro ao aceitar viagem");
     }
@@ -190,7 +214,11 @@ export default function MotoristaHome() {
       alert(response.data.message);
 
       // Refresh aos dados
-      fetchDadosIniciais(token);
+      await Promise.all([
+        fetchViagensPendentes(token, setViagensPendentes),
+        fetchHistorico(token, setHistorico),
+        fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+      ]);
     } catch (err) {
       alert("Erro ao aceitar viagem");
     }
@@ -218,7 +246,11 @@ export default function MotoristaHome() {
           localStorage.removeItem('motoristataxi');
         
           alert("Turno encerrado com sucesso. Bom descanso!");
-          fetchDadosIniciais(token);
+          await Promise.all([
+            fetchViagensPendentes(token, setViagensPendentes),
+            fetchHistorico(token, setHistorico),
+            fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+          ]);
         } catch (err) {
           console.error("Erro ao finalizar turno:", err);
           alert("Erro ao encerrar o turno no servidor.");
@@ -248,6 +280,15 @@ export default function MotoristaHome() {
     return () => clearInterval(t);
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    const t = setInterval(() => {
+      fetchViagensPendentes(token, setViagensPendentes);
+    }, 3000);
+    return () => clearInterval(t);
+  }, []);
+
   //Encontrar os dados da marca (id no marcasEModelos = marca na BD)
   const getDadosMarca = (idBD) => {
     const marcaEncontrada = VEICULOS.marcas.find(m => m.id === idBD);
@@ -266,7 +307,11 @@ export default function MotoristaHome() {
           );
 
           alert("Fatura gerada com sucesso");
-          fetchDadosIniciais(token);
+          await Promise.all([
+            fetchViagensPendentes(token, setViagensPendentes),
+            fetchHistorico(token, setHistorico),
+            fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+          ]);
         } catch (err) {
           alert("Erro ao gerar fatura no servidor.");
         } finally {
