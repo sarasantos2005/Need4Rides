@@ -1,5 +1,5 @@
 import { useState,useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/PedirTaxi.css';
 import AvatarDropdown from '../components/AvatarDropdown';
@@ -89,7 +89,11 @@ function MapSelectorOrigem({ coordsIniciais, moradaInicial, onConfirm, onClose }
                   <button className="map-close-btn" onClick={onClose}>&times;</button>
                 </div>
 
-                <div className="map-frame">
+                <div className="map-frame" style={{ 
+                    borderRadius: '16px', 
+                    border: '2px solid rgba(245, 166, 35, 0.3)',
+                    overflow: 'hidden' 
+                }}>
                   <MapContainer 
                     center={position} 
                     zoom={13} 
@@ -188,9 +192,11 @@ function calcEstimate(origem, destino, passengers) {
 
 export default function PedirTaxi() {
   const navigate = useNavigate();
+  const { state } = useLocation();
   const [showMapOrigem, setShowMapOrigem] = useState(false);
   const [showMapDestino, setShowMapDestino] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [viagemId, setViagemId] = useState(state?.viagemId);
 
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
   useEffect(() => {
@@ -232,6 +238,35 @@ export default function PedirTaxi() {
     });
   }
 }, []);
+
+  useEffect(() => {
+    
+    if (!viagemId) {
+      return;
+    }
+
+    const buscarStatus = async() => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const response = await axios.get(`http://localhost:3000/api/viagem/status/${viagemId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+      if(response.data.status){
+        navigate('/aguardar-taxi', { 
+          state: { viagemId: response.data.viagemAtiva._id } 
+        });
+      }
+      } catch (err) {
+        console.error("Erro ao buscar status:", err.message);
+      }
+    };
+
+    buscarStatus();
+  }, [navigate]);
 
   const [estimate, setEstimate] = useState(null);
   useEffect(() => {
