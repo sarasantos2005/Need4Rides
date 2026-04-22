@@ -307,3 +307,40 @@ exports.get = async(req, res) => {
     res.status(500).json({ error: error.message });
   }
 }
+
+exports.buscarSitios = async(req, res) => {
+   try {
+    const user = await User.findById(req.userId).select('favoritos');
+    
+    if (!user) return res.status(404).json({ message: "Utilizador não encontrado" });
+    
+    res.status(200).json(user.favoritos || []); 
+    
+  } catch(error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+exports.guardarSitios = async(req, res) => {
+  try {
+    const { label, address, lat, lng } = req.body;
+    const userId = req.userId;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "Utilizador não encontrado" });
+
+    const index = user.favoritos.findIndex(f => f.label === label);
+
+    if (index > -1) {
+      user.favoritos[index] = { label, address, lat, lng };
+    } else {
+      user.favoritos.push({ label, address, lat, lng });
+    }
+
+    await user.save();
+    res.status(200).json({ message: "Local guardado com sucesso", favoritos: user.favoritos });
+  } catch(err) {
+    console.log(err);
+    res.status(500).json({ err: err.message });
+  }
+}

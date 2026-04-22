@@ -7,6 +7,8 @@ router.get('/', userController.list);
 router.post('/', userController.create);
 router.post('/login', userController.login);
 router.post('/preco', userController.definirPreco);
+router.get('/sitios', auth, userController.buscarSitios);
+router.patch('/sitios', auth, userController.guardarSitios);
 router.delete('/:id', userController.delete);
 //router.put('/:id', userController.update);
 router.get('/:id', auth, userController.get);

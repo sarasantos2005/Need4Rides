@@ -44,12 +44,12 @@ const userSchema = new mongoose.Schema({
     required: true
   },
 
-  cliente: {
-    locais: {
-      type: [],
-      default: []
-    }
-  },
+  favoritos: [{
+    label: { type: String, enum: ['Casa', 'Trabalho'], required: true },
+    address: { type: String, required: true },
+    lat: { type: Number, required: true },
+    lng: { type: Number, required: true }
+  }],
 
   motorista: {
     n_carta_conducao: {

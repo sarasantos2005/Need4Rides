@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import taxiImg from '../assets/images/taxi.png';
 import heroBg from '../assets/images/LA.jpg';
@@ -6,10 +6,120 @@ import '../css/Home.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import axios from 'axios';
 
-const MOCK_SAVED_PLACES = [
-  { label: 'Casa',      address: 'Rua das Flores, 12, Lisboa',     icon: '🏠' },
-  { label: 'Trabalho',  address: 'Av. da Liberdade, 245, Lisboa',  icon: '💼' },
-];
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-geosearch/dist/geosearch.css';
+import L from 'leaflet';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+function SearchField({ onLocationSelected, searchText }) {
+    const map = useMap(); 
+    const searchControlRef = useRef(null);
+
+    useEffect(() => {
+        const provider = new OpenStreetMapProvider();
+        const searchControl = new GeoSearchControl({
+            provider,
+            style: "bar",
+            showMarker: false,
+            autoClose: true,
+            retainZoomLevel: false,
+        });
+
+        map.addControl(searchControl);
+        searchControlRef.current = searchControl;
+
+        map.on("geosearch/showlocation", (result) => {
+            onLocationSelected([result.location.y, result.location.x]);
+        });
+
+        return () => map.removeControl(searchControl);
+    }, [map, onLocationSelected]);
+
+    useEffect(() => {
+      if (searchText) {
+        setTimeout(() => {
+          const input = document.querySelector('.leaflet-geosearch-bar input, .glass');
+          if (input) input.value = searchText;
+        }, 100);
+      }
+    }, [searchText]);
+
+    return null;
+}
+
+function MapEventsHandler({ onMove }) {
+    useMapEvents({
+        click(e) {
+            onMove([e.latlng.lat, e.latlng.lng]);
+        },
+    });
+    return null;
+}
+
+function MapSelector({ label, coordsIniciais, moradaInicial, onConfirm, onClose }) {
+    const center = Array.isArray(coordsIniciais) && coordsIniciais.length === 2 
+        ? coordsIniciais 
+        : [38.7223, -9.1393];
+
+    const [position, setPosition] = useState(center);
+    const [addressText, setAddressText] = useState(moradaInicial || "");
+
+    const updateAddress = async (lat, lng) => {
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+            const data = await res.json();
+            setAddressText(data.display_name);
+        } catch (err) {
+            console.error("Erro no reverse geocoding");
+        }
+    };
+
+    return (
+        <div className="map-modal-overlay" onClick={onClose}>
+          <div className="map-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="map-inline-header">
+                <h3>Selecionar {label}</h3>
+                <button onClick={onClose} >X</button>
+            </div>
+
+            <div className="map-frame" style={{ height: "100%", width:"100%" }}>
+                <MapContainer
+                    center={position}
+                    zoom={13}
+                    style={{ height: '400px', width: '100%' }}
+                >
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <SearchField onLocationSelected={(coords) => {
+                        setPosition(coords);
+                        updateAddress(coords[0], coords[1]);
+                    }} searchText={addressText} />
+                    <Marker position={position} />
+                    <MapEventsHandler onMove={(coords) => {
+                        setPosition(coords);
+                        updateAddress(coords[0], coords[1]);
+                    }} />
+                </MapContainer>
+            </div>
+
+            <div className="map-inline-actions">
+                <button className="profile-back-btn" onClick={onClose}>Cancelar</button>
+                <button className="profile-save-btn" onClick={() => onConfirm(label, position, addressText)}>
+                    Confirmar {label}
+                </button>
+            </div>
+          </div>
+        </div>
+    );
+}
+
 
 const services = [
   { title: 'Transporte de Passageiros', desc: 'Viagens rápidas e seguras para qualquer destino.', accent: '#6c63ff' },
@@ -37,11 +147,19 @@ export default function HomeLogado() {
   const [form, setForm] = useState({ origin: '', destination: '', passengers: '', comfort: '' });
   const [activeTrip, setActiveTrip]   = useState(null);
   const [recentTrips, setRecentTrips]  = useState([]);
-  const [savedPlaces, setSavedPlaces]  = useState(MOCK_SAVED_PLACES);
+  const [savedPlaces, setSavedPlaces]  = useState([]);
+  const [showMap, setShowMap] = useState(null);
   const [userData, setUserData] = useState({ nome: 'Utilizador' });
-  
+  const [userLocation, setUserLocation] = useState(null);
+
   useEffect(() => {
     carregarDados();
+    carregarLocais();
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
+      () => setUserLocation(null) 
+    );
   }, []);
   
   const carregarDados = async () => {
@@ -56,7 +174,6 @@ export default function HomeLogado() {
       const resViagens = await axios.get('http://localhost:3000/api/viagem/historico/cliente', config);
 
       setRecentTrips(resViagens.data);
-      // setSavedPlaces(resLocais.data || []);
 
       const ativa = JSON.parse(localStorage.getItem('viagemAtiva'));
       if (ativa && ativa.viagemId !== null) setActiveTrip(ativa);
@@ -64,6 +181,30 @@ export default function HomeLogado() {
       setUserData(JSON.parse(storedUser));
     }
   };
+
+  const carregarLocais = async() => {
+    try {
+      const storedUser = localStorage.getItem('user_logado');
+      const token = localStorage.getItem('token');
+
+      if (!token || !storedUser) {
+        navigate('/login'); 
+      } else {
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+
+        const resSitios = await axios.get('http://localhost:3000/api/user/sitios', config);
+
+        setSavedPlaces(resSitios.data);
+
+        const ativa = JSON.parse(localStorage.getItem('viagemAtiva'));
+        if (ativa && ativa.viagemId !== null) setActiveTrip(ativa);
+
+        setUserData(JSON.parse(storedUser));
+      }
+    } catch (err) {
+        console.error("Erro ao buscar locais:", err.resSitios?.data || err);
+    }
+  }
  
   const repeatTrip = (trip) => {
     const tripData = {
@@ -98,7 +239,28 @@ export default function HomeLogado() {
   }
  
   const goToSavedPlace = (place) => {
-    navigate('/pedir-taxi', { state: { destination: place.address } });
+    navigate('/pedir-taxi', { 
+      state: { 
+        origem: { 
+          morada: place.address, 
+          localizacao: [place.lat, place.lng] 
+        } 
+      } 
+    });
+  };
+
+  const handleConfirmLocal = async (label, coords, address) => {
+    const token = localStorage.getItem('token');
+    try {
+      await axios.patch('http://localhost:3000/api/user/sitios', 
+          { label, address, lat: coords[0], lng: coords[1] },
+          { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setShowMap(null);
+      carregarLocais();
+    } catch (err) {
+        alert("Erro ao guardar local");
+    }
   };
 
   const firstName = userData.nome.split(' ')[0];
@@ -151,18 +313,31 @@ export default function HomeLogado() {
               {/* Card: Atalhos guardados */}
               <div className="dash-card dash-card--places">
                 <div className="dash-card-badge">📍 Os Teus Sítios</div>
-                <div className="saved-places-list">
-                  {savedPlaces.map((p, i) => (
-                    <button key={i} className="saved-place-btn" onClick={() => goToSavedPlace(p)}>
-                      <span className="saved-place-icon">{p.icon}</span>
-                      <span className="saved-place-info">
-                        <span className="saved-place-label">{p.label}</span>
-                        <span className="saved-place-addr">{p.address}</span>
-                      </span>
-                      <span className="saved-place-arrow">→</span>
-                    </button>
-                  ))}
-                </div>
+                  <div className="saved-places-list">
+                    {['Casa', 'Trabalho'].map((label) => {
+                      const place = savedPlaces.find(p => p.label === label);
+                      
+                      return (
+                        <div key={label} className="saved-place-item">
+                          {place ? (
+                            <button className="saved-place-btn" onClick={() => goToSavedPlace(place)}>
+                              <span>{label === 'Casa' ? '🏠' : '💼'}</span>
+                              <div className="saved-place-info">
+                                <span className="saved-place-label">{label}</span>
+                                <span className="saved-place-addr" title={place.address}>{place.address}</span>
+                              </div>
+                              <span className="edit-icon" onClick={(e) => { e.stopPropagation(); setShowMap( {label, place: savedPlaces.find(p => p.label === label) || null}); }}>✏️</span>
+                            </button>
+                          ) : (
+                            <button className="saved-place-btn empty" onClick={() => setShowMap( { label, place: savedPlaces.find(p => p.label === label) || null} )}>
+                              <span>{label === 'Casa' ? '🏠' : '💼'}</span>
+                              <span onClick={() => setShowMap(label)} className="saved-place-label">Definir {label}</span>
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
               </div>
 
               {/* Card: Últimas viagens */}
@@ -221,6 +396,19 @@ export default function HomeLogado() {
       <footer className="footer">
         <span>© 2026 Need4Rides. Todos os direitos reservados.</span>
       </footer>
+      {showMap && (
+        <MapSelector 
+          label={showMap.label}
+          coordsIniciais={
+            showMap.place 
+              ? [showMap.place.lat, showMap.place.lng] 
+              : userLocation                            
+          }
+          moradaInicial={showMap.place?.address || ""}
+          onClose={() => setShowMap(null)}
+          onConfirm={handleConfirmLocal}
+        />
+      )}
     </div>
   );
 }
