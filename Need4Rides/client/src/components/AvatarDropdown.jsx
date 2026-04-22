@@ -18,6 +18,7 @@ export default function AvatarDropdown({ profilePath = '/profile', avatarClass =
     localStorage.removeItem('motoristataxi');
     localStorage.removeItem('token');
     localStorage.removeItem('user_logado');
+    localStorage.removeItem("viagemAtiva");
     setOpen(false);
     navigate('/login');
   };

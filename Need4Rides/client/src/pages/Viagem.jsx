@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
@@ -6,6 +6,11 @@ import '../css/Viagem.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
+import React from 'react';
+
+import L from "leaflet";
+import "leaflet-routing-machine";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 
 const STAGES = ['A aguardar motorista', 'Motorista a caminho', 'Em viagem', 'Concluída'];
 
@@ -14,10 +19,83 @@ const getDadosMarca = (idBD) => {
   return marcaEncontrada ? marcaEncontrada.nome : idBD;
 };
 
+function MapController() {
+  const map = useMap();
+  useEffect(() => {
+    if (map) {
+      map.invalidateSize();
+    }
+  }, [map]);
+  return null;
+}
+
+function RoutingMachine({ origin, destination }) {
+  const map = useMap();
+  const routingControlRef = useRef(null);
+
+  useEffect(() => {
+    // 1. Validar se o mapa e as coordenadas são válidos
+    if (!map || !origin || !destination) return;
+
+    // 2. Criar a instância apenas se não existir
+    if (!routingControlRef.current) {
+      const control = L.Routing.control({
+        waypoints: [
+          L.latLng(origin[0], origin[1]),
+          L.latLng(destination[0], destination[1])
+        ],
+        lineOptions: { styles: [{ color: "#3388ff", weight: 4 }] },
+        addWaypoints: false,
+        draggableWaypoints: false,
+        fitSelectedRoutes: true,
+        show: false
+      });
+      
+      control.addTo(map);
+      routingControlRef.current = control;
+    } else {
+      // 3. Se a instância já existe, apenas atualizamos os pontos
+      routingControlRef.current.setWaypoints([
+        L.latLng(origin[0], origin[1]),
+        L.latLng(destination[0], destination[1])
+      ]);
+    }
+
+    // 4. Limpeza mais segura
+    return () => {
+      // Verificamos se a referência ainda existe e se o mapa está associado
+      if (routingControlRef.current) {
+        // Removemos o controlo do mapa
+        map.removeControl(routingControlRef.current);
+        // Resetamos a referência
+        routingControlRef.current = null;
+      }
+    };
+  }, [map, origin, destination]);
+
+  return null;
+}
+
+const StaticMap = React.memo(({origin, destination}) => {
+  return (
+    <MapContainer center={origin} zoom={13} style={{ height: "100%", width: "100%" }}>
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <MapController />
+      <Marker position={origin} />
+      <Marker position={destination} />
+      <RoutingMachine origin={origin} destination={destination} />
+    </MapContainer>
+  );
+  }, (prevProps, nextProps) => {
+  return prevProps.origin[0] === nextProps.origin[0] && 
+         prevProps.origin[1] === nextProps.origin[1] &&
+         prevProps.destination[0] === nextProps.destination[0] &&
+         prevProps.destination[1] === nextProps.destination[1];
+});
 
 export default function Viagem() {
   const navigate = useNavigate();
-  const [stage, setStage] = useState(1);
+  const [stage, setStage] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
   const [motorista, setDriver] = useState(null);
@@ -63,11 +141,11 @@ export default function Viagem() {
         } 
 
         const stageMap = {
-          'procurando': 1,
-          'aguardandoConfirmacao': 1,
-          'aguardandoInicio': 2,   
-          'emCurso': 3,            
-          'finalizada': 4         
+          'procurando': 0,
+          'aguardandoConfirmacao': 0,
+          'aguardandoInicio': 1,   
+          'emCurso': 2,            
+          'finalizada': 3         
         }; 
 
         if (stageMap[data.status] !== undefined) setStage(stageMap[data.status]);
@@ -102,10 +180,13 @@ export default function Viagem() {
   const trip = {
     from: form.origem.morada,
     to: form.destino.morada,
-    eta: estimate.wait,
+    eta: estimate.tempoMedio,
     driver: motorista,
     info: info
   };
+
+  const originCoord = useMemo(() => form.origem.localizacao, [form.origem.localizacao]);
+  const destCoord = useMemo(() => form.destino.localizacao, [form.destino.localizacao]);
 
   return (
     <div className="viagem-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -232,17 +313,15 @@ export default function Viagem() {
           {/* Mapa placeholder */}
           <div className="viagem-map-placeholder">
             <div className="viagem-map-inner">
-              <div className="viagem-map-icon">
+              {/* <div className="viagem-map-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
                   <circle cx="12" cy="9" r="2.5"/>
                 </svg>
-              </div>
-              <span>Mapa em tempo real</span>
-              <p>Integração com API de mapas em breve</p>
+              </div> */}
+              <StaticMap origin={originCoord} destination={destCoord} />
             </div>
           </div>
-
         </div>
       </div>
     </div>
