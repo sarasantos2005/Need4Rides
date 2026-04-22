@@ -290,6 +290,25 @@ body.claro .profile-select option {
   flex: 1;
 }
 
+.trip-invoice-btn {
+  flex-shrink: 0;
+  padding: 0.5rem 1.1rem;
+  border-radius: 50px;
+  border: 1.5px solid rgba(245, 197, 24, 0.5);
+  background: rgba(245, 197, 24, 0.1);
+  color: #f5c518;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.trip-invoice-btn:hover {
+  background: rgba(245, 197, 24, 0.22);
+  transform: translateY(-1px);
+}
+
 .trip-route {
   display: flex;
   align-items: center;
@@ -314,6 +333,30 @@ body.claro .profile-select option {
   color: #aaa;
 }
 
+.trip-meta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.trip-price {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f5c518;
+}
+
+.trip-status {
+  font-size: 0.75rem;
+  background: rgba(67, 233, 123, 0.15);
+  color: #43e97b;
+  border: 1px solid rgba(67, 233, 123, 0.3);
+  border-radius: 50px;
+  padding: 0.15rem 0.7rem;
+  font-weight: 600;
+}
+
+
 /* ─── MOBILE ────────────────────────────────────────────── */
 @media (max-width: 540px) {
   .profile-page {
@@ -333,6 +376,11 @@ body.claro .profile-select option {
   .profile-avatar-ring {
     width: 64px;
     height: 64px;
+  }
+
+  .profile-info {
+    min-width: 0;
+    flex: 1 1 calc(100% - 100px);
   }
 
   .profile-info h1 {
@@ -370,6 +418,18 @@ body.claro .profile-select option {
     color: #aaa;
     font-weight: 400;
     font-size: 0.82rem;
+  }
+
+  .profile-badges {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .profile-badge {
+    width: fit-content;
+    white-space: normal;
+    word-break: break-word;
   }
 }
 

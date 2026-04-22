@@ -44,9 +44,22 @@ const userSchema = new mongoose.Schema({
     required: true
   },
 
+  cliente: {
+    locais: {
+      type: [],
+      default: []
+    }
+  },
+
   motorista: {
     n_carta_conducao: {
       type: String
+    },
+
+    rating: {
+      type: Number,
+      min: 0,
+      max: 5
     },
 
     morada: { 

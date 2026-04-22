@@ -56,6 +56,13 @@ const viagemSchema = new mongoose.Schema({
         enum: ["Básico", "Luxuoso"]
     },
 
+    rating_motorista: {
+        type: Number,
+        min: 0,
+        max: 5,
+        default: 5
+    },
+
     cliente: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User',

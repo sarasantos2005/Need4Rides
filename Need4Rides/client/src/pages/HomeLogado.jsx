@@ -4,19 +4,12 @@ import taxiImg from '../assets/images/taxi.png';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Home.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import axios from 'axios';
 
-const BASE_PRICE = 3.5;
-const PRICE_PER_KM = 1.8;
-const WAIT_BASE = 4;
-
-function calcEstimate(origin, destination, passengers) {
-  if (!origin || !destination) return null;
-  const seed = (origin.length + destination.length) * 1.3;
-  const km = Math.max(2, Math.round(seed % 22) + 3);
-  const price = (BASE_PRICE + km * PRICE_PER_KM * (passengers > 4 ? 1.2 : 1)).toFixed(2);
-  const wait = WAIT_BASE + Math.round(km / 3);
-  return { km, price, wait };
-}
+const MOCK_SAVED_PLACES = [
+  { label: 'Casa',      address: 'Rua das Flores, 12, Lisboa',     icon: '🏠' },
+  { label: 'Trabalho',  address: 'Av. da Liberdade, 245, Lisboa',  icon: '💼' },
+];
 
 const services = [
   { title: 'Transporte de Passageiros', desc: 'Viagens rápidas e seguras para qualquer destino.', accent: '#6c63ff' },
@@ -29,28 +22,90 @@ const services = [
   { title: 'Relatórios e Estatísticas', desc: 'Análises completas sobre viagens, motoristas e clientes.', accent: '#a18cd1' },
 ];
 
+// ── Helpers ────────────────────────────────────────────────
+function ProgressBar({ value, max, color = '#f5c518' }) {
+  const pct = Math.min(100, Math.round((value / max) * 100));
+  return (
+    <div className="progress-track">
+      <div className="progress-fill" style={{ width: `${pct}%`, background: color }} />
+    </div>
+  );
+}
+
 export default function HomeLogado() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ origin: '', destination: '', passengers: '', comfort: '' });
-
+  const [activeTrip, setActiveTrip]   = useState(null);
+  const [recentTrips, setRecentTrips]  = useState([]);
+  const [savedPlaces, setSavedPlaces]  = useState(MOCK_SAVED_PLACES);
   const [userData, setUserData] = useState({ nome: 'Utilizador' });
+  
   useEffect(() => {
+    carregarDados();
+  }, []);
+  
+  const carregarDados = async () => {
     const storedUser = localStorage.getItem('user_logado');
     const token = localStorage.getItem('token');
 
     if (!token || !storedUser) {
       navigate('/login'); 
     } else {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const resViagens = await axios.get('http://localhost:3000/api/viagem/historico/cliente', config);
+
+      setRecentTrips(resViagens.data);
+      // setSavedPlaces(resLocais.data || []);
+
+      const ativa = JSON.parse(localStorage.getItem('viagemAtiva'));
+      if (ativa && ativa.viagemId !== null) setActiveTrip(ativa);
+
       setUserData(JSON.parse(storedUser));
     }
-  }, [navigate]);
+  };
+ 
+  const repeatTrip = (trip) => {
+    const tripData = {
+      origem: trip.morada_inicial_viagem,
+      destino: trip.morada_final_viagem,
+      passengers: trip.n_passageiros || 1,
+      comfort: trip.nivel_conforto || 'Básico'
+    };
+
+    localStorage.setItem('viagemAtiva', JSON.stringify({
+      form: tripData,
+      viagemId: null 
+    }));
+
+    navigate('/pedir-taxi');
+  };
+
+  const pedidoNovo = () => {
+    const tripData = {
+      origem: { morada: '', localizacao: null },
+      destino: { morada: '', localizacao: null },
+      passengers: 1,
+      comfort: ''
+    };
+
+    localStorage.setItem('viagemAtiva', JSON.stringify({
+      form: tripData,
+      viagemId: null 
+    }));
+
+    navigate('/pedir-taxi');
+  }
+ 
+  const goToSavedPlace = (place) => {
+    navigate('/pedir-taxi', { state: { destination: place.address } });
+  };
+
+  const firstName = userData.nome.split(' ')[0];
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Bom dia' : hour < 19 ? 'Boa tarde' : 'Boa noite';
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-
-  const handleGetTaxi = () => {
-    const estimate = calcEstimate(form.origin, form.destination, Number(form.passengers) || 1);
-    navigate('/aguardar-taxi', { state: { form, estimate } });
-  };
 
   return (
     <div className="home">
@@ -64,46 +119,79 @@ export default function HomeLogado() {
       </nav>
 
       {/* Hero */}
-      <section
-        className="hero"
-        id="hero"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      >
+      <section className="hero" id="hero" style={{ backgroundImage: `url(${heroBg})` }}>
         <div className="hero-overlay" />
-        <div className="hero-content">
-          <h1 className="hero-title">Vamos viajar, {userData.nome.split(' ')[0]}?</h1>
-          <div className="hero-form-block">
-            <form className="hero-form" onSubmit={e => e.preventDefault()}>
-              <input
-                type="text"
-                name="origin"
-                placeholder="Ponto de Partida..."
-                value={form.origin}
-                onChange={handleChange}
-              />
-              <input
-                type="text"
-                name="destination"
-                placeholder="Ponto de Chegada..."
-                value={form.destination}
-                onChange={handleChange}
-              />
-              <select name="passengers" value={form.passengers} onChange={handleChange}>
-                <option value="" disabled>Nº de Passageiros</option>
-                <option value="1">1 Passageiro</option>
-                <option value="2">2 Passageiros</option>
-                <option value="3">3 Passageiros</option>
-                <option value="4">4 Passageiros</option>
-              </select>
-              <select name="comfort" value={form.comfort} onChange={handleChange}>
-                <option value="" disabled>Conforto do Carro</option>
-                <option value="basic">Básico</option>
-                <option value="luxury">Luxuoso</option>
-              </select>
-            </form>
-            <button className="hero-btn" onClick={handleGetTaxi}>
-              GET TAXI
-            </button>
+          <div className="hero-content">
+            <h1 className="hero-title">Vamos viajar, {userData.nome.split(' ')[0]}?</h1>
+            <div className="hero-form-block">
+              {/* ── Dashboard Cards ── */}
+            <div className="dashboard-grid">
+  
+              {/* Card: Viagem Ativa ou CTA */}
+              {activeTrip ? (
+                <div className="dash-card dash-card--active">
+                  <div className="dash-card-badge">🚕 Em curso</div>
+                  <h3 className="dash-card-title">A caminho de <strong>{activeTrip.destino.morada}</strong></h3>
+                  <p className="dash-card-sub">Motorista: {activeTrip.driver.nome} · Tempo de espera: {activeTrip.eta.wait}</p>
+                  <button className="dash-btn dash-btn--primary" onClick={() => navigate('/aguardar-taxi')}>
+                    Ver viagem
+                  </button>
+                </div>
+              ) : (
+                <div className="dash-card dash-card--cta">
+                  <div className="dash-card-badge">✨ Rápido</div>
+                  <h3 className="dash-card-title">Precisas de um táxi?</h3>
+                  <p className="dash-card-sub">Pede-o aqui, de maneira rápida</p>
+                  <button className="dash-btn dash-btn--primary" onClick={pedidoNovo}>
+                    Novo Pedido
+                  </button>
+                </div>
+              )}
+  
+              {/* Card: Atalhos guardados */}
+              <div className="dash-card dash-card--places">
+                <div className="dash-card-badge">📍 Os Teus Sítios</div>
+                <div className="saved-places-list">
+                  {savedPlaces.map((p, i) => (
+                    <button key={i} className="saved-place-btn" onClick={() => goToSavedPlace(p)}>
+                      <span className="saved-place-icon">{p.icon}</span>
+                      <span className="saved-place-info">
+                        <span className="saved-place-label">{p.label}</span>
+                        <span className="saved-place-addr">{p.address}</span>
+                      </span>
+                      <span className="saved-place-arrow">→</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Card: Últimas viagens */}
+              <div className="dash-card dash-card--history">
+                <div className="dash-card-badge">🕒 Últimas Viagens</div>
+                <ul className="trips-list">
+                  {recentTrips.length > 0 ? (
+                  recentTrips.slice(0,3).map(trip => (
+                    <li key={trip.id} className="trip-item">
+                      <div className="trip-route">
+                        <span className="trip-origin">{trip.morada_inicial_viagem.morada}</span>
+                        <span className="trip-arrow">→</span>
+                        <span className="trip-dest">{trip.morada_final_viagem.morada}</span>
+                      </div>
+                      <div className="trip-meta">
+                        <span className="trip-date">{new Date(trip.hora_inicial_viagem).toLocaleDateString()} · {new Date(trip.hora_inicial_viagem).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                        <span className="trip-price">{trip.preco_viagem.toFixed(2)}€</span>
+                        <button className="trip-repeat-btn" onClick={() => repeatTrip(trip)} title="Repetir viagem">
+                          ↻
+                        </button>
+                      </div>
+                    </li>
+                  ))
+                  ) : (
+                    <p className="mh-no-data">Ainda não realizou viagens.</p>
+                  )}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
         <div className="hero-car">

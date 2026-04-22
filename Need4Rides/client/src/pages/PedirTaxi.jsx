@@ -214,30 +214,68 @@ export default function PedirTaxi() {
   });
 
   useEffect(() => {
+    const savedTrip = JSON.parse(localStorage.getItem('viagemAtiva'));
+    if (savedTrip && savedTrip.form) {
+      setForm(savedTrip.form);
+    }
+  }, []);
+
+  useEffect(() => {
     axios.get('http://localhost:3000/api/preco')
     .then(res => setTabelaPrecos(res.data))
   }, []);
 
   useEffect(() => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-      
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-        const data = await res.json();
-        
-        setForm(prev => ({
+    if (state && state.origem) {
+      setForm(prev => ({
           ...prev,
-          origem: { morada: data.display_name, localizacao: [lat, lng] }
+          origem: { morada: state.origem.morada, localizacao: state.origem.localizacao } 
         }));
-      } catch (err) {
-        console.error("Erro ao obter morada atual");
+      return;
+    }
+
+    const obterLocalizacaoAtual = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+            const data = await res.json();
+            
+            setForm(prev => {
+              if (prev.origem.morada === "") {
+                return {
+                  ...prev,
+                  origem: { morada: data.display_name, localizacao: [lat, lng] }  
+                }
+              }
+              return prev;
+            });
+          } catch (err) {
+            console.error("Erro ao obter morada atual");
+          }
+        });
       }
+    }
+
+    if(form.origem.morada === ""){
+      obterLocalizacaoAtual();  
+    }
+  }, [state]);
+
+  const usarLocalizacaoAtual = () => {
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const data = await res.json();
+        setForm(prev => ({
+            ...prev,
+            origem: { morada: data.display_name, localizacao: [latitude, longitude] }
+        }));
     });
-  }
-}, []);
+  };
 
   useEffect(() => {
     
@@ -406,15 +444,18 @@ export default function PedirTaxi() {
 
             <div className="pt-field">
               <label>Origem</label>
-              <input
-                name="origem"
-                type="text"
-                placeholder="De onde partes?"
-                value={form.origem.morada}
-                readOnly
-                onClick={() => setShowMapOrigem(true)}
-                required
-              />
+              <div className="pt-input-wrapper">
+                <input
+                  name="origem"
+                  type="text"
+                  placeholder="De onde partes?"
+                  value={form.origem.morada}
+                  readOnly
+                  onClick={() => setShowMapOrigem(true)}
+                  required
+                />
+                <button type="button" className="pt-btn-loc" onClick={usarLocalizacaoAtual} title="Usar localização atual">📍</button>  
+              </div>
             </div>
 
             <div className="pt-field">

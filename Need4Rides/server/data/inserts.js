@@ -29,12 +29,12 @@ async function runSeed() {
         const users = await User.insertMany([
             { nome: "Guilherme", email: "gui@teste.com", tipo: "Cliente", nif: 111111111, senha_acesso_web: passwordHash, genero: "M", ano_nascimento: 2000 },
             { nome: "Leonor", email: "leonor@teste.com", tipo: "Cliente", nif: 222222222, senha_acesso_web: passwordHash, genero: "F", ano_nascimento: 1995 },
-            { nome: "Maria", email: "maria@teste.com", tipo: "Motorista", nif: 333333333, senha_acesso_web: passwordHash, genero: "M", ano_nascimento: 1980, motorista: { n_carta_conducao: "ZA-12345 1", morada: { texto: "Rua Augusta, Lisboa", localizacao: { type: "Point", coordinates: [-9.1393, 38.7223] } }} },
-            { nome: "Afonso", email: "afonso@teste.com", tipo: "Motorista", nif: 444444444, senha_acesso_web: passwordHash, genero: "F", ano_nascimento: 1988, motorista: { n_carta_conducao: "ZA-12345 2", morada: { texto: "Rua Augusta, Lisboa", localizacao: { type: "Point", coordinates: [-9.1393, 38.7223] } }} },
+            { nome: "Maria", email: "maria@teste.com", tipo: "Motorista", nif: 333333333, senha_acesso_web: passwordHash, genero: "M", ano_nascimento: 1980, motorista: { n_carta_conducao: "ZA-12345 1", rating: 5, morada: { texto: "Rua Augusta, Lisboa", localizacao: { type: "Point", coordinates: [-9.1393, 38.7223] } }} },
+            { nome: "Afonso", email: "afonso@teste.com", tipo: "Motorista", nif: 444444444, senha_acesso_web: passwordHash, genero: "F", ano_nascimento: 1988, motorista: { n_carta_conducao: "ZA-12345 2",  rating: 5, morada: { texto: "Rua Augusta, Lisboa", localizacao: { type: "Point", coordinates: [-9.1393, 38.7223] } }} },
             { nome: "Sara", email: "sara@teste.com", tipo: "Cliente", nif: 555555555, senha_acesso_web: passwordHash, genero: "M", ano_nascimento: 1995 },
             { nome: "Cliente", email: "pessoa@need4rides.com", genero: "M", tipo: "Cliente", nif: 999999999, senha_acesso_web: passwordHash, ano_nascimento: 2005 },
             { nome: "Admin", email: "pessoa@need4rides.com", genero: "M", tipo: "Gestor", nif: 999999999, senha_acesso_web: passwordHash, ano_nascimento: 2005 },
-            { nome: "Motorista", email: "pessoa@need4rides.com", genero: "M", tipo: "Motorista", nif: 999999999, senha_acesso_web: passwordHash, ano_nascimento: 2005, motorista: {n_carta_conducao: "ZA-12345 6", morada: { texto: "Rua Augusta, Lisboa", localizacao: { type: "Point", coordinates: [-9.1393, 38.7223] } }} }
+            { nome: "Motorista", email: "pessoa@need4rides.com", genero: "M", tipo: "Motorista", nif: 999999999, senha_acesso_web: passwordHash, ano_nascimento: 2005, motorista: {n_carta_conducao: "ZA-12345 6", rating: 5, morada: { texto: "Rua Augusta, Lisboa", localizacao: { type: "Point", coordinates: [-9.1393, 38.7223] } }} }
         ]);
 
         //Taxis
@@ -185,6 +185,7 @@ async function runSeed() {
                 turno: turno[0]._id,   // Maria (Terminado)
                 n_passageiros: 2,
                 nivel_conforto: "Luxuoso",
+                rating_motorista: 5,
                 morada_inicial_viagem: { 
                     morada: "Rua Augusta, Lisboa", 
                     localizacao: { 
@@ -210,6 +211,7 @@ async function runSeed() {
                 turno: turno[2]._id,   // Maria (Terminado)
                 n_passageiros: 2,
                 nivel_conforto: "Luxuoso",
+                rating_motorista: 5,
                 morada_inicial_viagem: { 
                     morada: "Av. Dom João II Lote 1.16, Parque das Nações, 1990-083 Lisboa", 
                     localizacao: { 
@@ -235,6 +237,7 @@ async function runSeed() {
                 turno: turno[2]._id,   // Maria (Terminado)
                 n_passageiros: 2,
                 nivel_conforto: "Luxuoso",
+                rating_motorista: 5,
                 morada_inicial_viagem: { 
                     morada: "Saldanha Residence, Av. Fontes Pereira de Melo 42 E, 1050-250 Lisboa", 
                     localizacao: { 
@@ -260,6 +263,7 @@ async function runSeed() {
                 turno: turno[2]._id,   // Maria (Terminado)
                 n_passageiros: 2,
                 nivel_conforto: "Luxuoso",
+                rating_motorista: 5,
                 morada_inicial_viagem: { 
                     morada: "Aeroporto Internacional de Lisboa Humberto Delgado", 
                     localizacao: { 
@@ -285,6 +289,7 @@ async function runSeed() {
                 turno: turno[2]._id,   // Maria (Terminado)
                 n_passageiros: 2,
                 nivel_conforto: "Luxuoso",
+                rating_motorista: 5,
                 morada_inicial_viagem: { 
                     morada: "Alameda das Linhas de Torres, Lisboa", 
                     localizacao: { 
@@ -310,6 +315,7 @@ async function runSeed() {
                 turno: turno[2]._id,   // Maria (Terminado)
                 n_passageiros: 2,
                 nivel_conforto: "Luxuoso",
+                rating_motorista: 5,
                 morada_inicial_viagem: { 
                     morada: "Estr. de Telheiras, Lisboa", 
                     localizacao: { 
