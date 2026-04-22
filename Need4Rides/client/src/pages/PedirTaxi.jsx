@@ -234,6 +234,13 @@ export default function PedirTaxi() {
       return;
     }
 
+    if (state && state.destino) {
+      setForm(prev => ({
+        ...prev,
+        destino: { morada: state.destino.morada, localizacao: state.destino.localizacao }
+      }));
+    }
+
     const obterLocalizacaoAtual = () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(async (position) => {

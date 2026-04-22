@@ -241,7 +241,7 @@ export default function HomeLogado() {
   const goToSavedPlace = (place) => {
     navigate('/pedir-taxi', { 
       state: { 
-        origem: { 
+        destino: { 
           morada: place.address, 
           localizacao: [place.lat, place.lng] 
         } 
