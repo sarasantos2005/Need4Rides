@@ -1,0 +1,28 @@
+@import './GestorRegistarMotorista.css';
+
+.grt-color-input {
+  width: 100%;
+  height: 44px;
+  padding: 4px 6px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+
+.grt-color-input:focus {
+  border-color: #f5c518;
+}
+
+.grt-range-input {
+  width: 100%;
+  height: 6px;
+  margin-top: 0.6rem;
+  accent-color: #f5c518;
+  cursor: pointer;
+}
+
+body.claro .grt-color-input {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+}

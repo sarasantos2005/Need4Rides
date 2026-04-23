@@ -52,9 +52,10 @@ const taxiSchema = new mongoose.Schema({
 
     autonomia_maxima: {
         type: Number,
-        required: true
+        required: false,
+        default: 0
     }
 
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Taxi", taxiSchema, "Taxis");

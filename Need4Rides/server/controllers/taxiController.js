@@ -70,6 +70,15 @@ exports.delete = async (req, res) => {
   }
 };
 
+exports.listarTodos = async (req, res) => {
+  try {
+    const taxis = await Taxi.find().sort({ createdAt: -1 });
+    res.json({ success: true, taxis });
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao procurar táxis." });
+  }
+};
+
 exports.listarDisponiveis = async (req, res) => {
   try {
     const turnosOcupados = await Turno.find({
