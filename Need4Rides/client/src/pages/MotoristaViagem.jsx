@@ -240,7 +240,7 @@ export default function MotoristaViagem() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setEstado('em_curso');
+      setEstado('emCurso');
       timerRef.current = setInterval(() => setSegundos(s => s + 1), 1000);
     } catch (err) {
       console.error('Erro ao iniciar viagem:', err.message);
@@ -252,16 +252,36 @@ export default function MotoristaViagem() {
       const token = localStorage.getItem('token');
       const viagemAtiva = JSON.parse(localStorage.getItem('viagemAtivaMotorista'));
 
-      await axios.post(
-        'http://localhost:3000/api/viagem/finalizar',
-        { viagemId: viagemAtiva?.viagemId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
 
-      clearInterval(pollingRef.current);
-      clearInterval(timerRef.current);
-      localStorage.removeItem('viagemAtivaMotorista');
-      navigate('/motorista/fatura-conf', { state: { trip: tripAtiva, duracao: segundos } });
+        const resGeo = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const dataGeo = await resGeo.json();
+        const moradaCompleta = dataGeo.display_name || "Localização desconhecida";
+
+        await axios.post(
+          'http://localhost:3000/api/viagem/finalizar',
+          { 
+            viagemId: viagemAtiva?.viagemId,
+            destino: {
+              lat: latitude,
+              long: longitude,
+              morada: moradaCompleta
+            }
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+
+        clearInterval(pollingRef.current);
+        clearInterval(timerRef.current);
+        localStorage.removeItem('viagemAtivaMotorista');
+        navigate('/motorista/fatura-conf', { state: { trip: tripAtiva, duracao: segundos } });
+      }, (error) => {
+        console.error("Erro ao obter geolocalização:", err);
+        alert("Não foi possível obter a sua localização atual para finalizar a viagem.");
+      });
+
     } catch (err) {
       console.error('Erro ao terminar viagem:', err.message);
     }

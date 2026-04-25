@@ -35,11 +35,11 @@ exports.iniciarViagem = async (req, res) => {
 //US-8
 exports.finalizarViagem = async (req, res) => {
   try {
-    const { viagem_Id, destino } = req.body;
+    const { viagemId, destino } = req.body;
 
     const horaFim = new Date();
 
-    const viagem = await Viagem.findById(viagem_Id);
+    const viagem = await Viagem.findById(viagemId);
 
     if (!viagem) {
       return res.status(404).json({ success: false, message: "Viagem não encontrada." });
@@ -51,18 +51,18 @@ exports.finalizarViagem = async (req, res) => {
     }
 
     //RIA 19: Calcular distancia com a morada inicial e final
-    const km = calcularDistancia(viagem.morada_inicial_viagem.localizacao.coordinates, [destino.long, destino.lat]);
+    const km = await calcularDistanciaOSRM(viagem.morada_inicial_viagem.localizacao.coordinates, [destino.long, destino.lat]);
     
     //RIA 20: Calclar preco com o nivel de conforto, e hora inicial e final
     const preco = await calcularPreco(viagem.nivel_conforto, viagem.hora_inicial_viagem, horaFim);
 
     const viagemFinalizada = await Viagem.findByIdAndUpdate(
-        viagem_Id,
+        viagemId,
         {   
             hora_final_viagem: horaFim,
             morada_final_viagem: {
               morada: destino.morada,
-              localizacao: { coordinates: [destino.long, destino.lat] }
+              localizacao: { type: "Point", coordinates: [destino.long, destino.lat] }
             },
             km_percorridos: km,
             preco_viagem: preco,
@@ -381,6 +381,28 @@ function calcularDistancia(coordsInicio, coordsFim) {
   const distancia = R * c;
 
   return parseFloat(distancia.toFixed(2)); 
+}
+
+async function calcularDistanciaOSRM(coordsInicio, coordsFim) {
+  try {
+    const lon1 = coordsInicio[1];
+    const lat1 = coordsInicio[0];
+    const lon2 = coordsFim[1];
+    const lat2 = coordsFim[0];
+
+    const url = `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`;
+    const response = await axios.get(url);
+
+    if (response.data && response.data.routes && response.data.routes.length > 0) {
+      const distanciaMetros = response.data.routes[0].distance;
+      return parseFloat((distanciaMetros / 1000).toFixed(2));
+    } else {
+      throw new Error("Nenhuma rota encontrada pelo OSRM");
+    }
+  } catch (error) {
+    console.error("Erro ao calcular distância via OSRM:", error.message);
+    return null; 
+  }
 }
 
 //RIA 20
