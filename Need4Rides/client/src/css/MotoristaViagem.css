@@ -297,13 +297,13 @@
 }
 
 /* ─── Map ───────────────────────────────────────────────── */
-.mvg-map-wrap {
+.viagem-map-wrap {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.mvg-map-label {
+.viagem-map-label {
   font-size: 0.78rem;
   color: #ffffff;
   text-transform: uppercase;
@@ -311,7 +311,7 @@
   font-weight: 600;
 }
 
-.mvg-map-placeholder {
+.viagem-map-placeholder {
   flex: 1;
   min-height: 480px;
   border-radius: 20px;
@@ -325,20 +325,20 @@
   gap: 0.9rem;
 }
 
-.mvg-map-pin {
+.viagem-map-pin {
   width: 52px;
   height: 52px;
   opacity: 0.85;
 }
 
-.mvg-map-placeholder-title {
+.viagem-map-placeholder-title {
   font-size: 1.15rem;
   font-weight: 700;
   color: #e0e0e0;
   letter-spacing: -0.3px;
 }
 
-.mvg-map-placeholder-sub {
+.viagem-map-placeholder-sub {
   font-size: 0.82rem;
   color: #555;
 }
@@ -346,8 +346,7 @@
 /* ─── Responsive ────────────────────────────────────────── */
 @media (max-width: 900px) {
   .mvg-layout { grid-template-columns: 1fr; }
-  .mvg-map-wrap { order: -1; }
-  .mvg-map-placeholder { min-height: 260px; }
+  .viagem-map-placeholder { min-height: 260px; order: -1 }
 }
 
 @media (max-width: 560px) {
@@ -504,16 +503,16 @@ body.claro .mvg-btn.end {
 }
 
 /* mapa */
-body.claro .mvg-map-placeholder {
+body.claro .viagem-map-placeholder {
   background: rgba(255, 255, 255, 0.9);
   border: 2px dashed rgba(245, 197, 24, 0.35);
 }
 
-body.claro .mvg-map-placeholder-title {
+body.claro .viagem-map-placeholder-title {
   color: #111;
 }
 
-body.claro .mvg-map-placeholder-sub {
+body.claro .viagem-map-placeholder-sub {
   color: #666;
 }
 
@@ -534,6 +533,6 @@ body.claro .mvg-sub{
   color:#e9e9e9;
 }
 
-body.claro .mvg-map-label {
+body.claro .viagem-map-label {
   color: #ffffff;
 }

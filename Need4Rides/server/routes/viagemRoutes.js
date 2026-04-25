@@ -10,6 +10,7 @@ router.post('/confirmar', viagemController.confirmacaoCliente); // US6 - Cliente
 router.post('/cancelar-aceitacao', viagemController.cancelarAceitacaoMotorista); // US7 - Motorista cancela a sua própria aceitação
 router.get('/disponiveis', auth, viagemController.listarPedidosParaMotorista); // US7 - Motorista lista pedidos disponíveis perto de si
 router.patch('/aceitar', auth, viagemController.aceitarPedido); // US7 - Motorista aceita um pedido de viagem
+router.get("/motorista/ativa", auth, viagemController.statusMotorista);
 router.get('/motorista', auth, viagemController.historicoDeViagens); 
 router.patch('/recusar', auth, viagemController.recusarCliente); // Motorista rejeita um pedido de viagem
 router.get("/historico/cliente", auth, viagemController.historicoDeViagens_Cliente);

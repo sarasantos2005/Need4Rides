@@ -648,3 +648,76 @@ exports.estimarTempoEspera = async (req, res) => {
     res.status(500).json({ err: "Erro ao calcular espera." });
   }
 };
+
+exports.statusMotorista = async (req, res) => {
+  try {
+    const motoristaId  = req.userId;
+
+    if (!motoristaId ) {
+      return res.status(401).json({ message: "Utilizador não autenticado." });
+    }
+
+    const turnoAtivo = await Turno.findOne({ motorista: motoristaId, estado: 'Ativo' });
+    
+    if (!turnoAtivo) {
+      return res.status(200).json({ viagemId: null });
+    }
+
+    const viagem = await Viagem.findOne({
+      turno: turnoAtivo._id,
+      hora_final_viagem: { $exists: false }  
+    })
+    .populate({
+      path: 'turno',
+      populate: [
+        { path: 'motorista', select: 'nome email' },
+        { path: 'taxi',      select: 'marca modelo matricula' }
+      ]
+    })
+    .populate('cliente', 'nome');
+
+    if (!viagem) {
+      return res.status(200).json({ viagemId: null });
+    }
+
+    let status;
+    if (viagem.hora_inicial_viagem) {
+      status = 'emCurso';
+    } else {
+      status = 'aguardandoInicio';
+    }
+
+    const taxiData = viagem.turno?.taxi;
+    const viagemInfo = {
+      _id:         viagem._id,
+      origem:      viagem.morada_inicial_viagem,
+      destino:     viagem.morada_final_viagem,
+      km:          viagem.km_percorridos   ?? null,
+      preco:       viagem.preco_viagem     ?? null,
+      passageiros: viagem.n_passageiros,
+    };
+
+    const clienteInfo = viagem.cliente
+      ? { nome: viagem.cliente.nome }
+      : null;
+
+    const info = taxiData ? {
+      marca:     taxiData.marca    || 'N/A',
+      modelo:    taxiData.modelo   || 'N/A',
+      matricula: taxiData.matricula || 'N/A'
+    } : null;
+
+    res.status(200).json({
+      viagemId: viagem._id,
+      status,
+      viagem:  viagemInfo,
+      cliente: clienteInfo,
+      info
+    });
+
+    
+  } catch (error) {
+    console.error('Erro em statusMotorista:', error);
+    res.status(500).json({ error: error.message });
+  }
+};

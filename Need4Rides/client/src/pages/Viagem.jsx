@@ -34,10 +34,8 @@ function RoutingMachine({ origin, destination }) {
   const routingControlRef = useRef(null);
 
   useEffect(() => {
-    // 1. Validar se o mapa e as coordenadas são válidos
     if (!map || !origin || !destination) return;
 
-    // 2. Criar a instância apenas se não existir
     if (!routingControlRef.current) {
       const control = L.Routing.control({
         waypoints: [
@@ -54,20 +52,15 @@ function RoutingMachine({ origin, destination }) {
       control.addTo(map);
       routingControlRef.current = control;
     } else {
-      // 3. Se a instância já existe, apenas atualizamos os pontos
       routingControlRef.current.setWaypoints([
         L.latLng(origin[0], origin[1]),
         L.latLng(destination[0], destination[1])
       ]);
     }
 
-    // 4. Limpeza mais segura
     return () => {
-      // Verificamos se a referência ainda existe e se o mapa está associado
       if (routingControlRef.current) {
-        // Removemos o controlo do mapa
         map.removeControl(routingControlRef.current);
-        // Resetamos a referência
         routingControlRef.current = null;
       }
     };

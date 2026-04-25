@@ -321,7 +321,7 @@ export default function AguardarTaxi() {
               </div>
 
               <div className="agt-meta-item">
-                <span className="agt-meta-label">Espera</span>
+                <span className="agt-meta-label">Tempo de viagem</span>
                 <span className="agt-meta-value">{estimate.wait} min</span>
               </div>
             </div>
