@@ -5,13 +5,15 @@ import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
 import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import Loading from '../components/Loading';
+import useMinLoading from '../hooks/useMinLoading';
 
 export default function GestorHome() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userData, setUserData] = useState({ nome: 'Utilizador' });
   const [relatoriosData, setRelatoriosData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useMinLoading();
   const [periodo, setPeriodo] = useState('hoje');
   const [exporting, setExporting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -206,16 +208,7 @@ export default function GestorHome() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
-        <div className="mh-overlay" />
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'white' }}>
-          Carregando relatórios...
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <Loading />;
 
   
 

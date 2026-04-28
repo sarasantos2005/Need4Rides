@@ -4,6 +4,8 @@ import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
 import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import Loading from '../components/Loading';
+import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
 
@@ -71,7 +73,7 @@ export default function MotoristaHome() {
   const [viagensPendentes, setViagensPendentes] = useState([]);
   const [historico, setHistorico] = useState([]);
   const [turnoAtivo, setTurnoAtivo] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useMinLoading();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [emTurno, setEmTurno] = useState(true);
@@ -337,7 +339,7 @@ export default function MotoristaHome() {
   };
 
 
-  if (loading || !userData) return <div className="mh-loading">A carregar...</div>;
+  if (loading || !userData) return <Loading />;
   return (
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mh-overlay" />
