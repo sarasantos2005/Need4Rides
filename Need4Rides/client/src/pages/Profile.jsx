@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import Loading from '../components/Loading';
+import useMinLoading from '../hooks/useMinLoading';
 import ddImg from '../assets/images/fennec.jpg';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Profile.css';
@@ -9,7 +11,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [historico, setHistorico] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useMinLoading();
   const [formData, setFormData] = useState({
     email: '',
     nif: '',
@@ -54,6 +56,7 @@ export default function Profile() {
 
       setUserData(resUser.data);
       setHistorico(resTrips.data);
+      setLoading(false);
       setFormData({
         email: resUser.data.email || '',
         nif: resUser.data.nif || '',
@@ -107,7 +110,7 @@ export default function Profile() {
     setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
   };
 
-  if(!userData) return <div className="mh-loading">A carregar perfil...</div>;
+  if (!userData || loading) return <Loading />;
 
   return (
     <div

@@ -1,16 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
+import animationGif from '../assets/images/animation.gif';
 import '../css/GestorHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/GestorMotoristas.css';
 import '../css/MotoristaHome.css';
 import { useState, useEffect } from 'react';
+import useMinLoading from '../hooks/useMinLoading';
 
 export default function GestorMotoristas() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [motoristas, setMotoristas] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useMinLoading();
   const [sortCol, setSortCol] = useState(null);
   const [sortDir, setSortDir] = useState(1);
 
@@ -154,7 +156,7 @@ export default function GestorMotoristas() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={8} style={{ textAlign: 'center' }}>A carregar...</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: 'center' }}><img src={animationGif} alt="A carregar..." style={{ width: '80px' }} /></td></tr>
                 ) : sorted.map(m => (
                   <tr key={m._id}>
                     <td className="gm-nome">{m.nome}</td>
@@ -176,7 +178,7 @@ export default function GestorMotoristas() {
           {/* CARDS — mobile */}
           <div className="gm-mobile-list">
             {loading ? (
-              <p style={{ textAlign: 'center', color: '#aaa', padding: '1rem' }}>A carregar...</p>
+              <div style={{ textAlign: 'center', padding: '1rem' }}><img src={animationGif} alt="A carregar..." style={{ width: '80px' }} /></div>
             ) : sorted.map(m => (
               <div key={m._id} className="gm-m-card">
                 <div className="gm-m-header">

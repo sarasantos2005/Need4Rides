@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import Loading from '../components/Loading';
+import useMinLoading from '../hooks/useMinLoading';
 import '../css/MotoristaRequisitarTaxi.css';
 import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
@@ -11,7 +13,7 @@ export default function MotoristaRequisitarTaxi() {
   const navigate = useNavigate();
   const [taxis, setTaxis] = useState([]);
   const [selecionado, setSelecionado] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useMinLoading();
   const [turnoAtivo, setTurnoAtivo] = useState(null);
   const [userData, setUserData] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -86,7 +88,7 @@ export default function MotoristaRequisitarTaxi() {
     return marcaEncontrada ? marcaEncontrada.nome : idBD;
   };
 
-  if (loading) return <div className="mh-loading">A procurar veículos...</div>;
+  if (loading) return <Loading />;
 
   return (
     <div className="mrt-page" style={{ backgroundImage: `url(${heroBg})` }}>

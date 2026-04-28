@@ -3,6 +3,8 @@ import ddImg from '../assets/images/fennec.jpg';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Profile.css';
 import { useState, useEffect, useRef } from 'react';
+import Loading from '../components/Loading';
+import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
 
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
@@ -121,7 +123,7 @@ export default function MotoristaProfile() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [historico, setHistorico] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useMinLoading();
   const [showMap, setShowMap] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
@@ -171,6 +173,7 @@ export default function MotoristaProfile() {
 
       setUserData(resUser.data);
       setHistorico(resTrips.data);
+      setLoading(false);
       setFormData({
         nome: resUser.data.nome || '',
         email: resUser.data.email || '',
@@ -259,7 +262,7 @@ export default function MotoristaProfile() {
       setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
     };
 
-  if(!userData) return <div className="mh-loading">A carregar perfil...</div>;
+  if (!userData || loading) return <Loading />;
 
   return (
     <div className="profile-page" style={{ backgroundImage: `url(${heroBg})` }}>

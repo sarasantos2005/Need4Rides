@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/MotoristaHistorico.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import Loading from '../components/Loading';
+import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
 
 const formatarDataHora = (isoString) => {
@@ -18,7 +20,7 @@ export default function MotoristaHistorico() {
   const navigate = useNavigate();
   const [filtro, setFiltro] = useState('todas');
   const [historico, setHistorico] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useMinLoading();
   const [userData, setUserData] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -116,6 +118,8 @@ export default function MotoristaHistorico() {
   ))];
 
   const filtroDatas = ["todas", ...new Set(datasUnicas)];
+
+  if (loading) return <Loading />;
 
   return (
     <div className="mhist-page" style={{ backgroundImage: `url(${heroBg})` }}>
