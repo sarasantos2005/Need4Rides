@@ -65,7 +65,9 @@ exports.getRelatorios = async (req, res) => {
     // 5. VIAGENS EM CURSO DETALHADAS
     const viagensEmCursoDetalhadas = await Promise.all(
       viagensAtivas.map(async (viagem) => {
-        const turno = await Turno.findById(viagem.turno).populate('motorista').populate('taxi');
+        const turno = viagem.turno
+          ? (viagem.turno._id ? viagem.turno : await Turno.findById(viagem.turno).populate('motorista').populate('taxi'))
+          : null;
         return {
           id: viagem._id,
           cliente: viagem.cliente?.nome || 'Cliente',
@@ -108,6 +110,37 @@ exports.getRelatorios = async (req, res) => {
         };
       })
     );
+
+    // 8. VIAGENS DO PERÍODO SELECIONADO (aplicar filtro atual)
+    const viagensPeriodo = viagensCompletadas
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 20);
+
+    const viagensPeriodoDetalhadas = await Promise.all(
+      viagensPeriodo.map(async (viagem) => {
+        const turno = viagem.turno
+          ? (viagem.turno._id ? viagem.turno : await Turno.findById(viagem.turno).populate('motorista').populate('taxi'))
+          : null;
+        const rawDate = viagem.createdAt || viagem.hora_final_viagem || viagem.hora_inicial_viagem || new Date();
+        const dataViagem = rawDate instanceof Date ? rawDate : new Date(rawDate);
+
+        if (isNaN(dataViagem.getTime())) {
+          console.error('Erro: dataViagem inválida para viagem:', viagem._id, rawDate);
+          return null;
+        }
+
+        return {
+          id: viagem._id,
+          cliente: viagem.cliente?.nome || 'Cliente',
+          motorista: turno?.motorista?.nome || 'Motorista',
+          origem: viagem.morada_inicial_viagem?.morada || 'Origem',
+          destino: viagem.morada_final_viagem?.morada || 'Destino',
+          preco: viagem.preco_viagem || 0,
+          data: dataViagem.toLocaleDateString('pt-PT'),
+          hora: dataViagem.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
+        };
+      })
+    ).then(results => results.filter(r => r !== null));
 
     // 7. ESTATÍSTICAS ADICIONAIS PARA RELATÓRIOS
     const statsAdicionais = {
@@ -154,6 +187,7 @@ exports.getRelatorios = async (req, res) => {
       },
       viagensEmCurso: viagensEmCursoDetalhadas,
       motoristas: motoristasComStats,
+      viagensUltimaSemana: viagensPeriodoDetalhadas,
       statsAdicionais
     });
 

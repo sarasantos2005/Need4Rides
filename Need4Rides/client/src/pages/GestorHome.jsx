@@ -88,6 +88,10 @@ export default function GestorHome() {
   }, [navigate, periodo]);
 
 
+  const openTripDetails = (trip) => {
+    navigate('/gestor/viagem', { state: { trip } });
+  };
+
   const exportarPDF = () => {
     try {
       setExporting(true);
@@ -105,7 +109,7 @@ export default function GestorHome() {
       y += lineHeight * 1.5;
 
       doc.setFontSize(11);
-      doc.text(`Período: ${periodo}`, margin, y);
+      doc.text(`Período: ${currentLabel}`, margin, y);
       y += lineHeight;
       doc.text(`Gerado em: ${new Date().toLocaleString('pt-PT')}`, margin, y);
       y += lineHeight * 2;
@@ -166,6 +170,30 @@ export default function GestorHome() {
         });
       } else {
         doc.text('Nenhum motorista encontrado', margin, y);
+        y += lineHeight;
+      }
+
+      y += lineHeight;
+      doc.text(`Viagens do Período (${currentLabel})`, margin, y);
+      y += lineHeight;
+
+      if (relatoriosData.viagensUltimaSemana.length > 0) {
+        relatoriosData.viagensUltimaSemana.slice(0, 20).forEach((v, index) => {
+          if (y > 750) {
+            doc.addPage();
+            y = margin;
+          }
+          doc.text(`${index + 1}. ${v.cliente} → ${v.motorista}`, margin, y);
+          y += lineHeight;
+          doc.text(`Rota: ${v.origem} → ${v.destino}`, margin + 10, y);
+          y += lineHeight;
+          doc.text(`Data/Hora: ${v.data} às ${v.hora}`, margin + 10, y);
+          y += lineHeight;
+          doc.text(`Preço: €${v.preco}`, margin + 10, y);
+          y += lineHeight;
+        });
+      } else {
+        doc.text('Nenhuma viagem na última semana', margin, y);
         y += lineHeight;
       }
 
@@ -354,7 +382,12 @@ export default function GestorHome() {
             <div>
               {relatoriosData?.viagensEmCurso?.length > 0 ? (
                 relatoriosData.viagensEmCurso.map(v => (
-                  <div className="mh-pedido-card" key={v.id}>
+                  <div
+                    className="mh-pedido-card"
+                    key={v.id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => openTripDetails(v)}
+                  >
                     <div className="mh-pedido-route">
                       <span className="mh-dot origin" />
                       <span>{v.origem}</span>
@@ -412,6 +445,45 @@ export default function GestorHome() {
             </div>
           </div>
 
+        </div>
+
+        {/* VIAGENS ÚLTIMA SEMANA */}
+        <div className="mh-middle-row">
+          <div className="mh-card full-width">
+            <div className="mh-section-header">
+              <h3 className="mh-card-title">Viagens do Período ({currentLabel})</h3>
+              <span className="mh-badge">{relatoriosData?.viagensUltimaSemana?.length || 0}</span>
+            </div>
+
+            <div>
+              {relatoriosData?.viagensUltimaSemana?.length > 0 ? (
+                relatoriosData.viagensUltimaSemana.map(v => (
+                  <div
+                    className="mh-hist-row"
+                    key={v.id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => openTripDetails(v)}
+                  >
+                    <div>
+                      <div className="mh-car-value">{v.cliente} → {v.motorista}</div>
+                      <div className="mh-car-label">
+                        {v.origem} → {v.destino}
+                      </div>
+                    </div>
+
+                    <div className="mh-hist-meta">
+                      <span>{v.data} às {v.hora}</span>
+                      <span className="mh-hist-price">€{v.preco}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                  Nenhuma viagem na última semana
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
       </div>

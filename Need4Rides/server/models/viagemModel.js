@@ -85,7 +85,7 @@ const viagemSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Turno' 
     }
-});
+}, { timestamps: true });
 
 viagemSchema.index({ "morada_inicial_viagem.localizacao": "2dsphere" });
 viagemSchema.index({ "morada_final_viagem.localizacao": "2dsphere" });
