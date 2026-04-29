@@ -22,6 +22,7 @@ import GestorRegistarTaxi from './pages/GestorRegistarTaxi';
 import GestorMotoristas from './pages/GestorMotoristas';
 import GestorTaxis from './pages/GestorTaxis';
 import GestorProfile from './pages/GestorProfile';
+import GestorPrecos from './pages/GestorPrecos';
 import GestorMotoristaProfile from './pages/GestorMotoristaProfile';
 import MotoristaRequisitarTaxi from './pages/MotoristaRequisitarTaxi';
 import MotoristaLayout from './layouts/MotoristaLayout';
@@ -57,6 +58,7 @@ export default function App() {
         <Route path="/gestor/registar-taxi" element={<GestorRegistarTaxi />} />
         <Route path="/gestor/viagem" element={<GestorViagem />} />
         <Route path="/gestor/perfil" element={<GestorProfile />} />
+        <Route path="/gestor/precos" element={<GestorPrecos />} />
         
       </Routes>
     </BrowserRouter>

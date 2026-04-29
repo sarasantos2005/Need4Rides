@@ -110,6 +110,7 @@ export default function GestorRegistarTaxi() {
           <li><a onClick={() => navigate('/gestor')}>Dashboard</a></li>
           <li><a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a></li>
           <li><a onClick={() => navigate('/gestor/taxis')}>Táxis</a></li>
+          <li><a onClick={() => navigate('/gestor/precos')}>Preços</a></li>
           <li><a className="active" onClick={() => navigate('/gestor/registar-taxi')}>Registar Táxi</a></li>
           <li>
             <button className="mh-theme-btn" onClick={alternarTema}>
