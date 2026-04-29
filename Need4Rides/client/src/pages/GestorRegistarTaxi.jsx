@@ -27,8 +27,6 @@ export default function GestorRegistarTaxi() {
     autonomia_maxima: '',
   });
 
-  const [sucesso, setSucesso] = useState(false);
-  const [erro, setErro] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
 
@@ -61,11 +59,9 @@ export default function GestorRegistarTaxi() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setErro('');
-    setSucesso(false);
 
     if (!regexMatricula.test(form.matricula)) {
-      setErro('Matrícula inválida. Formato XX-XX-XX com letras e dígitos (ex: AA-12-BB).');
+      alert('Matrícula inválida. Formato XX-XX-XX com letras e dígitos (ex: AA-12-BB).');
       return;
     }
 
@@ -86,14 +82,10 @@ export default function GestorRegistarTaxi() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setErro(data.message || 'Erro ao registar táxi.'); return; }
-      setSucesso(true);
-      setForm({
-        matricula: '', marca: '', modelo: '', tipo_motor: '', ano_compra: '',
-        nivel_conforto: '', cor: '#f5c518', nivel_combustivel_carga: 100, autonomia_maxima: '',
-      });
+      if (!res.ok) { alert(data.message || 'Erro ao registar táxi.'); return; }
+      navigate('/gestor/taxis');
     } catch {
-      setErro('Não foi possível ligar ao servidor.');
+      alert('Não foi possível ligar ao servidor.');
     }
   };
 
@@ -118,7 +110,6 @@ export default function GestorRegistarTaxi() {
           <li><a onClick={() => navigate('/gestor')}>Dashboard</a></li>
           <li><a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a></li>
           <li><a onClick={() => navigate('/gestor/taxis')}>Táxis</a></li>
-          <li><a onClick={() => navigate('/gestor/registar-motorista')}>Registar Motorista</a></li>
           <li><a className="active" onClick={() => navigate('/gestor/registar-taxi')}>Registar Táxi</a></li>
           <li>
             <button className="mh-theme-btn" onClick={alternarTema}>
@@ -135,9 +126,6 @@ export default function GestorRegistarTaxi() {
         <div className="grm-card">
           <h2 className="grm-title">Registar Táxi</h2>
           <p className="grm-subtitle">Preenche os dados para adicionar um novo táxi ao sistema</p>
-
-          {sucesso && <div className="grm-sucesso">Táxi registado com sucesso!</div>}
-          {erro && <div className="grm-erro">{erro}</div>}
 
           <form className="grm-form" onSubmit={handleSubmit}>
 

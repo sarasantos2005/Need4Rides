@@ -63,16 +63,23 @@ exports.create = async (req, res) => {
         return res.status(400).json({ success: false, message: "Dados de motorista incompletos (Carta, Morada e Localização são obrigatórios)." });
       }
 
-      if(!regexCarta.test(n_carta_conducao)){
-        return res.status(400).json({ 
-          success: false, 
-          message: "Formato da carta inválido (Ex: ZA-12345 6). " 
+      const cartaNormalizada = n_carta_conducao.toUpperCase().trim();
+
+      if(!regexCarta.test(cartaNormalizada)){
+        return res.status(400).json({
+          success: false,
+          message: "Formato da carta inválido (Ex: ZA-12345 6). "
         });
+      }
+
+      const cartaExistente = await User.findOne({ 'motorista.n_carta_conducao': cartaNormalizada });
+      if (cartaExistente) {
+        return res.status(409).json({ success: false, message: 'Já existe um motorista com este número de carta de condução.' });
       }
 
       if (localizacao && localizacao.long && localizacao.lat) {
         userData.motorista = {
-          n_carta_conducao,
+          n_carta_conducao: cartaNormalizada,
           morada: {
             texto: morada,
             localizacao: {

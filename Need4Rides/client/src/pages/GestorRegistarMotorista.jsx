@@ -11,8 +11,6 @@ export default function GestorRegistarMotorista() {
     nome: '', email: '', ano_nascimento: '', nif: '', genero: '',
     n_carta_conducao: '', senha_acesso_web: '', codigoPostal: '', morada: '', lat: '', long: '',
   });
-  const [sucesso, setSucesso] = useState(false);
-  const [erro, setErro] = useState('');
   const [cpLoading, setCpLoading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -27,12 +25,15 @@ export default function GestorRegistarMotorista() {
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
-  const handleCodigoPostal = async e => {
+  const handleCodigoPostalChange = e => {
     const cp = e.target.value.trim();
     setForm(f => ({ ...f, codigoPostal: cp, morada: '', lat: '', long: '' }));
+  };
+
+  const handleCodigoPostalBlur = async e => {
+    const cp = e.target.value.trim();
     if (!/^\d{4}-\d{3}$/.test(cp)) return;
     setCpLoading(true);
-    setErro('');
     try {
       const res = await fetch(`https://json.geoapi.pt/cp/${cp}`);
       if (!res.ok) throw new Error('não encontrado');
@@ -40,7 +41,7 @@ export default function GestorRegistarMotorista() {
       const localidade = [data.Localidade, data.Concelho].filter(Boolean).join(', ');
       setForm(f => ({ ...f, morada: localidade, lat: String(data.centro[0]), long: String(data.centro[1]) }));
     } catch {
-      setErro('Código postal não encontrado. Verifique e tente novamente.');
+      alert('Código postal não encontrado. Verifique e tente novamente.');
     } finally {
       setCpLoading(false);
     }
@@ -48,10 +49,8 @@ export default function GestorRegistarMotorista() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setErro('');
-    setSucesso(false);
     if (!form.lat || !form.long) {
-      setErro('Introduza um código postal válido para obter a localização.');
+      alert('Introduza um código postal válido para obter a localização.');
       return;
     }
     try {
@@ -72,11 +71,10 @@ export default function GestorRegistarMotorista() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setErro(data.message || 'Erro ao registar motorista.'); return; }
-      setSucesso(true);
-      setForm({ nome: '', email: '', ano_nascimento: '', nif: '', genero: '', n_carta_conducao: '', senha_acesso_web: '', codigoPostal: '', morada: '', lat: '', long: '' });
+      if (!res.ok) { alert(data.message || 'Erro ao registar motorista.'); return; }
+      navigate('/gestor/motoristas');
     } catch {
-      setErro('Não foi possível ligar ao servidor.');
+      alert('Não foi possível ligar ao servidor.');
     }
   };
 
@@ -117,9 +115,6 @@ export default function GestorRegistarMotorista() {
         <div className="grm-card">
           <h2 className="grm-title">Registar Motorista</h2>
           <p className="grm-subtitle">Preenche os dados para adicionar um novo motorista ao sistema</p>
-
-          {sucesso && <div className="grm-sucesso">Motorista registado com sucesso!</div>}
-          {erro && <div className="grm-erro">{erro}</div>}
 
           <form className="grm-form" onSubmit={handleSubmit}>
 
@@ -167,7 +162,7 @@ export default function GestorRegistarMotorista() {
               </div>
               <div className="grm-field">
                 <label>Código Postal</label>
-                <input type="text" name="codigoPostal" placeholder="0000-000" maxLength={8} value={form.codigoPostal} onChange={handleCodigoPostal} />
+                <input type="text" name="codigoPostal" placeholder="0000-000" maxLength={8} value={form.codigoPostal} onChange={handleCodigoPostalChange} onBlur={handleCodigoPostalBlur} />
               </div>
             </div>
 
