@@ -98,6 +98,15 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
+.gm-table-row-clickable {
+  transition: background 0.2s ease;
+}
+
+.gm-table-row-clickable:hover {
+  background: rgba(245, 197, 24, 0.08) !important;
+  color: #f5c518;
+}
+
 .gm-nome {
   font-weight: 600;
   color: #e0e0e0;
@@ -206,6 +215,11 @@ body.claro .gm-table tbody tr:hover {
   background: rgba(0, 0, 0, 0.04);
 }
 
+body.claro .gm-table-row-clickable:hover {
+  background: rgba(245, 197, 24, 0.1) !important;
+  color: #d4a300;
+}
+
 body.claro .gm-nome {
   color: #111;
 }
@@ -236,6 +250,16 @@ body.claro .gm-estado.offline {
   color: #dc3545;
 }
 
+body.claro .gm-m-card {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.claro .gm-m-card:hover {
+  background: rgba(245, 197, 24, 0.1);
+  border: 1px solid rgba(245, 197, 24, 0.3);
+}
+
 .gm-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .gm-table { min-width: 620px; }
 
@@ -252,7 +276,8 @@ th.desc .sort-icon .up { color: rgba(255,255,255,.2); }
 
 /* Mobile cards */
 .gm-mobile-list { display: none; flex-direction: column; gap: .6rem; padding: .75rem; }
-.gm-m-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 12px; padding: .85rem 1rem; display: flex; flex-direction: column; gap: .4rem; }
+.gm-m-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 12px; padding: .85rem 1rem; display: flex; flex-direction: column; gap: .4rem; transition: background 0.2s, border 0.2s; }
+.gm-m-card:hover { background: rgba(245, 197, 24, 0.08); border: 1px solid rgba(245, 197, 24, 0.3); }
 .gm-m-header { display: flex; justify-content: space-between; align-items: center; }
 .gm-m-row { display: flex; justify-content: space-between; font-size: .82rem; color: #000000; }
 .gm-m-label { color: #000000 !important; font-size: .72rem; text-transform: uppercase; letter-spacing: .5px; }

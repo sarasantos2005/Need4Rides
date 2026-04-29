@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
-import animationGif from '../assets/images/animation.gif';
 import '../css/GestorHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/GestorMotoristas.css';
@@ -152,10 +151,8 @@ export default function GestorMotoristas() {
                 </tr>
               </thead>
               <tbody>
-                {loading ? (
-                  <tr><td colSpan={8} style={{ textAlign: 'center' }}><img src={animationGif} alt="A carregar..." style={{ width: '80px' }} /></td></tr>
-                ) : sorted.map(m => (
-                  <tr key={m._id}>
+                {sorted.map(m => (
+                  <tr key={m._id} onClick={() => navigate(`/gestor/motoristas/${m._id}`)} style={{ cursor: 'pointer' }} className="gm-table-row-clickable">
                     <td className="gm-nome">{m.nome}</td>
                     <td className="gm-muted">{m.nif}</td>
                     <td className="gm-muted">{m.motorista?.n_carta_conducao ?? '—'}</td>
@@ -174,10 +171,8 @@ export default function GestorMotoristas() {
 
           {/* CARDS — mobile */}
           <div className="gm-mobile-list">
-            {loading ? (
-              <div style={{ textAlign: 'center', padding: '1rem' }}><img src={animationGif} alt="A carregar..." style={{ width: '80px' }} /></div>
-            ) : sorted.map(m => (
-              <div key={m._id} className="gm-m-card">
+            {sorted.map(m => (
+              <div key={m._id} className="gm-m-card" onClick={() => navigate(`/gestor/motoristas/${m._id}`)} style={{ cursor: 'pointer' }}>
                 <div className="gm-m-header">
                   <span className="gm-nome">{m.nome}</span>
                   <span className="gm-estado offline">○ —</span>

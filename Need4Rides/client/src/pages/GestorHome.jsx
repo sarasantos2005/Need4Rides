@@ -77,19 +77,6 @@ export default function GestorHome() {
     setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
   };
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user_logado');
-    const token = localStorage.getItem('token');
-
-    if (!token || !storedUser) {
-      navigate('/login');
-    } else {
-      setUserData(JSON.parse(storedUser));
-      fetchRelatorios();
-    }
-  }, [navigate, periodo]);
-
-
   const openTripDetails = (trip) => {
     navigate('/gestor/viagem', { state: { trip } });
   };
@@ -122,8 +109,8 @@ export default function GestorHome() {
 
       const resumo = relatoriosData.resumo;
       const resumoItens = [
-        { label: 'Viagens', value: resumo.viagensHoje },
-        { label: 'Receita', value: `€${resumo.receitaHoje}` },
+        { label: 'Viagens', value: resumo.viagensPeriodo ?? resumo.viagensHoje },
+        { label: 'Receita', value: `€${resumo.receitaPeriodo ?? resumo.receitaHoje}` },
         { label: 'Motoristas ativos', value: resumo.motoristasAtivos },
         { label: 'Táxis em serviço', value: resumo.taxisEmServico }
       ];
@@ -179,8 +166,8 @@ export default function GestorHome() {
       doc.text(`Viagens do Período (${currentLabel})`, margin, y);
       y += lineHeight;
 
-      if (relatoriosData.viagensUltimaSemana.length > 0) {
-        relatoriosData.viagensUltimaSemana.slice(0, 20).forEach((v, index) => {
+      if (relatoriosData.viagensPeriodo?.length > 0) {
+        relatoriosData.viagensPeriodo.slice(0, 20).forEach((v, index) => {
           if (y > 750) {
             doc.addPage();
             y = margin;
@@ -195,7 +182,7 @@ export default function GestorHome() {
           y += lineHeight;
         });
       } else {
-        doc.text('Nenhuma viagem na última semana', margin, y);
+        doc.text('Nenhuma viagem no período selecionado', margin, y);
         y += lineHeight;
       }
 
@@ -339,12 +326,12 @@ export default function GestorHome() {
         <div className="mh-stats-row">
           <div className="mh-stat-card">
             <span className="mh-stat-label">Viagens no período</span>
-            <span className="mh-stat-value">{relatoriosData?.resumo?.viagensHoje || 0}</span>
+            <span className="mh-stat-value">{relatoriosData?.resumo?.viagensPeriodo ?? relatoriosData?.resumo?.viagensHoje || 0}</span>
           </div>
 
           <div className="mh-stat-card accent">
             <span className="mh-stat-label">Receita no período</span>
-            <span className="mh-stat-value">€{relatoriosData?.resumo?.receitaHoje || '0.00'}</span>
+            <span className="mh-stat-value">€{relatoriosData?.resumo?.receitaPeriodo ?? relatoriosData?.resumo?.receitaHoje || '0.00'}</span>
           </div>
 
           <div className="mh-stat-card">
@@ -412,7 +399,12 @@ export default function GestorHome() {
             <div>
               {relatoriosData?.motoristas?.length > 0 ? (
                 relatoriosData.motoristas.map(m => (
-                  <div className="mh-hist-row" key={m.id}>
+                  <div 
+                    className="mh-hist-row mh-motorista-row" 
+                    key={m.id}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate(`/gestor/motoristas/${m.id}`)}
+                  >
                     <div>
                       <div className="mh-car-value">{m.nome}</div>
                       <div className="mh-car-label">
@@ -441,12 +433,12 @@ export default function GestorHome() {
           <div className="mh-card full-width">
             <div className="mh-section-header">
               <h3 className="mh-card-title">Viagens do Período ({currentLabel})</h3>
-              <span className="mh-badge">{relatoriosData?.viagensUltimaSemana?.length || 0}</span>
+              <span className="mh-badge">{relatoriosData?.viagensPeriodo?.length || 0}</span>
             </div>
 
             <div>
-              {relatoriosData?.viagensUltimaSemana?.length > 0 ? (
-                relatoriosData.viagensUltimaSemana.map(v => (
+              {relatoriosData?.viagensPeriodo?.length > 0 ? (
+                relatoriosData.viagensPeriodo.map(v => (
                   <div
                     className="mh-hist-row"
                     key={v.id}
@@ -468,7 +460,7 @@ export default function GestorHome() {
                 ))
               ) : (
                 <div style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
-                  Nenhuma viagem na última semana
+                  Nenhuma viagem no período selecionado
                 </div>
               )}
             </div>

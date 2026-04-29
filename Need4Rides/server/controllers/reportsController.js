@@ -38,15 +38,21 @@ exports.getRelatorios = async (req, res) => {
     }
 
     // 1. VIAGENS NO PERÍODO
-    const viagens = await Viagem.find({
+    const viagensNoPeriodo = await Viagem.find({
       createdAt: { $gte: dataInicio, $lt: dataFim }
     }).populate('turno').populate('cliente');
 
-    const viagensAtivas = viagens.filter(v => !v.hora_final_viagem);
-    const viagensCompletadas = viagens.filter(v => v.hora_final_viagem);
+    const viagensPeriodoAtivas = viagensNoPeriodo.filter(v => !v.hora_final_viagem);
+    const viagensPeriodoCompletadas = viagensNoPeriodo.filter(v => v.hora_final_viagem);
 
-    // 2. RECEITA TOTAL
-    const receitaTotal = viagensCompletadas.reduce((total, v) => total + (v.preco_viagem || 0), 0);
+    // 2. VIAGENS EM CURSO ATUAIS (independentes do filtro de período)
+    const viagensEmCursoAtuais = await Viagem.find({
+      hora_final_viagem: null,
+      hora_inicial_viagem: { $lte: agora }
+    }).populate('turno').populate('cliente');
+
+    // 3. RECEITA TOTAL DO PERÍODO
+    const receitaTotal = viagensPeriodoCompletadas.reduce((total, v) => total + (v.preco_viagem || 0), 0);
 
     // 3. MOTORISTAS ATIVOS
     const turnosAtivos = await Turno.find({
@@ -64,7 +70,7 @@ exports.getRelatorios = async (req, res) => {
 
     // 5. VIAGENS EM CURSO DETALHADAS
     const viagensEmCursoDetalhadas = await Promise.all(
-      viagensAtivas.map(async (viagem) => {
+      viagensEmCursoAtuais.map(async (viagem) => {
         const turno = viagem.turno
           ? (viagem.turno._id ? viagem.turno : await Turno.findById(viagem.turno).populate('motorista').populate('taxi'))
           : null;
@@ -112,12 +118,12 @@ exports.getRelatorios = async (req, res) => {
     );
 
     // 8. VIAGENS DO PERÍODO SELECIONADO (aplicar filtro atual)
-    const viagensPeriodo = viagensCompletadas
+    const viagensPeriodoSelecionadas = viagensPeriodoCompletadas
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 20);
 
     const viagensPeriodoDetalhadas = await Promise.all(
-      viagensPeriodo.map(async (viagem) => {
+      viagensPeriodoSelecionadas.map(async (viagem) => {
         const turno = viagem.turno
           ? (viagem.turno._id ? viagem.turno : await Turno.findById(viagem.turno).populate('motorista').populate('taxi'))
           : null;
@@ -164,11 +170,11 @@ exports.getRelatorios = async (req, res) => {
           .slice(0, 5)
       },
       viagens: {
-        total: viagens.length,
-        ativas: viagensAtivas.length,
-        completadas: viagensCompletadas.length,
-        mediaPreco: viagensCompletadas.length > 0 ?
-          (receitaTotal / viagensCompletadas.length).toFixed(2) : '0.00'
+        total: viagensNoPeriodo.length,
+        ativas: viagensEmCursoAtuais.length,
+        completadas: viagensPeriodoCompletadas.length,
+        mediaPreco: viagensPeriodoCompletadas.length > 0 ?
+          (receitaTotal / viagensPeriodoCompletadas.length).toFixed(2) : '0.00'
       }
     };
 
@@ -180,13 +186,16 @@ exports.getRelatorios = async (req, res) => {
         fim: dataFim
       },
       resumo: {
-        viagensHoje: viagens.length,
+        viagensPeriodo: viagensNoPeriodo.length,
+        receitaPeriodo: receitaTotal.toFixed(2),
+        viagensHoje: viagensNoPeriodo.length,
         receitaHoje: receitaTotal.toFixed(2),
         motoristasAtivos: `${motoristasAtivos} / ${totalMotoristas}`,
         taxisEmServico: `${taxisEmServico} / ${totalTaxis}`
       },
       viagensEmCurso: viagensEmCursoDetalhadas,
       motoristas: motoristasComStats,
+      viagensPeriodo: viagensPeriodoDetalhadas,
       viagensUltimaSemana: viagensPeriodoDetalhadas,
       statsAdicionais
     });
