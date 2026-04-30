@@ -330,12 +330,12 @@ export default function GestorHome() {
         <div className="mh-stats-row">
           <div className="mh-stat-card">
             <span className="mh-stat-label">Viagens no período</span>
-            <span className="mh-stat-value">{relatoriosData?.resumo?.viagensPeriodo ?? relatoriosData?.resumo?.viagensHoje || 0}</span>
+            <span className="mh-stat-value">{(relatoriosData?.resumo?.viagensPeriodo ?? relatoriosData?.resumo?.viagensHoje) || 0}</span>
           </div>
 
           <div className="mh-stat-card accent">
             <span className="mh-stat-label">Receita no período</span>
-            <span className="mh-stat-value">€{relatoriosData?.resumo?.receitaPeriodo ?? relatoriosData?.resumo?.receitaHoje || '0.00'}</span>
+            <span className="mh-stat-value">€{(relatoriosData?.resumo?.receitaPeriodo ?? relatoriosData?.resumo?.receitaHoje) || '0.00'}</span>
           </div>
 
           <div className="mh-stat-card">
