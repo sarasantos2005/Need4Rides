@@ -13,11 +13,15 @@ export default function MotoristaRequisitarTaxi() {
   const navigate = useNavigate();
   const [taxis, setTaxis] = useState([]);
   const [selecionado, setSelecionado] = useState(null);
-  const [loading, setLoading] = useMinLoading();
+  const [loading, setLoading] = useState(true);
   const [turnoAtivo, setTurnoAtivo] = useState(null);
   const [userData, setUserData] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+  const [apiStatus, setApiStatus] = useState({
+    taxi: false,
+    turno: false
+  });
 
   useEffect(() => {
     document.body.className = tema;
@@ -43,16 +47,17 @@ export default function MotoristaRequisitarTaxi() {
 
             const resTurno = await axios.get(`http://localhost:3000/api/turno/atual`, config);
             setTurnoAtivo(resTurno.data);
+            setApiStatus(prev => ({ ...prev, turno: true }));
 
             const res = await axios.get('http://localhost:3000/api/taxi/', {
               headers: { Authorization: `Bearer ${token}` }
             });
             setTaxis(res.data);
+            setApiStatus({ taxi: true, turno: true });
           } catch (err) {
             console.error("Erro ao procurar dados na BD", err);
-          } finally {
-            setLoading(false);
-          }
+            setApiStatus({ taxi: true, turno: true });
+          } 
         };
         carregarDadosIniciais();
       }
@@ -88,9 +93,15 @@ export default function MotoristaRequisitarTaxi() {
     return marcaEncontrada ? marcaEncontrada.nome : idBD;
   };
 
-  if (loading) return <Loading />;
 
   return (
+    <>
+    {loading && (
+      <Loading 
+        tasks={Object.values(apiStatus)} 
+        onFinished={() => setLoading(false)} 
+      />
+    )}
     <div className="mrt-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mh-overlay" />
 
@@ -184,5 +195,6 @@ export default function MotoristaRequisitarTaxi() {
         </div>
       </div>
     </div>
+    </>
   );
 }

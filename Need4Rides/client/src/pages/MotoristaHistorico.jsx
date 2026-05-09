@@ -20,9 +20,12 @@ export default function MotoristaHistorico() {
   const navigate = useNavigate();
   const [filtro, setFiltro] = useState('todas');
   const [historico, setHistorico] = useState([]);
-  const [loading, setLoading] = useMinLoading();
+  const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [apiStatus, setApiStatus] = useState({
+    historico: false
+  });
 
   /*Tema */
   const [tema, setTema] = useState(() => {
@@ -68,11 +71,11 @@ export default function MotoristaHistorico() {
      const resHistorico = await axios.get(`http://localhost:3000/api/viagem/motorista`, config);
 
       setHistorico(resHistorico.data);
+      setApiStatus({historico: true});
     } catch (err) {
       console.error("Erro ao procurar dados na BD", err.response?.data || err.message);
-    } finally {
-      setLoading(false);
-    }
+      setApiStatus({historico: true});
+    } 
   };
 
   const gerarFatura = async(viagemId) => {
@@ -119,9 +122,14 @@ export default function MotoristaHistorico() {
 
   const filtroDatas = ["todas", ...new Set(datasUnicas)];
 
-  if (loading) return <Loading />;
-
   return (
+    <>
+    {loading && (
+      <Loading 
+        tasks={Object.values(apiStatus)} 
+        onFinished={() => setLoading(false)} 
+      />
+    )}
     <div className="mhist-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mhist-overlay" />
 
@@ -242,5 +250,6 @@ export default function MotoristaHistorico() {
 
       </div>
     </div>
+    </>
   );
 }

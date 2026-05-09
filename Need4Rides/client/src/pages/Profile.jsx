@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import Loading from '../components/Loading';
-import useMinLoading from '../hooks/useMinLoading';
 import ddImg from '../assets/images/fennec.jpg';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Profile.css';
@@ -11,7 +10,11 @@ export default function Profile() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [historico, setHistorico] = useState([]);
-  const [loading, setLoading] = useMinLoading();
+  const [loading, setLoading] = useState(true);
+  const [apiStatus, setApiStatus] = useState({
+    user: false,
+    trips: false
+  });
   const [formData, setFormData] = useState({
     email: '',
     nif: '',
@@ -52,20 +55,21 @@ export default function Profile() {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       const resUser = await axios.get(`http://localhost:3000/api/user/${userId}`, config);
-      const resTrips = await axios.get(`http://localhost:3000/api/viagem/historico/cliente`, config);
-
       setUserData(resUser.data);
-      setHistorico(resTrips.data);
-      setLoading(false);
       setFormData({
         email: resUser.data.email || '',
         nif: resUser.data.nif || '',
         genero: resUser.data.genero || '',
-        senha_acesso_web: '',
-        nome: resUser.data.nome || ''
+        nome: resUser.data.nome || '',
+        senha_acesso_web: ''
       });
+      setApiStatus(prev => ({ ...prev, user: true }));
+      const resTrips = await axios.get(`http://localhost:3000/api/viagem/historico/cliente`, config);
+      setHistorico(resTrips.data);
+      setApiStatus({ user: true, trips: true });
     } catch (err) {
       console.error("Erro ao carregar perfil:", err);
+      setApiStatus({ user: true, trips: true });
     }
   }
 
@@ -110,10 +114,16 @@ export default function Profile() {
     setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
   };
 
-  if (!userData || loading) return <Loading />;
-
   return (
-    <div
+    <>
+    {loading && (
+      <Loading 
+        tasks={Object.values(apiStatus)} 
+        onFinished={() => setLoading(false)} 
+      />
+    )}
+    {(!loading && userData) && (
+      <div
       className="profile-page"
       style={{ backgroundImage: `url(${heroBg})` }}
     >
@@ -137,7 +147,7 @@ export default function Profile() {
               </div>
             </div>
            <div className="profile-actions">
-              <button className="profile-back-btn" onClick={() => navigate(-1)}>
+              <button className="profile-back-btn" onClick={() => navigate('/home')}>
                 Voltar
               </button>
 
@@ -203,17 +213,17 @@ export default function Profile() {
                       <span className="trip-price">{trip.preco_viagem?.toFixed(2)}€</span>
                       <span className="trip-status">Concluída</span>
                     </div>
+                    {trip.temFatura ? (
+                      <button
+                        className="trip-invoice-btn"
+                        onClick={() => navigate('/fatura', { state: { trip, client: formData.nome } })}
+                      >
+                        Fatura
+                      </button>
+                    ) : (
+                      <span style={{ color: '#999', fontSize: '0.8rem' }}>Processando Fatura...</span>
+                    )}
                   </div>
-                  {trip.temFatura ? (
-                    <button
-                      className="trip-invoice-btn"
-                      onClick={() => navigate('/fatura', { state: { trip, client: formData.nome } })}
-                    >
-                      Fatura
-                    </button>
-                  ) : (
-                    <span style={{ color: '#999', fontSize: '0.8rem' }}>Processando Fatura...</span>
-                  )}
                 </div>
               ))
             ) : (
@@ -224,5 +234,7 @@ export default function Profile() {
 
       </div>
     </div>
+    )}
+    </>
   );
 } 

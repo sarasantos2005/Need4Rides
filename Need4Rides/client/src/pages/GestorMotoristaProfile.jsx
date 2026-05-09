@@ -14,6 +14,10 @@ export default function GestorMotoristaProfile() {
   const [userData, setUserData] = useState(null);
   const [historico, setHistorico] = useState([]);
   const [loading, setLoading] = useMinLoading();
+  const [apiStatus, setApiStatus] = useState({
+    user: false,
+    historico: false
+  });
 
   useEffect(() => {
     if (!motorista_id) {
@@ -32,6 +36,7 @@ export default function GestorMotoristaProfile() {
 
       const resUser = await axios.get(`http://localhost:3000/api/user/${motorista_id}`, config);
       setUserData(resUser.data);
+      setApiStatus(prev => ({ ...prev, user: true }));
       
       // Tentar buscar viagens do motorista (se houver endpoint)
       try {
@@ -42,7 +47,7 @@ export default function GestorMotoristaProfile() {
         setHistorico([]);
       }
 
-      setLoading(false);
+      setApiStatus(prev => ({ ...prev, historico: true }));
     } catch (err) {
       console.error("Erro ao carregar perfil:", err);
       alert("Erro ao carregar perfil do motorista");
@@ -74,9 +79,17 @@ export default function GestorMotoristaProfile() {
     setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
   };
 
-  if (!userData || loading) return <Loading />;
-
+  if (loading || !userData) {
+    return (
+      <Loading 
+        tasks={Object.values(apiStatus)} 
+        onFinished={() => setLoading(false)} 
+      />
+    );
+  }
+  
   return (
+    <>
     <div className="profile-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="profile-overlay" />
 
@@ -199,5 +212,6 @@ export default function GestorMotoristaProfile() {
         )}
       </div>
     </div>
+    </>
   );
 }

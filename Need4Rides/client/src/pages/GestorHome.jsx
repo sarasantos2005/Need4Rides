@@ -17,6 +17,9 @@ export default function GestorHome() {
   const [periodo, setPeriodo] = useState('hoje');
   const [exporting, setExporting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [apiStatus, setApiStatus] = useState({
+    relatorios: false
+  });
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user_logado');
@@ -54,14 +57,15 @@ export default function GestorHome() {
       if (response.ok) {
         const data = await response.json();
         setRelatoriosData(data);
+        setApiStatus({ relatorios: true });
       } else {
         console.error('Erro ao buscar relatórios');
+        setApiStatus({ relatorios: true });
       }
     } catch (error) {
       console.error('Erro na requisição:', error);
-    } finally {
-      setLoading(false);
-    }
+      setApiStatus({ relatorios: true });
+    } 
   };
 
   const [tema, setTema] = useState(() => {
@@ -195,11 +199,17 @@ export default function GestorHome() {
     }
   };
 
-  if (loading) return <Loading />;
-
-  
+  if (loading || !userData) {
+    return (
+      <Loading 
+        tasks={Object.values(apiStatus)} 
+        onFinished={() => setLoading(false)} 
+      />
+    );
+  }
 
   return (
+    <>
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mh-overlay" />
 
@@ -473,5 +483,6 @@ export default function GestorHome() {
 
       </div>
     </div>
+    </>
   );
 }

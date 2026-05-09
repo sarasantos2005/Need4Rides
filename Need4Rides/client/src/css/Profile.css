@@ -431,6 +431,10 @@ body.claro .profile-select option {
     white-space: normal;
     word-break: break-word;
   }
+
+  .trip-invoice-btn {
+    width: 100%;
+  }
 }
 
 /* ─── MODO CLARO ────────────────────────────────────────── */

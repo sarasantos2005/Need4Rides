@@ -28,42 +28,50 @@ const getCoords = () =>
     )
   );
 
-const fetchViagensPendentes = async (token, setViagensPendentes) => {
+const fetchViagensPendentes = async (token, setViagensPendentes, setApiStatus) => {
   if (!token) { console.error("Token ausente"); return; }
   try {
     const { latitude, longitude } = await getCoords();
     const config = { headers: { Authorization: `Bearer ${token}` }, params: { lat: latitude, lng: longitude } };
     const res = await axios.get(`http://localhost:3000/api/viagem/disponiveis`, config);
     setViagensPendentes(res.data);
+    setApiStatus(prev => ({ ...prev, trips: true }));
   } catch (err) {
     console.error("Erro ao procurar viagens pendentes", err.response?.data || err.message);
+    setApiStatus(prev => ({ ...prev, trips: true }));
   }
 };
 
-const fetchHistorico = async (token, setHistorico) => {
+const fetchHistorico = async (token, setHistorico, setApiStatus) => {
   if (!token) { console.error("Token ausente"); return; }
   try {
     const { latitude, longitude } = await getCoords();
     const config = { headers: { Authorization: `Bearer ${token}` }, params: { lat: latitude, lng: longitude } };
     const res = await axios.get(`http://localhost:3000/api/viagem/motorista`, config);
     setHistorico(res.data);
+    setApiStatus(prev => ({ ...prev, historico: true }));
   } catch (err) {
     console.error("Erro ao procurar histórico", err.response?.data || err.message);
+    setApiStatus(prev => ({ ...prev, historico: true }));
   }
 };
 
-const fetchTurnoAtual = async (token, setTurnoAtivo, setTaxi) => {
+const fetchTurnoAtual = async (token, setTurnoAtivo, setTaxi, setApiStatus) => {
   if (!token) { console.error("Token ausente"); return; }
   try {
     const { latitude, longitude } = await getCoords();
     const config = { headers: { Authorization: `Bearer ${token}` }, params: { lat: latitude, lng: longitude } };
     const res = await axios.get(`http://localhost:3000/api/turno/atual`, config);
     setTurnoAtivo(res.data);
+    setApiStatus(prev => ({ ...prev, turno: true }));
+
     if (res.data && res.data.taxi) {
       setTaxi(res.data.taxi);
     }
+    setApiStatus(prev => ({ ...prev, taxi: true, turno: true }));
   } catch (err) {
     console.error("Erro ao procurar turno atual", err.response?.data || err.message);
+    setApiStatus(prev => ({ ...prev, taxi: true, turno: true }));
   }
 };
 
@@ -75,7 +83,13 @@ export default function MotoristaHome() {
   const [turnoAtivo, setTurnoAtivo] = useState(null);
   const [loading, setLoading] = useMinLoading();
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const [apiStatus, setApiStatus] = useState({
+    user: false,
+    trips: false,
+    taxi: false,
+    turno: false,
+    historico: false
+  });
   const [emTurno, setEmTurno] = useState(true);
   const [agora, setAgora] = useState(minutosAgora());
   const [taxi, setTaxi] = useState(() => {
@@ -93,14 +107,15 @@ export default function MotoristaHome() {
     } else {
       const user = JSON.parse(storedUser);
       setUserData(user);
+      setApiStatus(prev => ({ ...prev, user: true }));
 
       const userId = user._id || user.id;
       if (userId && token) {
         Promise.all([
-          fetchViagensPendentes(token, setViagensPendentes),
-          fetchHistorico(token, setHistorico),
-          fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
-        ]).finally(() => setLoading(false));
+          fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
+          fetchHistorico(token, setHistorico, setApiStatus),
+          fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
+        ]);
       }
     }
   }, [navigate]);
@@ -155,9 +170,9 @@ export default function MotoristaHome() {
       setTaxi(null);
       
       await Promise.all([
-        fetchViagensPendentes(token, setViagensPendentes),
-        fetchHistorico(token, setHistorico),
-        fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+        fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
+        fetchHistorico(token, setHistorico, setApiStatus),
+        fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
       ]);
 
       alert("Táxi devolvido com sucesso!");
@@ -188,9 +203,9 @@ export default function MotoristaHome() {
 
       // Refresh aos dados
       await Promise.all([
-        fetchViagensPendentes(token, setViagensPendentes),
-        fetchHistorico(token, setHistorico),
-        fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+        fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
+        fetchHistorico(token, setHistorico, setApiStatus),
+        fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
       ]);
     } catch (err) {
       alert("Erro ao aceitar viagem");
@@ -217,9 +232,9 @@ export default function MotoristaHome() {
 
       // Refresh aos dados
       await Promise.all([
-        fetchViagensPendentes(token, setViagensPendentes),
-        fetchHistorico(token, setHistorico),
-        fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+        fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
+        fetchHistorico(token, setHistorico, setApiStatus),
+        fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
       ]);
     } catch (err) {
       alert("Erro ao aceitar viagem");
@@ -249,9 +264,9 @@ export default function MotoristaHome() {
         
           alert("Turno encerrado com sucesso. Bom descanso!");
           await Promise.all([
-            fetchViagensPendentes(token, setViagensPendentes),
-            fetchHistorico(token, setHistorico),
-            fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+            fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
+            fetchHistorico(token, setHistorico, setApiStatus),
+            fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
           ]);
         } catch (err) {
           console.error("Erro ao finalizar turno:", err);
@@ -286,7 +301,7 @@ export default function MotoristaHome() {
     const token = localStorage.getItem('token');
     if (!token) return;
     const t = setInterval(() => {
-      fetchViagensPendentes(token, setViagensPendentes);
+      fetchViagensPendentes(token, setViagensPendentes, setApiStatus);
     }, 3000);
     return () => clearInterval(t);
   }, []);
@@ -310,9 +325,9 @@ export default function MotoristaHome() {
 
           alert("Fatura gerada com sucesso");
           await Promise.all([
-            fetchViagensPendentes(token, setViagensPendentes),
-            fetchHistorico(token, setHistorico),
-            fetchTurnoAtual(token, setTurnoAtivo, setTaxi),
+            fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
+            fetchHistorico(token, setHistorico, setApiStatus),
+            fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
           ]);
         } catch (err) {
           alert("Erro ao gerar fatura no servidor.");
@@ -338,9 +353,16 @@ export default function MotoristaHome() {
     setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
   };
 
-
-  if (loading || !userData) return <Loading />;
+  
   return (
+    <>
+    {loading && (
+          <Loading 
+            tasks={Object.values(apiStatus)} 
+            onFinished={() => setLoading(false)} 
+          />
+        )}
+    {userData && (
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mh-overlay" />
 
@@ -594,5 +616,7 @@ export default function MotoristaHome() {
 
       </div>
     </div>
+    )};
+    </>
   );
 }

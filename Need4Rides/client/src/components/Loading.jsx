@@ -1,41 +1,64 @@
 import { useState, useEffect } from 'react';
-import animationGif from '../assets/images/animation.gif';
+import animationGif from '../assets/images/animation2.gif';
 import heroBg from '../assets/images/LA.jpg';
 import './Loading.css';
 
-const GIF_DURATION = 8000;
+export default function Loading({ tasks = [], onFinished }) {
+  const [visualProgress, setVisualProgress] = useState(0);
 
-export default function Loading() {
-  const [progress, setProgress] = useState(0);
+  const completed = tasks.filter(t => t === true).length;
+  const total = tasks.length;
+  const apiProgress = total > 0 ? (completed / total) * 100 : 0;
 
   useEffect(() => {
-    const start = Date.now();
-    const id = setInterval(() => {
-      const t = Math.min((Date.now() - start) / GIF_DURATION, 1);
-      // ease-out: fast start, slows towards the end
-      const eased = 1 - Math.pow(1 - t, 2.2);
-      setProgress(eased * 100);
-      if (t >= 1) clearInterval(id);
-    }, 50);
-    return () => clearInterval(id);
-  }, []);
+    const interval = setInterval(() => {
+      setVisualProgress(prev => {
+        if (apiProgress === 100) return prev < 100 ? prev + 2 : 100;
+        
+        if (prev < apiProgress) return prev + 1;
+        
+        if (prev < 95) return prev + 0.2; 
+        
+        return prev;
+      });
+    }, 30);
+
+    return () => clearInterval(interval);
+  }, [apiProgress]);
+
+  useEffect(() => {
+    if (visualProgress >= 100) {
+      const timer = setTimeout(() => {
+        if (onFinished) onFinished();
+      }, 500); 
+      return () => clearTimeout(timer);
+    }
+  }, [visualProgress, onFinished]);
 
   const label =
-    progress < 25 ? 'A iniciar...' :
-    progress < 60 ? 'A carregar...' :
-    progress < 88 ? 'Quase pronto...' :
-    'A finalizar...';
+    visualProgress < 30 ? 'A iniciar...' :
+    visualProgress < 70 ? 'A carregar...' :
+    visualProgress < 100 ? 'Quase pronto...' :
+    'Finalizado...';
 
   return (
     <div className="loading-overlay" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="loading-card">
-        <img src={animationGif} alt="A carregar..." className="loading-gif" />
+        <div className="loading-gif-container">
+          <img src={animationGif} alt="A carregar..." className="loading-gif" />
+        </div>
         <div className="loading-bar-track">
-          <div className="loading-bar-fill" style={{ width: `${progress}%` }} />
+          <div 
+            className="loading-bar-fill" 
+            style={{ 
+                width: `${visualProgress}%`, 
+                transition: visualProgress >= 100 ? 'none' : 'width 0.2s linear' 
+            }} 
+          />
         </div>
         <div className="loading-footer">
           <span className="loading-label">{label}</span>
-          <span className="loading-percent">{Math.floor(progress)}%</span>
+          <span className="loading-percent">{Math.floor(visualProgress)}%</span>
         </div>
       </div>
     </div>

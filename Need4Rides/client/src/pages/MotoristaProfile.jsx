@@ -123,8 +123,12 @@ export default function MotoristaProfile() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [historico, setHistorico] = useState([]);
-  const [loading, setLoading] = useMinLoading();
+  const [loading, setLoading] = useState(true);
   const [showMap, setShowMap] = useState(false);
+  const [apiStatus, setApiStatus] = useState({
+    user: false,
+    trips: false
+  });
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -169,11 +173,7 @@ export default function MotoristaProfile() {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       const resUser = await axios.get(`http://localhost:3000/api/user/${userId}`, config);
-      const resTrips = await axios.get(`http://localhost:3000/api/viagem/motorista`, config);
-
       setUserData(resUser.data);
-      setHistorico(resTrips.data);
-      setLoading(false);
       setFormData({
         nome: resUser.data.nome || '',
         email: resUser.data.email || '',
@@ -185,6 +185,11 @@ export default function MotoristaProfile() {
         senha_acesso_web: resUser.data.senha_acesso_web || '',
         localizacao: resUser.data.motorista?.morada?.localizacao?.coordinates ? [resUser.data.motorista.morada.localizacao.coordinates[1], resUser.data.motorista.morada.localizacao.coordinates[0]] : ''
       });
+      setApiStatus(prev => ({ ...prev, user: true }));
+
+      const resTrips = await axios.get(`http://localhost:3000/api/viagem/motorista`, config);
+      setHistorico(resTrips.data);
+      setApiStatus({ user: true, trips: true });
     } catch (err) {
       console.error("Erro ao carregar perfil:", err);
     }
@@ -262,9 +267,16 @@ export default function MotoristaProfile() {
       setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
     };
 
-  if (!userData || loading) return <Loading />;
 
   return (
+    <>
+    {loading && (
+      <Loading 
+        tasks={Object.values(apiStatus)} 
+        onFinished={() => setLoading(false)} 
+      />
+    )}
+    {(!loading && userData) && (
     <div className="profile-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="profile-overlay" />
 
@@ -405,5 +417,7 @@ export default function MotoristaProfile() {
 
       </div>
     </div>
+    )};
+    </>
   );
 }
