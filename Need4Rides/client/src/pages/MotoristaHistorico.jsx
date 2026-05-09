@@ -222,7 +222,7 @@ export default function MotoristaHistorico() {
                   <span className="mhist-date">{formatarDataHora(v.hora_inicial_viagem).data} às {formatarDataHora(v.hora_inicial_viagem).hora}</span>
                   <span className="mhist-detail">{v.km_percorridos} km</span>
                   <span className="mhist-detail">{v.n_passageiros} pax</span>
-                  <span className="mhist-detail">{(new Date(v.hora_final_viagem) - new Date(v.hora_inicial_viagem)) / (1000 * 60)} min</span>
+                  <span className="mhist-detail">{Math.max(1, Math.round((new Date(v.hora_final_viagem) - new Date(v.hora_inicial_viagem)) / (1000 * 60)))} min</span>
                   {v.temFatura ? (
                     <span className="mh-hist-status">Concluída</span>
                     ) : (

@@ -51,8 +51,14 @@ exports.finalizarViagem = async (req, res) => {
     }
 
     //RIA 19: Calcular distancia com a morada inicial e final
-    const km = await calcularDistanciaOSRM(viagem.morada_inicial_viagem.localizacao.coordinates, [destino.long, destino.lat]);
-    
+    const coordsInicio = [
+      viagem.morada_inicial_viagem.localizacao.coordinates[0], 
+      viagem.morada_inicial_viagem.localizacao.coordinates[1]  
+    ];
+    const coordsFim = [destino.lat, destino.long];
+    const km = await calcularDistanciaOSRM(coordsInicio, coordsFim);
+    console.log("km calculado:", km);
+
     //RIA 20: Calclar preco com o nivel de conforto, e hora inicial e final
     const preco = await calcularPreco(viagem.nivel_conforto, viagem.hora_inicial_viagem, horaFim);
 
@@ -640,6 +646,7 @@ exports.estimarTempoEspera = async (req, res) => {
       }
     });
 
+    console.log("Motoristas:", motoristasAtivos);
     if(motoristasAtivos.length === 0) return res.status(200).json({ tempoEspera: 15, media: 15 });
 
     let coordsStr = `${lng},${lat}`;
@@ -663,10 +670,9 @@ exports.estimarTempoEspera = async (req, res) => {
           media: Math.round(media) //media de tempos de espera
       });
     } else {
-      res.status(200).json({ tempoEspera: 10, media: 10 });
+      res.status(200).json({ tempoEspera: 15, media: 15 });
     }
   } catch (err) {
-    console.error("DEBUG: ERRO NO BACKEND:", err); // ISTO VAI MOSTRAR O ERRO REAL
     res.status(500).json({ err: "Erro ao calcular espera." });
   }
 };

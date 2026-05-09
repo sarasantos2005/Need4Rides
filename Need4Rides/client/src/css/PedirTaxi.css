@@ -165,6 +165,9 @@
   font-size: 0.95rem;
   outline: none;
   transition: border-color 0.2s, background 0.2s;
+  /* [ALTERADO] Bug 3: box-sizing e width:100% aqui para cobrir todos os contextos incluindo mobile */
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .pt-field input::placeholder {
@@ -184,22 +187,28 @@
 }
 
 .pt-input-wrapper input {
-  width: 100%;
-  padding-right: 50px; 
+  /* [ALTERADO] Bug 3: flex:1 faz o input ocupar o espaço disponível dentro do wrapper flex */
+  flex: 1;
+  min-width: 0;
+  padding-right: 50px;
 }
 
 .pt-btn-loc {
   position: absolute;
-  right: 5px; 
+  right: 5px;
+  /* [ALTERADO] Bug 3: width e height explícitos impedem o botão de expandir em mobile */
+  width: 36px;
+  height: 36px;
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 5px;
+  padding: 0;
   font-size: 1.2rem;
   transition: transform 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .pt-btn-loc:hover {

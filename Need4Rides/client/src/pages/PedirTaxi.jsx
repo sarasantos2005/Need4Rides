@@ -64,9 +64,14 @@ function MapEventsHandler({ onMove }) {
 }
 
 function MapSelectorOrigem({ coordsIniciais, moradaInicial, onConfirm, onClose }) {
-    const center = (coordsIniciais && coordsIniciais.length === 2) 
-    ? coordsIniciais 
-    : [38.7223, -9.1393];
+    const normalizeCoords = (c) => {
+        if (!c) return null;
+        if (Array.isArray(c) && c.length === 2) return [parseFloat(c[0]), parseFloat(c[1])]; // [ALTERADO] Bug 2: array interno já é sempre [lat, lng], passa direto
+        if (c.coordinates && c.coordinates.length >= 2) return [parseFloat(c.coordinates[0]), parseFloat(c.coordinates[1])]; // [ALTERADO] Bug 2: backend guarda coordinates=[lat,lng], passa direto
+        return null;
+    };
+    const coords = normalizeCoords(coordsIniciais);
+    const center = coords || [38.7223, -9.1393];
 
     const [position, setPosition] = useState(center);
     const [addressText, setAddressText] = useState(moradaInicial || "");
@@ -95,7 +100,8 @@ function MapSelectorOrigem({ coordsIniciais, moradaInicial, onConfirm, onClose }
                     overflow: 'hidden' 
                 }}>
                   <MapContainer 
-                    center={position} 
+                    key={coords ? coords.join(',') : 'default'}
+                    center={center}
                     zoom={13} 
                     style={{ height: '400px', width: '100%' }}
                   >
@@ -124,9 +130,15 @@ function MapSelectorOrigem({ coordsIniciais, moradaInicial, onConfirm, onClose }
 }
 
 function MapSelectorDestino({ coordsIniciais, moradaInicial, onConfirm, onClose }) {
-    const center = Array.isArray(coordsIniciais) && coordsIniciais.length === 2 
-        ? coordsIniciais 
-        : [38.7223, -9.1393];
+    const normalizeCoords = (c) => {
+        if (!c) return null;
+        if (Array.isArray(c) && c.length === 2) return [parseFloat(c[0]), parseFloat(c[1])]; // [ALTERADO] Bug 2: array interno já é sempre [lat, lng], passa direto
+        if (c.coordinates && c.coordinates.length >= 2) return [parseFloat(c.coordinates[0]), parseFloat(c.coordinates[1])]; // [ALTERADO] Bug 2: backend guarda coordinates=[lat,lng], passa direto
+        return null;
+    };
+    const coords = normalizeCoords(coordsIniciais);
+    console.log(coords);
+    const center = coords || [38.7223, -9.1393];
 
     const [position, setPosition] = useState(center);
     const [addressText, setAddressText] = useState(moradaInicial || "");
@@ -151,7 +163,8 @@ function MapSelectorDestino({ coordsIniciais, moradaInicial, onConfirm, onClose 
 
                 <div className="map-frame">
                   <MapContainer 
-                    center={position} 
+                    key={coords ? coords.join(',') : 'default'}
+                    center={center}
                     zoom={13} 
                     style={{ height: '400px', width: '100%' }}
                   >
@@ -231,7 +244,6 @@ export default function PedirTaxi() {
           ...prev,
           origem: { morada: state.origem.morada, localizacao: state.origem.localizacao } 
         }));
-      return;
     }
 
     if (state && state.destino) {
@@ -267,7 +279,7 @@ export default function PedirTaxi() {
       }
     }
 
-    if(form.origem.morada === ""){
+    if(!state?.origem && form.origem.morada === ""){
       obterLocalizacaoAtual();  
     }
   }, [state]);
@@ -314,10 +326,20 @@ export default function PedirTaxi() {
   }, [navigate]);
 
   const [estimate, setEstimate] = useState(null);
+
+  const toLatLng = (loc) => {
+    if (!loc) return null;
+    if (Array.isArray(loc) && loc.length === 2) return [parseFloat(loc[0]), parseFloat(loc[1])];
+    if (loc.coordinates && loc.coordinates.length >= 2) return [parseFloat(loc.coordinates[0]), parseFloat(loc.coordinates[1])];
+    return null;
+  };
+
   useEffect(() => {
   const calcularTudo = async () => {
-    if (form.origem.localizacao && form.destino.localizacao && tabelaPrecos) {
-        const url = `https://router.project-osrm.org/route/v1/driving/${form.origem.localizacao[1]},${form.origem.localizacao[0]};${form.destino.localizacao[1]},${form.destino.localizacao[0]}?overview=false`;
+    const origemCoords = toLatLng(form.origem.localizacao);
+    const destinoCoords = toLatLng(form.destino.localizacao);
+    if (origemCoords && destinoCoords && tabelaPrecos) {
+        const url = `https://router.project-osrm.org/route/v1/driving/${origemCoords[1]},${origemCoords[0]};${destinoCoords[1]},${destinoCoords[0]}?overview=false`;
         const res = await axios.get(url);
         const km = (res.data.routes[0].distance / 1000).toFixed(1);
         const tempo = Math.round(res.data.routes[0].duration / 60);
@@ -337,7 +359,7 @@ export default function PedirTaxi() {
         try {
           const token = localStorage.getItem('token');
           const respEsp = await axios.get(`http://localhost:3000/api/viagem/espera`, {
-            params: { lat: form.origem.localizacao[0], lng: form.origem.localizacao[1] },
+            params: { lat: origemCoords[0], lng: origemCoords[1] },
             headers: { Authorization: `Bearer ${token}` }
           });
           tempoMedio = respEsp.data.media;
