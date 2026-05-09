@@ -228,7 +228,6 @@ export default function MotoristaViagem() {
   calcularTudo();
   }, [tripAtiva, tabelaPrecos]);
 
-
   async function iniciarViagem() {
     try {
       const token = localStorage.getItem('token');
@@ -252,33 +251,59 @@ export default function MotoristaViagem() {
       const token = localStorage.getItem('token');
       const viagemAtiva = JSON.parse(localStorage.getItem('viagemAtivaMotorista'));
 
+      if (!viagemAtiva?.viagemId) {
+        navigate('/motorista');
+        return;
+      }
+
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
 
-        const resGeo = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-        const dataGeo = await resGeo.json();
-        const moradaCompleta = dataGeo.display_name || "Localização desconhecida";
+        try{
+          const resGeo = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const dataGeo = await resGeo.json();
+          const moradaCompleta = dataGeo.display_name || "Localização desconhecida";
 
-        await axios.post(
-          'http://localhost:3000/api/viagem/finalizar',
-          { 
-            viagemId: viagemAtiva?.viagemId,
-            destino: {
-              lat: latitude,
-              long: longitude,
-              morada: moradaCompleta
-            }
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+          const response = await axios.post(
+            'http://localhost:3000/api/viagem/finalizar',
+            { 
+              viagemId: viagemAtiva?.viagemId,
+              destino: {
+                lat: latitude,
+                long: longitude,
+                morada: moradaCompleta
+              }
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+          ); 
 
+          if (response.data.success) {
+            const viagemFinal = response.data.viagem;
 
-        clearInterval(pollingRef.current);
-        clearInterval(timerRef.current);
-        localStorage.removeItem('viagemAtivaMotorista');
-        navigate('/motorista/fatura-conf', { state: { trip: tripAtiva, duracao: segundos } });
+            if (pollingRef.current) clearInterval(pollingRef.current);
+            if (timerRef.current) clearInterval(timerRef.current);
+            localStorage.removeItem('viagemAtivaMotorista');
+
+            const tripDadosFinais = {
+              id:          viagemFinal._id,
+              from:        viagemFinal.morada_inicial_viagem,
+              to:          viagemFinal.morada_final_viagem,
+              dist:        `${viagemFinal.km_percorridos ?? '—'} km`,
+              price:       `€${viagemFinal.preco_viagem ?? '—'}`,
+              passengers:  viagemFinal.n_passageiros || '—',
+              clientName:  tripAtiva?.clientName ?? '—',
+              conforto:    viagemFinal.nivel_conforto
+            };
+
+            navigate('/motorista/fatura-conf', { state: { trip: tripDadosFinais, duracao: segundos } });
+          } 
+        } catch (err) {
+          console.error("Erro ao finalizar viagem no servidor:", err);
+          alert("Erro ao processar o fim da viagem.");
+        }
+
       }, (error) => {
-        console.error("Erro ao obter geolocalização:", err);
+        console.error("Erro ao obter geolocalização:", error);
         alert("Não foi possível obter a sua localização atual para finalizar a viagem.");
       });
 

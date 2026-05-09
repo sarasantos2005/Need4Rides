@@ -55,6 +55,7 @@ exports.finalizarViagem = async (req, res) => {
       viagem.morada_inicial_viagem.localizacao.coordinates[0], 
       viagem.morada_inicial_viagem.localizacao.coordinates[1]  
     ];
+
     const coordsFim = [destino.lat, destino.long];
     const km = await calcularDistanciaOSRM(coordsInicio, coordsFim);
     console.log("km calculado:", km);
@@ -68,7 +69,7 @@ exports.finalizarViagem = async (req, res) => {
             hora_final_viagem: horaFim,
             morada_final_viagem: {
               morada: destino.morada,
-              localizacao: { type: "Point", coordinates: [destino.long, destino.lat] }
+              localizacao: { type: "Point", coordinates: [destino.lat, destino.long] }
             },
             km_percorridos: km,
             preco_viagem: preco,
@@ -646,7 +647,6 @@ exports.estimarTempoEspera = async (req, res) => {
       }
     });
 
-    console.log("Motoristas:", motoristasAtivos);
     if(motoristasAtivos.length === 0) return res.status(200).json({ tempoEspera: 15, media: 15 });
 
     let coordsStr = `${lng},${lat}`;

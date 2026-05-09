@@ -137,7 +137,6 @@ function MapSelectorDestino({ coordsIniciais, moradaInicial, onConfirm, onClose 
         return null;
     };
     const coords = normalizeCoords(coordsIniciais);
-    console.log(coords);
     const center = coords || [38.7223, -9.1393];
 
     const [position, setPosition] = useState(center);
@@ -397,7 +396,7 @@ export default function PedirTaxi() {
           morada: form.destino.morada,
           localizacao: { type: "Point", coordinates: [parseFloat(form.destino.localizacao[1]), parseFloat(form.destino.localizacao[0])] }
         },
-        custo_estimado: estimate.preco
+        custo_estimado: estimate.price
       }
 
       const response = await axios.post('http://localhost:3000/api/viagem/pedir', dadosViagem, {

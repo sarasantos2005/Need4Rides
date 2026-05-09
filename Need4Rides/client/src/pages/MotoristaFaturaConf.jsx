@@ -5,17 +5,7 @@ import '../css/MotoristaFaturaConf.css';
 import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 
-const DRIVER_NAME = 'Carlos Silva';
-
-const DEFAULT_TRIP = {
-  id: 42,
-  from: 'Aeroporto de Lisboa',
-  to: 'Baixa-Chiado',
-  dist: '14 km',
-  price: '€18.50',
-  passengers: 2,
-  clientName: 'João Ferreira',
-};
+const DRIVER_NAME = JSON.parse(localStorage.getItem("user_logado")).nome || "Motorista";
 
 function formatDuracao(s) {
   if (!s) return '—';
@@ -27,11 +17,16 @@ function formatDuracao(s) {
 export default function MotoristaFaturaConf() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const trip = state?.trip ?? DEFAULT_TRIP;
+  const trip = state?.trip;
   const duracao = state?.duracao ?? 0;
-
   const [menuOpen, setMenuOpen] = useState(false);
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+
+  useEffect(() => {
+    if (!trip) {
+      navigate('/motorista', { replace: true });
+    }
+  }, [trip, navigate]);
 
   useEffect(() => {
     document.body.className = tema;
@@ -43,7 +38,12 @@ export default function MotoristaFaturaConf() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' });
   const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
-  const faturaNr = `N4R-2026-${String(trip.id).padStart(4, '0')}`;
+  const faturaNr = `N4R-2026`;
+
+  const handleFinalize = () => {
+    localStorage.removeItem('viagemAtivaMotorista');
+    navigate('/motorista', { replace: true });
+  };
 
   return (
     <div className="mfc-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -107,15 +107,16 @@ export default function MotoristaFaturaConf() {
           </div>
 
           <div className="mfc-divider" />
-
+          {console.log(trip)}
           <div className="mfc-rows">
             <div className="mfc-row"><span className="mfc-row-label">Motorista</span><span className="mfc-row-val">{DRIVER_NAME}</span></div>
             <div className="mfc-row"><span className="mfc-row-label">Cliente</span><span className="mfc-row-val">{trip.clientName}</span></div>
-            <div className="mfc-row"><span className="mfc-row-label">Origem</span><span className="mfc-row-val">{trip.from}</span></div>
-            <div className="mfc-row"><span className="mfc-row-label">Destino</span><span className="mfc-row-val">{trip.to}</span></div>
+            <div className="mfc-row"><span className="mfc-row-label">Origem</span><span className="mfc-row-val">{trip.from?.morada}</span></div>
+            <div className="mfc-row"><span className="mfc-row-label">Destino</span><span className="mfc-row-val">{trip.to?.morada}</span></div>
             <div className="mfc-row"><span className="mfc-row-label">Distância</span><span className="mfc-row-val">{trip.dist}</span></div>
             <div className="mfc-row"><span className="mfc-row-label">Duração</span><span className="mfc-row-val">{formatDuracao(duracao)}</span></div>
             <div className="mfc-row"><span className="mfc-row-label">Passageiros</span><span className="mfc-row-val">{trip.passengers}</span></div>
+            <div className="mfc-row"><span className="mfc-row-label">Conforto</span><span className="mfc-row-val">{trip.conforto}</span></div>
             <div className="mfc-row"><span className="mfc-row-label">Pagamento</span><span className="mfc-row-val">Stripe</span></div>
           </div>
 
@@ -129,8 +130,8 @@ export default function MotoristaFaturaConf() {
 
         {/* Actions */}
         <div className="mfc-actions">
-          <button className="mfc-btn confirm" onClick={() => navigate('/motorista')}>
-            &nbsp; Confirmar e Enviar Fatura ao Cliente
+          <button className="mfc-btn confirm" onClick={handleFinalize}>
+            &nbsp; Confirmar e concluir
           </button>
           <button className="mfc-btn problem" onClick={() => navigate('/motorista/suporte')}>
             ⚠&nbsp; Reportar Problema com a Fatura

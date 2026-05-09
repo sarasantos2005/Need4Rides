@@ -208,8 +208,14 @@ export default function HomeLogado() {
  
   const repeatTrip = (trip) => {
     const tripData = {
-      origem: trip.morada_inicial_viagem,
-      destino: trip.morada_final_viagem,
+      origem: { 
+        morada: trip.morada_inicial_viagem.morada, 
+        localizacao: trip.morada_inicial_viagem.localizacao.coordinates 
+      },
+      destino: { 
+        morada: trip.morada_final_viagem.morada, 
+        localizacao: trip.morada_final_viagem.localizacao.coordinates 
+      },
       passengers: trip.n_passageiros || 1,
       comfort: trip.nivel_conforto || 'Básico'
     };
