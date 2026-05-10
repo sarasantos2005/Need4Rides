@@ -15,36 +15,40 @@
 }
 
 /* ─── Navbar ────────────────────────────────────────────── */
-.mhist-navbar {
+.mh-navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 0 2.5rem;
   height: 64px;
   background: rgba(10, 10, 10, 0.85);
   backdrop-filter: blur(10px);
 }
 
-.mhist-logo {
+.mh-logo {
   font-size: 1.4rem;
   font-weight: 700;
   color: #fff;
+  min-width: 160px;
+  flex-shrink: 0;
 }
 
-.mhist-nav-links {
+.mh-nav-links {
   display: flex;
   align-items: center;
   gap: 2rem;
   list-style: none;
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  justify-content: center;
 }
 
-.mhist-nav-links li { display: flex; align-items: center; }
+.mh-nav-links li { display: flex; align-items: center; }
 
-.mhist-nav-links a {
+.mh-nav-links a {
   color: #ddd;
   font-weight: 700;
   font-size: 0.95rem;
@@ -53,10 +57,10 @@
   transition: color 0.2s;
 }
 
-.mhist-nav-links a:hover,
-.mhist-nav-links a.active { color: #f5c518; }
+.mh-nav-links a:hover,
+.mh-nav-links a.active { color: #f5c518; }
 
-.mhist-avatar {
+.mh-avatar {
   width: 36px; height: 36px;
   border-radius: 50%;
   object-fit: cover;
@@ -66,9 +70,38 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.mhist-avatar:hover {
+.mh-avatar:hover {
   transform: scale(1.1);
   box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
+}
+
+.avatarNormal {
+  position: absolute;
+  right: 2.5rem;
+}
+
+.avatarHamburguer {
+  display: none!important;
+}
+
+.mh-profile-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 4px 4px 4px 10px;
+  border-radius: 999px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.mh-profile-pill-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e9e9e9;
+  white-space: nowrap;
+}
+
+.mh-profile-pill-name {
+  color: #f5c518;
 }
 
 /* ─── Wrapper ───────────────────────────────────────────── */
@@ -286,6 +319,11 @@
     display: flex;
   }
 
+  .mh-navbar {
+    display: flex;
+    justify-content: space-between;
+  }
+  
   .mh-nav-links {
     position: absolute;
     top: 64px;
@@ -295,6 +333,42 @@
     width: 220px;
     padding: 1rem;
     display: none;
+  }
+
+  .avatarHamburguer {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.4rem 1rem 1rem;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .avatarHamburguer .mh-profile-pill {
+    flex-direction: column;
+    background: transparent;
+    border: none;
+    padding: 0;
+    gap: 0.25rem;
+  }
+
+  .avatarHamburguer .mh-avatar {
+    width: 56px;
+    height: 56px;
+    border-width: 2.5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .avatarHamburguer .mh-profile-pill-name {
+    color: #f5c518;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .avatarNormal {
+    display: none !important;
   }
 
   .mh-nav-links.active {
