@@ -353,6 +353,8 @@ export default function MotoristaHome() {
     setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
   };
 
+
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
   
   return (
     <>
@@ -367,39 +369,48 @@ export default function MotoristaHome() {
       <div className="mh-overlay" />
 
       <nav className="mh-navbar">
-  <span className="mh-logo">Need4Rides</span>
+        
+        <span className="mh-logo">Need4Rides</span>
 
-  
+        {/* BOTÃO HAMBURGUER */}
+        <div 
+          className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
 
-  {/* BOTÃO HAMBURGUER */}
-  <div 
-    className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
-    onClick={() => setMenuOpen(!menuOpen)}
-  >
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
+        <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="mh-profile-li avatarHamburguer">
+            <div className="mh-profile-pill">
+              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+            </div>
+          </li>
 
-  <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
-    <li><a className="active">Dashboard</a></li>
+          <li><a className="active">Dashboard</a></li>
 
-    <li><a onClick={() => navigate('/motorista/reabastecimento')}>Registar Reabastecimento</a></li>
-    <li><a onClick={() => navigate('/motorista/historico')}>Histórico</a></li>
-    <li><a onClick={() => navigate('/motorista/suporte')}>Suporte</a></li>
-    <li><a onClick={() => navigate('/motorista/viagem')}>Viagem</a></li>
+          <li><a onClick={() => navigate('/motorista/reabastecimento')}>Reabastecimento</a></li>
+          <li><a onClick={() => navigate('/motorista/historico')}>Histórico</a></li>
+          <li><a onClick={() => navigate('/motorista/suporte')}>Suporte</a></li>
+          <li><a onClick={() => navigate('/motorista/viagem')}>Viagem</a></li>
 
-    <li>
-      <button className="mh-theme-btn" onClick={alternarTema}>
-        {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
-      </button>
-    </li>
+          <li className="mh-theme-li-hamburger">
+            <button className="mh-theme-btn" onClick={alternarTema}>
+              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+            </button>
+          </li>
 
-    <li>
-      <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
-    </li>
-  </ul>
-</nav>
+          <li className="mh-profile-li avatarNormal">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+            </div>
+          </li>
+        </ul>
+      </nav>
 
       <div className="mh-wrapper">
 
