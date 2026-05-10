@@ -191,42 +191,55 @@ export default function MotoristaSuporte() {
       )
     : TOPICOS;
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+
   return (
     <div className="ms-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="ms-overlay" />
 
        <nav className="mh-navbar">
-             <span className="mh-logo">Need4Rides</span>
-           
-             {/* BOTÃO HAMBURGUER */}
-                      <div 
-                        className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
-                        onClick={() => setMenuOpen(!menuOpen)}
-                      >
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                      </div>
-                    
-                      <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
-                        <li><a onClick={() => navigate('/motorista')}>Dashboard</a></li>
-                    
-                        <li><a onClick={() => navigate('/motorista/reabastecimento')}>Registar Reabastecimento</a></li>
-                        <li><a onClick={() => navigate('/motorista/historico')}>Histórico</a></li>
-                        <li><a className="active">Suporte</a></li>
-                        <li><a onClick={() => navigate('/motorista/viagem')}>Viagem</a></li>
-                    
-                        <li>
-                          <button className="mh-theme-btn" onClick={alternarTema}>
-                            {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
-                          </button>
-                        </li>
-                    
-                        <li>
-                          <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
-                        </li>
-                      </ul>
-                    </nav>
+               
+          <span className="mh-logo">Need4Rides</span>
+  
+          {/* BOTÃO HAMBURGUER */}
+          <div 
+            className={`mh-hamburger ${menuOpen ? 'open' : ''}`} 
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+  
+          <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+            <li className="mh-profile-li avatarHamburguer">
+              <div className="mh-profile-pill">
+                <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+                <span className="mh-profile-pill-name">{USERNAME}</span>
+              </div>
+            </li>
+  
+            <li onClick={() => navigate('/motorista')}><a>Dashboard</a></li>
+  
+            <li><a onClick={() => navigate('/motorista/reabastecimento')}>Reabastecimento</a></li>
+            <li><a onClick={() => navigate('/motorista/historico')}>Histórico</a></li>
+            <li><a className="active">Suporte</a></li>
+            <li><a onClick={() => navigate('/motorista/viagem')}>Viagem</a></li>
+  
+            <li className="mh-theme-li-hamburger">
+              <button className="mh-theme-btn" onClick={alternarTema}>
+                {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+              </button>
+            </li>
+  
+            <li className="mh-profile-li avatarNormal">
+              <div className="mh-profile-pill">
+                <span className="mh-profile-pill-name">{USERNAME}</span>
+                <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+              </div>
+            </li>
+          </ul>
+        </nav>
 
       <div className="ms-wrapper">
 
