@@ -274,15 +274,20 @@ export default function HomeLogado() {
   const greeting = hour < 12 ? 'Bom dia' : hour < 19 ? 'Boa tarde' : 'Boa noite';
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
 
   return (
     <div className="home">
       {/* Navbar */}
       <nav className="navbar">
         <span className="navbar-logo">Need4Rides</span>
-        <ul className="navbar-links">
-          <li><a onClick={() => navigate('/pedir-taxi')} style={{ cursor: 'pointer' }}>Pedir Táxi</a></li>
-          <li><AvatarDropdown profilePath="/profile" avatarClass="navbar-avatar" /></li>
+        <ul className="navbar-links">          
+          <li className="mh-profile-li">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/profile" avatarClass="mh-avatar" />
+            </div>
+          </li>
         </ul>
       </nav>
 

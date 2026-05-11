@@ -8,25 +8,22 @@
 /* ─── Navbar ────────────────────────────────────────────── */
 .navbar {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 0 2.5rem;
   height: 64px;
   background: rgba(10, 10, 10, 0.85);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .navbar-logo {
   font-size: 1.4rem;
   font-weight: 700;
   color: #fff;
-  letter-spacing: 0.5px;
+  min-width: 160px;
+  flex-shrink: 0;
 }
 
 .navbar-links {
@@ -36,6 +33,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  flex: 1;
+  justify-content: center;
 }
 
 .navbar-links li {
@@ -45,9 +44,10 @@
 
 .navbar-links a {
   color: #ddd;
-  text-decoration: none;
-  font-size: 0.95rem;
   font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
   transition: color 0.2s;
 }
 
@@ -67,8 +67,45 @@
   transition: color 0.2s;
 }
 
+.mh-profile-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 4px 4px 4px 10px;
+  border-radius: 999px;
+  transition: background 0.2s, border-color 0.2s;
+  position: absolute;
+  right: 2.5rem;
+}
+
+.mh-profile-pill-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e9e9e9;
+  white-space: nowrap;
+}
+
+.mh-profile-pill-name {
+  color: #f5c518;
+}
+
 .navbar-login-btn:hover {
   color: #ffd740;
+}
+
+.mh-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mh-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
 }
 
 .navbar-avatar {

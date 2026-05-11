@@ -5,7 +5,9 @@ import '../css/MotoristaFaturaConf.css';
 import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 
-const DRIVER_NAME = JSON.parse(localStorage.getItem("user_logado")).nome || "Motorista";
+if(localStorage.getItem("user_logado")){
+  const DRIVER_NAME = JSON.parse(localStorage.getItem("user_logado")).nome
+} else { "Motorista" };
 
 function formatDuracao(s) {
   if (!s) return '—';
