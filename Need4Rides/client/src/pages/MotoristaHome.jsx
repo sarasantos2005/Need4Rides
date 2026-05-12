@@ -384,10 +384,8 @@ export default function MotoristaHome() {
 
         <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
           <li className="mh-profile-li avatarHamburguer">
-            <div className="mh-profile-pill">
-              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
-              <span className="mh-profile-pill-name">{USERNAME}</span>
-            </div>
+            <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+            <span className="mh-profile-pill-name">{USERNAME}</span>
           </li>
 
           <li><a className="active">Dashboard</a></li>

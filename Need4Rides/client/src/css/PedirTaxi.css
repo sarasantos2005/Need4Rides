@@ -23,7 +23,6 @@
   z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 0 2.5rem;
   height: 64px;
   background: rgba(10, 10, 10, 0.85);
@@ -34,7 +33,8 @@
   font-size: 1.4rem;
   font-weight: 700;
   color: #fff;
-  cursor: pointer;
+  min-width: 160px;
+  flex-shrink: 0;
 }
 
 .pt-nav-links {
@@ -44,6 +44,8 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  flex: 1;
+  justify-content: center;
 }
 
 .pt-nav-links li {
@@ -88,6 +90,50 @@
 .pt-avatar:hover {
   transform: scale(1.1);
   box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
+}
+
+.mh-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mh-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
+}
+
+.avatarNormal {
+  position: absolute;
+  right: 2.5rem;
+}
+
+.avatarHamburguer {
+  display: none!important;
+}
+
+.mh-profile-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 4px 4px 4px 10px;
+  border-radius: 999px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.mh-profile-pill-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e9e9e9;
+  white-space: nowrap;
+}
+
+.mh-profile-pill-name {
+  color: #f5c518;
 }
 
 /* ─── Wrapper ───────────────────────────────────────────── */
@@ -679,6 +725,11 @@ body.claro .map-modal-header h3, body.claro .leaflet-container a {
     display: flex;
   }
 
+  .pt-navbar {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .pt-nav-links {
     position: absolute;
     top: 64px;
@@ -688,7 +739,46 @@ body.claro .map-modal-header h3, body.claro .leaflet-container a {
     width: 220px;
     padding: 1rem;
     display: none;
-    gap: 1rem;
+  }
+
+  .pt-nav-links.active {
+    display: flex;
+  }
+
+  .avatarHamburguer {
+    display: flex !important;
+    flex-direction: column!important;
+    align-items: center!important;
+    padding: 1.4rem 1rem 1rem!important;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.08)!important;
+    margin-bottom: 0.5rem!important;
+    width: 100%!important;
+    box-sizing: border-box!important;
+  }
+
+  .avatarHamburguer .mh-profile-pill {
+    flex-direction: column!important;
+    background: transparent!important;
+    border: none!important;
+    padding: 0!important;
+    gap: 0.25rem!important;
+  }
+
+  .avatarHamburguer .mh-avatar {
+    width: 56px!important;
+    height: 56px!important;
+    border-width: 2.5px!important;
+    margin-bottom: 0.5rem!important;
+  }
+
+  .avatarHamburguer .mh-profile-pill-name {
+    color: #f5c518;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .avatarNormal {
+    display: none !important;
   }
 
   .pt-nav-links.active {

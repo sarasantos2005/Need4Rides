@@ -429,6 +429,8 @@ export default function PedirTaxi() {
     }
   }, []);
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+
   return (
     <div className="pt-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="pt-overlay" />
@@ -447,13 +449,24 @@ export default function PedirTaxi() {
         </div>
 
         <ul className={`pt-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="mh-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/profile" avatarClass="mh-avatar" />
+            <span className="mh-profile-pill-name">{USERNAME}</span>
+          </li>
+
           <li><a onClick={() => { navigate('/home'); setMenuOpen(false); }}>Home</a></li>
           <li>
             <button className="pt-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li><AvatarDropdown profilePath="/profile" avatarClass="pt-avatar" /></li>
+          
+          <li className="mh-profile-li avatarNormal">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/profile" avatarClass="mh-avatar" />
+            </div>
+          </li>
         </ul>
       </nav>
 
