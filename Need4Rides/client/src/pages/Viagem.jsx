@@ -181,6 +181,8 @@ export default function Viagem() {
   const originCoord = useMemo(() => form.origem.localizacao, [form.origem.localizacao]);
   const destCoord = useMemo(() => form.destino.localizacao, [form.destino.localizacao]);
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+
   return (
     <div className="viagem-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="viagem-overlay" />
@@ -199,6 +201,10 @@ export default function Viagem() {
         </div>
 
         <ul className={`viagem-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="mh-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/profile" avatarClass="mh-avatar" />
+            <span className="mh-profile-pill-name">{USERNAME}</span>
+          </li>
           <li><a onClick={() => { navigate('/home'); setMenuOpen(false); }}>Home</a></li>
           <li><a onClick={() => { navigate('/services'); setMenuOpen(false); }}>Serviços</a></li>
           <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
@@ -208,7 +214,12 @@ export default function Viagem() {
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li><AvatarDropdown profilePath="/profile" avatarClass="viagem-avatar" /></li>
+          <li className="mh-profile-li avatarNormal">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="viagem-avatar" />
+            </div>
+          </li>
         </ul>
       </nav>
 

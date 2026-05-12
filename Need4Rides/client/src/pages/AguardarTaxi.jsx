@@ -185,6 +185,8 @@ export default function AguardarTaxi() {
   const fmt = s =>
     `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+
   return (
     <div className="agt-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="agt-overlay" />
@@ -206,6 +208,10 @@ export default function AguardarTaxi() {
 
         {/* LINKS */}
         <ul className={`agt-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="mh-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            <span className="mh-profile-pill-name">{USERNAME}</span>
+          </li>
           <li><a onClick={() => navigate('/home')}>Home</a></li>
           <li><a onClick={() => navigate('/pedir-taxi')}>Pedir Táxi</a></li>
 
@@ -215,8 +221,11 @@ export default function AguardarTaxi() {
             </button>
           </li>
 
-          <li>
-            <AvatarDropdown profilePath="/profile" avatarClass="agt-avatar" />
+          <li className="mh-profile-li avatarNormal">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            </div>
           </li>
         </ul>
       </nav>
