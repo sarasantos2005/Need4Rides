@@ -32,6 +32,8 @@
   font-size: 1.4rem;
   font-weight: 700;
   color: #fff;
+  min-width: 160px;
+  flex-shrink: 0;
 }
 
 .mvg-nav-links {
@@ -39,7 +41,10 @@
   align-items: center;
   gap: 2rem;
   list-style: none;
-  margin: 0; padding: 0;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  justify-content: center;
 }
 
 .mvg-nav-links li { display: flex; align-items: center; }
@@ -67,6 +72,48 @@
 }
 
 .mvg-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
+}
+
+.mh-profile-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 4px 4px 4px 10px;
+  border-radius: 999px;
+  transition: background 0.2s, border-color 0.2s;
+  position: absolute;
+  right: 2.5rem;
+}
+
+.mh-profile-pill-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e9e9e9;
+  white-space: nowrap;
+}
+
+.mh-profile-pill-name {
+  color: #f5c518;
+}
+
+.navbar-login-btn:hover {
+  color: #ffd740;
+}
+
+.navbar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  cursor: pointer;
+  display: block;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.navbar-avatar:hover {
   transform: scale(1.1);
   box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
 }

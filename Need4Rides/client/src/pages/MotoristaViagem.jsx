@@ -326,6 +326,8 @@ export default function MotoristaViagem() {
     );
   }
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+
   return (
     <div className="mvg-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mvg-overlay" />
@@ -343,8 +345,13 @@ export default function MotoristaViagem() {
         </div>
 
         <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="mh-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+            <span className="mh-profile-pill-name">{USERNAME}</span>
+          </li>
+          
           <li><a onClick={() => navigate('/motorista')}>Dashboard</a></li>
-          <li><a onClick={() => navigate('/motorista/reabastecimento')}>Registar Reabastecimento</a></li>
+          <li><a onClick={() => navigate('/motorista/reabastecimento')}>Reabastecimento</a></li>
           <li><a onClick={() => navigate('/motorista/historico')}>Histórico</a></li>
           <li><a onClick={() => navigate('/motorista/suporte')}>Suporte</a></li>
           <li><a className="active">Viagem</a></li>
@@ -353,8 +360,11 @@ export default function MotoristaViagem() {
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li>
-            <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+          <li className="mh-profile-li avatarNormal">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+            </div>
           </li>
         </ul>
       </nav>
