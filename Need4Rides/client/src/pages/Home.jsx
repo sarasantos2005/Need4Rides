@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import taxiImg from '../assets/images/taxi.png';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Home.css';
+import '../css/HomeNav.css';
 
 const services = [
   { title: 'Transporte de Passageiros', desc: 'Viagens rápidas e seguras para qualquer destino.', accent: '#6c63ff' },

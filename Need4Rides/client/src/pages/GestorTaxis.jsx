@@ -59,6 +59,8 @@ export default function GestorTaxis() {
     </span>
   );
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+
   return (
     <div className="gm-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="grm-overlay" />
@@ -77,6 +79,10 @@ export default function GestorTaxis() {
         </div>
 
         <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="mh-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            <span className="mh-profile-pill-name">{USERNAME}</span>
+          </li>
           <li><a onClick={() => navigate('/gestor')}>Dashboard</a></li>
           <li><a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a></li>
           <li><a className="active" onClick={() => navigate('/gestor/taxis')}>Táxis</a></li>
@@ -86,8 +92,11 @@ export default function GestorTaxis() {
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li>
-            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+          <li className="mh-profile-li avatarNormal">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            </div>
           </li>
         </ul>
       </nav>

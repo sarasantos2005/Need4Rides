@@ -208,6 +208,8 @@ export default function GestorHome() {
     );
   }
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+
   return (
     <>
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -227,29 +229,29 @@ export default function GestorHome() {
         </div>
 
         <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
-          <li>
-            <a className="active" onClick={() => navigate('/gestor')}>Dashboard</a>
+          <li className="mh-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            <span className="mh-profile-pill-name">{USERNAME}</span>
           </li>
 
-          <li>
-            <a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a>
-          </li>
+          <li><a className="active" onClick={() => navigate('/gestor')}>Dashboard</a></li>
 
-          <li>
-            <a onClick={() => navigate('/gestor/taxis')}>Táxis</a>
-          </li>
+          <li><a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a></li>
 
-          <li>
-            <a onClick={() => navigate('/gestor/precos')}>Preços</a>
-          </li>
+          <li><a onClick={() => navigate('/gestor/taxis')}>Táxis</a></li>
+
+          <li><a onClick={() => navigate('/gestor/precos')}>Preços</a></li>
 
           <li>
             <button className="mh-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li>
-            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+          <li className="mh-profile-li avatarNormal">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            </div>
           </li>
         </ul>
       </nav>

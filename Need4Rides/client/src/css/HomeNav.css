@@ -1,0 +1,5 @@
+.home .navbar-links {
+  justify-content: flex-end;  
+  flex: unset;              
+  margin-left: auto;     
+}

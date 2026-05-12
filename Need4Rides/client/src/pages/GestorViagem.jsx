@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
@@ -12,6 +12,7 @@ export default function GestorViagem() {
   const token = localStorage.getItem('token');
   const storedUser = localStorage.getItem('user_logado');
   const userData = storedUser ? JSON.parse(storedUser) : { nome: 'Utilizador' };
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!token || !storedUser) {
@@ -27,6 +28,8 @@ export default function GestorViagem() {
     return null;
   }
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+
   return (
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mh-overlay" />
@@ -34,18 +37,30 @@ export default function GestorViagem() {
       <nav className="mh-navbar">
         <span className="mh-logo">Need4Rides</span>
 
-        <div className="mh-hamburger" onClick={() => {}}>
+        <div
+          className={`mh-hamburger ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
           <span></span>
           <span></span>
           <span></span>
         </div>
 
-        <ul className="mh-nav-links active">
-          <li><a className="active" onClick={goBack}>Voltar</a></li>
+        <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="mh-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            <span className="mh-profile-pill-name">{USERNAME}</span>
+          </li>
+          <li><a onClick={() => navigate('/gestor')}>Dashboard</a></li>
           <li><a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a></li>
           <li><a onClick={() => navigate('/gestor/taxis')}>Táxis</a></li>
-          <li><a onClick={() => navigate('/gestor/registar-motorista')}>Registar Motorista</a></li>
-          <li><AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" /></li>
+          <li><a onClick={() => navigate('/gestor/precos')}>Preços</a></li>
+          <li className="mh-profile-li avatarNormal">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            </div>
+          </li>
         </ul>
       </nav>
 

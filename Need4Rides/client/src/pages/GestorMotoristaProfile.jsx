@@ -87,6 +87,8 @@ export default function GestorMotoristaProfile() {
       />
     );
   }
+
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
   
   return (
     <>
@@ -112,8 +114,11 @@ export default function GestorMotoristaProfile() {
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li>
-            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+          <li className="mh-profile-li avatarNormal">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            </div>
           </li>
         </ul>
       </nav>
@@ -136,7 +141,7 @@ export default function GestorMotoristaProfile() {
               </div>
             </div>
             <div className="profile-actions">
-              <button className="profile-back-btn" onClick={() => navigate('/gestor/motoristas')}>
+              <button className="profile-back-btn" onClick={() => navigate(-1)}>
                 ← Voltar
               </button>
 

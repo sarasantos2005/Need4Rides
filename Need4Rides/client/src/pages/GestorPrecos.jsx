@@ -83,6 +83,8 @@ export default function GestorPrecos() {
 
   const temPrecos = precosAtuais && Object.keys(precosAtuais).length > 0;
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+  
   return (
     <div className="gp-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="gp-overlay" />
@@ -93,6 +95,10 @@ export default function GestorPrecos() {
           <span /><span /><span />
         </div>
         <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="mh-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            <span className="mh-profile-pill-name">{USERNAME}</span>
+          </li>
           <li><a onClick={() => navigate('/gestor')}>Dashboard</a></li>
           <li><a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a></li>
           <li><a onClick={() => navigate('/gestor/taxis')}>Táxis</a></li>
@@ -102,7 +108,12 @@ export default function GestorPrecos() {
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li><AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" /></li>
+          <li className="mh-profile-li avatarNormal">
+            <div className="mh-profile-pill">
+              <span className="mh-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+            </div>
+          </li>
         </ul>
       </nav>
 
