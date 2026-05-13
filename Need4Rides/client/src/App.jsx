@@ -25,6 +25,7 @@ import GestorProfile from './pages/GestorProfile';
 import GestorPrecos from './pages/GestorPrecos';
 import GestorMotoristaProfile from './pages/GestorMotoristaProfile';
 import MotoristaRequisitarTaxi from './pages/MotoristaRequisitarTaxi';
+import MotoristaRelatorio from './pages/MotoristaRelatorio';
 import MotoristaLayout from './layouts/MotoristaLayout';
 
 export default function App() {
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/motorista/suporte" element={<MotoristaSuporte />} />
           <Route path="/motorista/viagem" element={<MotoristaViagem />} />
           <Route path="/motorista/fatura-conf" element={<MotoristaFaturaConf />} />
+          <Route path="/motorista/relatorio" element={<MotoristaRelatorio />} />
         </Route>
         <Route path="/gestor" element={<GestorHome />} />
         <Route path="/gestor/registar-motorista" element={<GestorRegistarMotorista />} />

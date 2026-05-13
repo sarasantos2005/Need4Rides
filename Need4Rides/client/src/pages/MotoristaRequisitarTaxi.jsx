@@ -121,6 +121,7 @@ export default function MotoristaRequisitarTaxi() {
         <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
           <li><a style={{ cursor: 'pointer' }} onClick={() => { navigate('/motorista'); setMenuOpen(false); }}>Dashboard</a></li>
           <li><a onClick={() => { navigate('/motorista/historico'); setMenuOpen(false); }} style={{ cursor: 'pointer' }}>Histórico</a></li>
+          <li><a onClick={() => { navigate('/motorista/relatorio'); setMenuOpen(false); }} style={{ cursor: 'pointer' }}>Relatório</a></li>
           <li><a onClick={() => { navigate('/motorista/suporte'); setMenuOpen(false); }} style={{ cursor: 'pointer' }}>Suporte</a></li>
           <li><a className="active">Requisitar Táxi</a></li>
           <li>

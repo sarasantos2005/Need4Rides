@@ -70,6 +70,7 @@ export default function MotoristaFaturaConf() {
           <li><a onClick={() => { navigate('/motorista'); setMenuOpen(false); }}>Dashboard</a></li>
           <li><a onClick={() => { navigate('/motorista/reabastecimento'); setMenuOpen(false); }}>Reabastecimento</a></li>
           <li><a onClick={() => { navigate('/motorista/historico'); setMenuOpen(false); }}>Histórico</a></li>
+          <li><a onClick={() => { navigate('/motorista/relatorio'); setMenuOpen(false); }}>Relatório</a></li>
           <li><a onClick={() => { navigate('/motorista/suporte'); setMenuOpen(false); }}>Suporte</a></li>
           <li><a className="active" onClick={() => { navigate('/motorista/viagem'); setMenuOpen(false); }}>Viagem</a></li>
           <li>

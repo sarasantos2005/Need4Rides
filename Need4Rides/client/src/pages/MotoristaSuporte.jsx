@@ -221,6 +221,7 @@ export default function MotoristaSuporte() {
   
             <li><a onClick={() => navigate('/motorista/reabastecimento')}>Reabastecimento</a></li>
             <li><a onClick={() => navigate('/motorista/historico')}>Histórico</a></li>
+            <li><a onClick={() => navigate('/motorista/relatorio')}>Relatório</a></li>
             <li><a className="active">Suporte</a></li>
             <li><a onClick={() => navigate('/motorista/viagem')}>Viagem</a></li>
   

@@ -200,6 +200,77 @@ exports.getRelatorios = async (req, res) => {
   }
 };
 
+// US - Relatório pessoal do motorista
+exports.getRelatoriosMotorista = async (req, res) => {
+  try {
+    const agora = new Date();
+    const hojeStr = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`;
+    const di = req.query.dataInicio || hojeStr;
+    const df = req.query.dataFim   || hojeStr;
+    const dataInicio = parseDia(di, false);
+    const dataFim    = parseDia(df, true);
+
+    const motoristaId = req.userId;
+
+    const turnoIds = await Turno.find({ motorista: motoristaId }).distinct('_id');
+
+    const viagens = await Viagem.find({
+      turno: { $in: turnoIds },
+      createdAt: { $gte: dataInicio, $lte: dataFim },
+      hora_final_viagem: { $exists: true, $ne: null }
+    }).populate('cliente');
+
+    const totalGanhos = viagens.reduce((s, v) => s + (v.preco_viagem || 0), 0);
+    const totalKm     = viagens.reduce((s, v) => s + (v.km_percorridos || 0), 0);
+    const ratings     = viagens.map(v => v.rating_motorista).filter(r => r != null);
+    const avgRating   = ratings.length > 0
+      ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
+      : null;
+
+    const viagensDetalhadas = viagens
+      .map(v => {
+        const raw = v.createdAt || v.hora_inicial_viagem;
+        const d   = raw instanceof Date ? raw : new Date(raw);
+        const durMin = v.hora_final_viagem && v.hora_inicial_viagem
+          ? Math.round((new Date(v.hora_final_viagem) - new Date(v.hora_inicial_viagem)) / 60000)
+          : null;
+        return {
+          id:          v._id,
+          cliente:     v.cliente?.nome || '—',
+          origem:      v.morada_inicial_viagem?.morada || '—',
+          destino:     v.morada_final_viagem?.morada   || '—',
+          km:          v.km_percorridos  || 0,
+          preco:       v.preco_viagem    || 0,
+          rating:      v.rating_motorista ?? null,
+          passageiros: v.n_passageiros   || 1,
+          conforto:    v.nivel_conforto  || '—',
+          duracao:     durMin,
+          data:        d.toLocaleDateString('pt-PT'),
+          hora:        d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }),
+        };
+      })
+      .sort((a, b) => {
+        const parse = str => { const [d,m,y] = str.split('/'); return new Date(`${y}-${m}-${d}`).getTime(); };
+        return parse(b.data) - parse(a.data);
+      });
+
+    res.status(200).json({
+      success: true,
+      periodo: { inicio: dataInicio, fim: dataFim },
+      resumo: {
+        viagens:     viagens.length,
+        ganhos:      totalGanhos.toFixed(2),
+        km:          totalKm.toFixed(1),
+        ratingMedio: avgRating ?? '—',
+      },
+      viagens: viagensDetalhadas,
+    });
+  } catch (error) {
+    console.error('Erro ao gerar relatório do motorista:', error);
+    res.status(500).json({ success: false, message: 'Erro ao gerar relatório.', error: error.message });
+  }
+};
+
 // Exportar relatório para PDF
 exports.exportarPDF = async (req, res) => {
   try {

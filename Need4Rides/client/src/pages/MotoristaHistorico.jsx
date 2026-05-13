@@ -157,7 +157,8 @@ export default function MotoristaHistorico() {
           <li><a onClick={() => navigate('/motorista')}>Dashboard</a></li>
 
           <li><a onClick={() => navigate('/motorista/reabastecimento')}>Reabastecimento</a></li>
-          <li><a class="active">Histórico</a></li>
+          <li><a className="active">Histórico</a></li>
+          <li><a onClick={() => navigate('/motorista/relatorio')}>Relatório</a></li>
           <li><a onClick={() => navigate('/motorista/suporte')}>Suporte</a></li>
           <li><a onClick={() => navigate('/motorista/viagem')}>Viagem</a></li>
 
@@ -195,11 +196,11 @@ export default function MotoristaHistorico() {
           </div>
           <div className="mhist-stat accent">
             <span className="mhist-stat-label">Total Ganho</span>
-            <span className="mhist-stat-value">€{totalGanhos}</span>
+            <span className="mhist-stat-value">€{totalGanhos.toFixed(2)}</span>
           </div>
           <div className="mhist-stat">
             <span className="mhist-stat-label">Km Totais</span>
-            <span className="mhist-stat-value">{totalKm} km</span>
+            <span className="mhist-stat-value">{totalKm.toFixed(1)} km</span>
           </div>
           <div className="mhist-stat">
             <span className="mhist-stat-label">Média por Viagem</span>

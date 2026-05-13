@@ -525,6 +525,8 @@ body.claro .av-item-logout {
   color: #ff6b6b;
 }
 
+@keyframes spin { to { transform: rotate(360deg); } }
+
 .trip-invoice-btn{
   background: rgba(233, 189, 67, 0.1);
   color: #e9ba43;
