@@ -6,41 +6,38 @@ const pdf = require('html-pdf');
 const fs = require('fs');
 const path = require('path');
 
+// Converte "YYYY-MM-DD" em Date local (início ou fim do dia)
+function parseDia(str, fimDoDia = false) {
+  const [y, m, d] = str.split('-').map(Number);
+  return fimDoDia
+    ? new Date(y, m - 1, d, 23, 59, 59, 999)
+    : new Date(y, m - 1, d, 0, 0, 0, 0);
+}
+
 // US14 - Relatórios táxis e motoristas
 exports.getRelatorios = async (req, res) => {
   try {
-    const { periodo = 'hoje' } = req.query;
-
-    // Definir período baseado no filtro
-    let dataInicio, dataFim;
     const agora = new Date();
+    const hojeStr = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`;
 
-    switch (periodo) {
-      case 'hoje':
-        dataInicio = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
-        dataFim = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1);
-        break;
-      case 'semana':
-        dataInicio = new Date(agora.getTime() - 7 * 24 * 60 * 60 * 1000);
-        dataFim = agora;
-        break;
-      case 'mes':
-        dataInicio = new Date(agora.getTime() - 30 * 24 * 60 * 60 * 1000);
-        dataFim = agora;
-        break;
-      case 'ano':
-        dataInicio = new Date(agora.getTime() - 365 * 24 * 60 * 60 * 1000);
-        dataFim = agora;
-        break;
-      default:
-        dataInicio = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
-        dataFim = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1);
-    }
+    const di = req.query.dataInicio || hojeStr;
+    const df = req.query.dataFim   || hojeStr;
+
+    const dataInicio = parseDia(di, false);
+    const dataFim    = parseDia(df, true);
+
+    console.log('[relatorios] di:', di, '→', dataInicio.toISOString());
+    console.log('[relatorios] df:', df, '→', dataFim.toISOString());
 
     // 1. VIAGENS NO PERÍODO
     const viagensNoPeriodo = await Viagem.find({
-      createdAt: { $gte: dataInicio, $lt: dataFim }
+      createdAt: { $gte: dataInicio, $lte: dataFim }
     }).populate('turno').populate('cliente');
+
+    console.log('[relatorios] viagensNoPeriodo:', viagensNoPeriodo.length);
+    if (viagensNoPeriodo.length > 0) {
+      console.log('[relatorios] exemplo createdAt:', viagensNoPeriodo[0].createdAt);
+    }
 
     const viagensPeriodoAtivas = viagensNoPeriodo.filter(v => !v.hora_final_viagem);
     const viagensPeriodoCompletadas = viagensNoPeriodo.filter(v => v.hora_final_viagem);
@@ -93,7 +90,7 @@ exports.getRelatorios = async (req, res) => {
         // Viagens no período
         const viagensMotorista = await Viagem.find({
           turno: { $in: await Turno.find({ motorista: motorista._id }).distinct('_id') },
-          createdAt: { $gte: dataInicio, $lt: dataFim }
+          createdAt: { $gte: dataInicio, $lte: dataFim }
         });
 
         const viagensCompletadas = viagensMotorista.filter(v => v.hora_final_viagem);
@@ -117,10 +114,9 @@ exports.getRelatorios = async (req, res) => {
       })
     );
 
-    // 8. VIAGENS DO PERÍODO SELECIONADO (aplicar filtro atual)
-    const viagensPeriodoSelecionadas = viagensPeriodoCompletadas
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 20);
+    // 8. VIAGENS DO PERÍODO SELECIONADO
+    const viagensPeriodoSelecionadas = [...viagensPeriodoCompletadas]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     const viagensPeriodoDetalhadas = await Promise.all(
       viagensPeriodoSelecionadas.map(async (viagem) => {
@@ -180,16 +176,10 @@ exports.getRelatorios = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      periodo: {
-        filtro: periodo,
-        inicio: dataInicio,
-        fim: dataFim
-      },
+      periodo: { inicio: dataInicio, fim: dataFim },
       resumo: {
         viagensPeriodo: viagensNoPeriodo.length,
         receitaPeriodo: receitaTotal.toFixed(2),
-        viagensHoje: viagensNoPeriodo.length,
-        receitaHoje: receitaTotal.toFixed(2),
         motoristasAtivos: `${motoristasAtivos} / ${totalMotoristas}`,
         taxisEmServico: `${taxisEmServico} / ${totalTaxis}`
       },
