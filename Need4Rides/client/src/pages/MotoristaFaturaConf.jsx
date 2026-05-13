@@ -5,9 +5,6 @@ import '../css/MotoristaFaturaConf.css';
 import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 
-if(localStorage.getItem("user_logado")){
-  const DRIVER_NAME = JSON.parse(localStorage.getItem("user_logado")).nome
-} else { "Motorista" };
 
 function formatDuracao(s) {
   if (!s) return '—';
@@ -23,6 +20,7 @@ export default function MotoristaFaturaConf() {
   const duracao = state?.duracao ?? 0;
   const [menuOpen, setMenuOpen] = useState(false);
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+  const DRIVER_NAME = JSON.parse(localStorage.getItem('user_logado') || '{}').nome || 'Motorista';
 
   useEffect(() => {
     if (!trip) {
@@ -46,6 +44,8 @@ export default function MotoristaFaturaConf() {
     localStorage.removeItem('viagemAtivaMotorista');
     navigate('/motorista', { replace: true });
   };
+
+  if (!trip) return null;
 
   return (
     <div className="mfc-page" style={{ backgroundImage: `url(${heroBg})` }}>
@@ -110,7 +110,6 @@ export default function MotoristaFaturaConf() {
           </div>
 
           <div className="mfc-divider" />
-          {console.log(trip)}
           <div className="mfc-rows">
             <div className="mfc-row"><span className="mfc-row-label">Motorista</span><span className="mfc-row-val">{DRIVER_NAME}</span></div>
             <div className="mfc-row"><span className="mfc-row-label">Cliente</span><span className="mfc-row-val">{trip.clientName}</span></div>

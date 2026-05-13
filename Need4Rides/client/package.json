@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@react-leaflet/core": "^2.1.0",
+    "@stripe/react-stripe-js": "^6.3.0",
+    "@stripe/stripe-js": "^9.5.0",
     "axios": "^1.15.1",
     "jspdf": "^4.2.1",
     "leaflet": "^1.9.4",

@@ -69,8 +69,12 @@ const faturaRoutes = require('./routes/faturaRoutes');
 app.use('/api/fatura', faturaRoutes); 
 
 // Rotas de reabastecimentos
-const reabastecimentoRoutes = require('./routes/reabastecimentosRoutes');  
+const reabastecimentoRoutes = require('./routes/reabastecimentosRoutes');
 app.use('/api/reabastecimento', reabastecimentoRoutes);
+
+// Rotas de pagamento
+const pagamentoRoutes = require('./routes/pagamentoRoutes');
+app.use('/api/pagamento', pagamentoRoutes);
 
 
 

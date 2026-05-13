@@ -1,92 +1,148 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import heroBg from '../assets/images/LA.jpg';
 import stripeImg from '../assets/images/stripe.png';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/Pagamento.css';
 
-function StripeForm() {
-  const [num, setNum] = useState('');
-  const fmt = v => v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
+// ── Formulário real do Stripe ────────────────────────────────────────────────
+function CheckoutForm({ viagemId, preco, onSuccess }) {
+  const stripe   = useStripe();
+  const elements = useElements();
+  const [processing, setProcessing] = useState(false);
+  const [erro, setErro]             = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setProcessing(true);
+    setErro(null);
+
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      confirmParams: { return_url: window.location.href },
+      redirect: 'if_required',
+    });
+
+    if (error) {
+      setErro(error.message);
+      setProcessing(false);
+      return;
+    }
+
+    if (paymentIntent?.status === 'succeeded') {
+      try {
+        const token = localStorage.getItem('token');
+        await fetch('http://localhost:3000/api/pagamento/confirmar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ viagemId, paymentIntentId: paymentIntent.id }),
+        });
+      } catch {
+        // pagamento confirmado no Stripe mesmo que o backend falhe
+      }
+      onSuccess();
+    }
+
+    setProcessing(false);
+  };
 
   return (
-    <div className="pag-form">
+    <form onSubmit={handleSubmit} className="pag-form">
       <div className="pag-stripe-badge">
         <img src={stripeImg} alt="Stripe" />
         <span>Pagamento seguro via Stripe</span>
       </div>
 
-      <div className="pag-card-preview">
-        <span className="pag-card-chip" />
-        <span className="pag-card-number">{num || '•••• •••• •••• ••••'}</span>
-        <div className="pag-card-bottom">
-          <span className="pag-card-label-sm">Titular</span>
-          <span className="pag-card-label-sm">Validade</span>
-        </div>
-      </div>
+      <PaymentElement options={{ layout: 'tabs' }} />
 
-      <div className="pag-field">
-        <label>Número do Cartão</label>
-        <input
-          type="text"
-          placeholder="1234 5678 9012 3456"
-          value={num}
-          maxLength={19}
-          onChange={e => setNum(fmt(e.target.value))}
-        />
+      {erro && (
+        <p style={{ color: '#ff6b6b', fontSize: '0.85rem', margin: 0 }}>{erro}</p>
+      )}
+
+      <div className="pag-actions">
+        <button type="button" className="pag-btn-back" onClick={() => window.history.back()}>
+          ← Voltar
+        </button>
+        <button type="submit" className="pag-btn-pay" disabled={!stripe || processing}>
+          {processing ? 'A processar...' : `Pagar €${preco}`}
+        </button>
       </div>
-      <div className="pag-field">
-        <label>Nome do Titular</label>
-        <input type="text" placeholder="Como aparece no cartão" />
-      </div>
-      <div className="pag-row">
-        <div className="pag-field">
-          <label>Data de Validade</label>
-          <input type="text" placeholder="MM/AA" maxLength={5} />
-        </div>
-        <div className="pag-field">
-          <label>CVV</label>
-          <input type="password" placeholder="•••" maxLength={4} />
-        </div>
-      </div>
-    </div>
+    </form>
   );
 }
 
+// ── Página principal ─────────────────────────────────────────────────────────
 export default function Pagamento() {
-  const navigate = useNavigate();
-  const [paid, setPaid] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const price = '€18.50';
+  const navigate  = useNavigate();
+  const location  = useLocation();
+  const [menuOpen, setMenuOpen]       = useState(false);
+  const [clientSecret, setClientSecret] = useState(null);
+  const [preco, setPreco]             = useState(null);
+  const [paid, setPaid]               = useState(false);
+  const [erro, setErro]               = useState(null);
+
+  const viagemId = location.state?.viagemId;
 
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
-  useEffect(() => {
-    document.body.className = tema;
-    localStorage.setItem('tema', tema);
-  }, [tema]);
+  useEffect(() => { document.body.className = tema; localStorage.setItem('tema', tema); }, [tema]);
   const alternarTema = () => setTema(prev => prev === 'escuro' ? 'claro' : 'escuro');
+
+  useEffect(() => {
+    if (!viagemId) { setErro('Nenhuma viagem encontrada.'); return; }
+
+    const token = localStorage.getItem('token');
+    fetch('http://localhost:3000/api/pagamento/criar-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ viagemId }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+          setPreco((data.amount / 100).toFixed(2));
+        } else {
+          setErro(data.message || 'Erro ao iniciar pagamento.');
+        }
+      })
+      .catch(() => setErro('Erro de ligação ao servidor.'));
+  }, [viagemId]);
+
+  const stripeOptions = {
+    clientSecret,
+    appearance: {
+      theme: 'night',
+      variables: {
+        colorPrimary: '#f5c518',
+        colorBackground: 'rgba(18,18,26,0)',
+        colorText: '#f0f0f0',
+        colorDanger: '#ff6b6b',
+        borderRadius: '12px',
+        fontFamily: 'Segoe UI, system-ui, sans-serif',
+      },
+    },
+  };
 
   return (
     <div className="pag-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="pag-overlay" />
 
-      {/* Navbar */}
       <nav className="pag-navbar">
         <span className="pag-logo" onClick={() => navigate('/')}>Need4Rides</span>
 
-        <div
-          className={`pag-hamburger ${menuOpen ? 'open' : ''}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <span></span>
-          <span></span>
-          <span></span>
+        <div className={`pag-hamburger ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
+          <span /><span /><span />
         </div>
 
         <ul className={`pag-nav-links ${menuOpen ? 'active' : ''}`}>
-          <li><a onClick={() => { navigate('/'); setMenuOpen(false); }}>Home</a></li>
+          <li><a onClick={() => { navigate('/home'); setMenuOpen(false); }}>Home</a></li>
           <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
-          <li><a onClick={() => { navigate('/viagem'); setMenuOpen(false); }}>Viagem</a></li>
           <li><a className="active">Pagamento</a></li>
           <li>
             <button className="pag-theme-btn" onClick={alternarTema}>
@@ -99,9 +155,33 @@ export default function Pagamento() {
 
       <div className="pag-wrapper">
 
-        {!paid ? (
-          <div className="pag-card">
+        {paid ? (
+          <div className="pag-card pag-success">
+            <div className="pag-success-icon">✓</div>
+            <h2>Pagamento Confirmado!</h2>
+            <p>A tua viagem foi paga com sucesso.</p>
+            <div className="pag-success-actions">
+              <button className="pag-btn-pay" onClick={() => navigate('/home')}>Voltar ao Início</button>
+            </div>
+          </div>
 
+        ) : erro ? (
+          <div className="pag-card pag-success">
+            <div className="pag-success-icon" style={{ background: 'linear-gradient(135deg,#ff6b6b,#ee5a24)' }}>✕</div>
+            <h2>Erro</h2>
+            <p>{erro}</p>
+            <div className="pag-success-actions">
+              <button className="pag-btn-back" onClick={() => navigate(-1)}>← Voltar</button>
+            </div>
+          </div>
+
+        ) : !clientSecret ? (
+          <div className="pag-card" style={{ alignItems: 'center', gap: '1rem' }}>
+            <p style={{ color: '#e9e9e9' }}>A preparar pagamento...</p>
+          </div>
+
+        ) : (
+          <div className="pag-card">
             <div className="pag-header">
               <div>
                 <h1>Pagamento</h1>
@@ -109,33 +189,15 @@ export default function Pagamento() {
               </div>
               <div className="pag-price-box">
                 <span className="pag-price-label">Total</span>
-                <span className="pag-price-value">{price}</span>
+                <span className="pag-price-value">€{preco}</span>
               </div>
             </div>
 
             <div className="pag-divider" />
 
-            <StripeForm />
-
-            <div className="pag-divider" />
-
-            <div className="pag-actions">
-              <button className="pag-btn-back" onClick={() => navigate(-1)}>← Voltar</button>
-              <button className="pag-btn-pay" onClick={() => setPaid(true)}>
-                Confirmar Pagamento · {price}
-              </button>
-            </div>
-
-          </div>
-        ) : (
-          <div className="pag-card pag-success">
-            <div className="pag-success-icon">✓</div>
-            <h2>Pagamento Confirmado!</h2>
-            <p>A tua viagem foi paga com sucesso.</p>
-            <div className="pag-success-actions">
-              <button className="pag-btn-pay" onClick={() => navigate('/profile')}>Ver Histórico</button>
-              <button className="pag-btn-back" onClick={() => navigate('/')}>Voltar ao Início</button>
-            </div>
+            <Elements stripe={stripePromise} options={stripeOptions}>
+              <CheckoutForm viagemId={viagemId} preco={preco} onSuccess={() => setPaid(true)} />
+            </Elements>
           </div>
         )}
 

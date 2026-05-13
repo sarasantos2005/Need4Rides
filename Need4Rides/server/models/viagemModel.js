@@ -81,10 +81,13 @@ const viagemSchema = new mongoose.Schema({
         default: []
     },
 
-    motorista_proposto: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Turno' 
-    }
+    motorista_proposto: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Turno'
+    },
+
+    pago: { type: Boolean, default: false },
+    stripe_payment_id: { type: String, default: null },
 }, { timestamps: true });
 
 viagemSchema.index({ "morada_inicial_viagem.localizacao": "2dsphere" });
