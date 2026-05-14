@@ -167,10 +167,31 @@ exports.confirmacaoCliente = async (req, res) => {
     }
 
     const viagem = await Viagem.findById(viagemId);
-    await Viagem.findByIdAndUpdate(viagemId, {
-      turno: viagem.motorista_proposto,
-      $unset: { motorista_proposto: "" }
+    const viagemAtualizada = await Viagem.findByIdAndUpdate(
+      viagemId,
+      { turno: viagem.motorista_proposto, $unset: { motorista_proposto: "" } },
+      { new: true }
+    ).populate({
+      path: 'turno',
+      populate: [
+        { path: 'motorista', select: 'nome email' },
+        { path: 'taxi', select: 'marca modelo matricula' }
+      ]
     });
+
+    const io = req.app.get('io');
+    io.to(`viagem_${viagemId}`).emit('motorista_encontrado', {
+      motorista: {
+        nome: viagemAtualizada.turno?.motorista?.nome,
+        email: viagemAtualizada.turno?.motorista?.email,
+      },
+      taxi: {
+        marca: viagemAtualizada.turno?.taxi?.marca,
+        modelo: viagemAtualizada.turno?.taxi?.modelo,
+        matricula: viagemAtualizada.turno?.taxi?.matricula,
+      }
+    });
+
 
     res.status(200).json({ message: "Motorista confirmado! Aguarde a chegada. " });
   } catch (error) {

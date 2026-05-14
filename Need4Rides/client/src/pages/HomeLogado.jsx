@@ -5,6 +5,7 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/Home.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
@@ -151,6 +152,37 @@ export default function HomeLogado() {
   const [showMap, setShowMap] = useState(null);
   const [userData, setUserData] = useState({ nome: 'Utilizador' });
   const [userLocation, setUserLocation] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    // Procuramos a viagem ativa tanto no estado como no storage
+    const ativa = activeTrip || JSON.parse(localStorage.getItem('viagemAtiva'));
+    
+    if (token && ativa?.viagemId) {
+      const socket = io('http://localhost:3000', { auth: { token } });
+
+      socket.on('connect', () => {
+        console.log('Socket Conectado no Home. Sala:', ativa.viagemId);
+        socket.emit('entrar_viagem', ativa.viagemId);
+      });
+
+      socket.on('motorista_encontrado', (data) => {
+        console.log('MOTORISTA RECEBIDO NO FRONT:', data);
+        
+        // IMPORTANTE: Ajustar para que 'driver' no storage e 'motorista' no controller coincidam
+        const dadosAtualizados = {
+          ...ativa,
+          motorista: data.motorista, // O controller envia 'motorista'
+          taxi: data.taxi
+        };
+
+        setActiveTrip(dadosAtualizados);
+        localStorage.setItem('viagemAtiva', JSON.stringify(dadosAtualizados));
+      });
+
+      return () => socket.disconnect();
+    }
+  }, [activeTrip?.viagemId]); // Re-executa se o ID da viagem mudar
 
   useEffect(() => {
     carregarDados();
@@ -304,8 +336,12 @@ export default function HomeLogado() {
               {activeTrip ? (
                 <div className="dash-card dash-card--active">
                   <div className="dash-card-badge">🚕 Em curso</div>
-                  <h3 className="dash-card-title">A caminho de <strong>{activeTrip.destino.morada}</strong></h3>
-                  <p className="dash-card-sub">Motorista: {activeTrip.driver.nome} · Tempo de espera: {activeTrip.eta.wait}</p>
+                  <h3 className="dash-card-title">A caminho de <strong>{activeTrip.form?.destino?.morada ?? "..."}</strong></h3>
+                  <p className="dash-card-sub">
+                    {activeTrip.motorista
+                    ? `Motorista: ${activeTrip.motorista.nome} · Tempo de espera: ${activeTrip.eta?.wait}`
+                    : 'A aguardar motorista...'}
+                  </p>
                   <button className="dash-btn dash-btn--primary" onClick={() => navigate('/aguardar-taxi')}>
                     Ver viagem
                   </button>
@@ -357,7 +393,7 @@ export default function HomeLogado() {
                 <ul className="trips-list">
                   {recentTrips.length > 0 ? (
                   recentTrips.slice(0,3).map(trip => (
-                    <li key={trip.id} className="trip-item">
+                    <li key={trip.id || trip._id} className="trip-item">
                       <div className="trip-route">
                         <span className="trip-origin">{trip.morada_inicial_viagem.morada}</span>
                         <span className="trip-arrow">→</span>

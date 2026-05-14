@@ -410,6 +410,7 @@ export default function PedirTaxi() {
           form, 
           estimate
         }));
+        window.dispatchEvent(new Event('storage'));
         navigate('/aguardar-taxi');
       }
     } catch (err) {
@@ -456,8 +457,8 @@ export default function PedirTaxi() {
 
           <li><a onClick={() => { navigate('/home'); setMenuOpen(false); }}>Home</a></li>
           <li><a onClick={() => { navigate('/services'); setMenuOpen(false); }}>Serviços</a></li>
-          <li><a class="active">Pedir Táxi</a></li>
-          <li><a a onClick={() => { navigate('/viagem'); setMenuOpen(false); }}>Viagem</a></li>
+          <li><a className="active">Pedir Táxi</a></li>
+          <li><a onClick={() => { navigate('/viagem'); setMenuOpen(false); }}>Viagem</a></li>
           <li>
             <button className="pt-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
