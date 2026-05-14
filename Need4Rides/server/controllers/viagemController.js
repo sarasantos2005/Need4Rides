@@ -168,7 +168,6 @@ exports.pedirTaxi = async (req, res) => {
 exports.confirmacaoCliente = async (req, res) => {
   try {
     const { viagemId, confirma, motoristaId } = req.body;
-console.log('CONFIRMACAO CLIENTE - viagemId:', viagemId, '| confirma:', confirma);
 
     if (!confirma) {
       const turno = await Turno.findById(motoristaId);
@@ -194,14 +193,9 @@ console.log('CONFIRMACAO CLIENTE - viagemId:', viagemId, '| confirma:', confirma
       ]
     });
 
-    console.log('TURNO APÓS UPDATE:', viagemAtualizada?.turno);
-    console.log('MOTORISTA:', viagemAtualizada?.turno?.motorista);
-
     const io = req.app.get('io');
-    console.log('IO EXISTE?', !!io);
     
     const sala = io.sockets.adapter.rooms.get(`viagem_${viagemId}`);
-    console.log('CLIENTES NA SALA:', sala ? sala.size : 0);
 
     io.to(`viagem_${viagemId}`).emit('motorista_encontrado', {
       motorista: {
@@ -214,8 +208,17 @@ console.log('CONFIRMACAO CLIENTE - viagemId:', viagemId, '| confirma:', confirma
         matricula: viagemAtualizada.turno?.taxi?.matricula,
       }
     });
-    console.log('EVENTO EMITIDO');
 
+    io.to(`motorista_${viagemAtualizada.turno._id}`).emit('nova_viagem_atribuida', {
+      viagemId: viagemAtualizada._id,
+      status: viagemAtualizada.status,
+      viagem: {
+        origem: viagemAtualizada.morada_inicial_viagem,
+        destino: viagemAtualizada.morada_final_viagem,
+      },
+      cliente: viagemAtualizada.cliente,
+      info: viagemAtualizada
+    });
 
     res.status(200).json({ message: "Motorista confirmado! Aguarde a chegada. " });
   } catch (error) {

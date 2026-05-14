@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useEffect, useRef } from 'react';
+import { MotoristaViagemProvider } from './components/MotoristaViagemContext';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -100,6 +101,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ViagemPoller />
+      <MotoristaViagemProvider>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<HomeLogado />} />
@@ -132,6 +134,7 @@ export default function App() {
         <Route path="/gestor/precos" element={<GestorPrecos />} />
         
       </Routes>
+      </MotoristaViagemProvider>
     </BrowserRouter>
   );
 }
