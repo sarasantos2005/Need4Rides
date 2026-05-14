@@ -204,13 +204,13 @@ exports.confirmacaoCliente = async (req, res) => {
         viagemId,
         { turno: viagem.motorista_proposto, $unset: { motorista_proposto: "" } },
         { new: true }
-      ).populate({
-        path: 'turno',
-        populate: [
-          { path: 'motorista', select: 'nome email' },
-          { path: 'taxi', select: 'marca modelo matricula' }
-        ]
-      });
+      ).populate([
+          { 
+            path: 'turno',
+            populate: [{ path: 'motorista', select: 'nome email' }, { path: 'taxi', select: 'marca modelo matricula' }]
+          },
+          { path: 'cliente', select: 'nome' }
+      ]);
       
       const sala = io.sockets.adapter.rooms.get(`viagem_${viagemId}`);
 
@@ -235,6 +235,13 @@ exports.confirmacaoCliente = async (req, res) => {
         },
         cliente: viagemAtualizada.cliente,
         info: viagemAtualizada
+      });
+
+      io.to(`motorista_${viagemAtualizada.turno._id}`).emit('notificacao_viagem_confirmada', {
+        viagemId: viagemAtualizada._id,
+        clienteNome: viagemAtualizada.cliente.nome,
+        origem: viagemAtualizada.morada_inicial_viagem.morada,
+        destino: viagemAtualizada.morada_final_viagem.morada
       });
 
       io.to(`viagem_${viagemId}`).emit('cliente_confirmou', { status: 'aguardandoInicio' });
@@ -458,7 +465,6 @@ exports.aceitarPedido = async (req, res) => {
         motorista: pedido.motorista_proposto.motorista,
         taxi: pedido.motorista_proposto.taxi
       });
-      console.log("Aqui");
     }
 
     res.status(200).json({

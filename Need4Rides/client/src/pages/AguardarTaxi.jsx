@@ -50,9 +50,10 @@ export default function AguardarTaxi() {
     price: '--',
     wait: '--'
   };
-
+  
+  const tripAtiva = JSON.parse(localStorage.getItem('viagemAtiva'));
   const [dotIdx, setDotIdx] = useState(0);
-  const [status, setStatus] = useState("procurando");
+  const [status, setStatus] = useState(tripAtiva ? tripAtiva.status : "procurando");
   const [condutor, setDriver] = useState(null);
   const [seconds, setSeconds] = useState(0);
   const [userData, setUserData] = useState(null);
@@ -103,7 +104,7 @@ export default function AguardarTaxi() {
         if (atualizada.motorista) setDriver(atualizada.motorista);
         if (atualizada.status) setStatus(atualizada.status);
         
-        if (atualizada.status === 'emCurso') {
+        if (atualizada.status === 'emCurso' || atualizada.status === 'aguardandoInicio') {
           navigate("/viagem");
         }
       }
