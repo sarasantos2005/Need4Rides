@@ -182,12 +182,17 @@ exports.confirmacaoCliente = async (req, res) => {
     const io = req.app.get('io');
 
     if (!confirma) {
-      const turno = await Turno.findById(motoristaId);
-      if (!turno) return res.status(404).json({ message: "Turno não encontrado." });
+      const viagem = await Viagem.findById(viagemId).populate('motorista_proposto');
+  
+      if (!viagem || !viagem.motorista_proposto) {
+        return res.status(404).json({ message: "Pedido ou motorista proposto não encontrado." });
+      }
+
+      const motoristaParaRejeitar = viagem.motorista_proposto.motorista;
 
       await Viagem.findByIdAndUpdate(viagemId, {
         $unset: { motorista_proposto: "" }, 
-        $addToSet: { motoristas_rejeitados: turno.motorista }
+        $addToSet: { motoristas_rejeitados: motoristaParaRejeitar }
       });
 
       io.to(`viagem_${viagemId}`).emit('cliente_rejeitou', { status: 'procurando' });
@@ -319,6 +324,11 @@ exports.cancelarViagem = async(req, res) => {
     turnosAtivos.forEach(turno => {
       io.to(`motorista_${turno._id}`).emit('pedido_removido', viagemId);
     });
+
+    const roomName = `viagem_${viagemId}`;
+    io.to(roomName).emit('viagem_cancelada', { message: "A viagem foi cancelada." });
+
+    io.in(roomName).socketsLeave(roomName);
     
     res.status(200).json({ success: true, message: "Pedido ignorado." });
   } catch (error) {

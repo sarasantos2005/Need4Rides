@@ -53,7 +53,6 @@ function ViagemPoller() {
 
       const socket = io('http://localhost:3000', { auth: { token }, reconnection: true });
       socketRef.current = socket;
-      console.log('SOCKET CRIADO:', socket.id);
 
       socket.on('connect', () => {
         const viagemAtualizada = JSON.parse(localStorage.getItem('viagemAtiva'));
@@ -69,8 +68,6 @@ function ViagemPoller() {
 
       socket.on('motorista_encontrado', (data) => {
         const viagemAtual = JSON.parse(localStorage.getItem('viagemAtiva'));
-        console.log("ID no Storage:", viagemAtual?.viagemId);
-        console.log("Evento recebido para:", data);
         
         const novaViagem = {
           ...viagemAtual,
@@ -98,6 +95,13 @@ function ViagemPoller() {
 
         socket.disconnect();
         navigate('/pagamento', { state: { viagemId: data.viagemId } });
+      });
+
+      socket.on('viagem_cancelada', () => {
+        localStorage.removeItem('viagemAtiva');
+        
+        socket.disconnect();
+        navigate('/pedir-taxi');
       });
 
       socket.on('cliente_confirmou', (data) => {
