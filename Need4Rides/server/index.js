@@ -50,6 +50,11 @@ io.on('connection', (socket) => {
   socket.on('entrar_viagem', (viagemId) => {
     socket.join(`viagem_${viagemId}`);
   });
+
+  socket.on('entrar_motorista', (turnoId) => {
+    socket.join(`motorista_${turnoId}`);
+    console.log(`Motorista ${turnoId} na sala`);
+  });
 });
 
 // Middlewares existentes

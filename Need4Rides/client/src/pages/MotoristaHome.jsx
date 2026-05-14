@@ -8,6 +8,7 @@ import Loading from '../components/Loading';
 import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
+import { io } from 'socket.io-client';
 
 function minutosAgora() {
   const now = new Date();
@@ -85,7 +86,6 @@ export default function MotoristaHome() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [apiStatus, setApiStatus] = useState({
     user: false,
-    trips: false,
     taxi: false,
     turno: false,
     historico: false
@@ -199,6 +199,10 @@ export default function MotoristaHome() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      if (response) {
+        setViagensPendentes(prev => prev.filter(p => p._id !== viagemId));
+      }
+
       alert(response.data.message);
 
       // Refresh aos dados
@@ -229,6 +233,8 @@ export default function MotoristaHome() {
       );
 
       alert(response.data.message);
+
+      setViagensPendentes(prev => prev.filter(p => p._id !== viagemId));
 
       // Refresh aos dados
       await Promise.all([
@@ -298,13 +304,29 @@ export default function MotoristaHome() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-    const t = setInterval(() => {
-      fetchViagensPendentes(token, setViagensPendentes, setApiStatus);
-    }, 3000);
-    return () => clearInterval(t);
-  }, []);
+    const token = localStorage.getItem("token");
+    if (!token || !turnoAtivo?._id) return;
+
+    const socket = io('http://localhost:3000', { auth: { token } });
+
+    socket.on('connect', () => {
+      socket.emit('entrar_motorista', turnoAtivo._id);
+    });
+
+    socket.on('novo_pedido', (pedido) => {
+      setViagensPendentes(prev => {
+        const jaExiste = prev.some(p => p._id === pedido._id);
+        if (jaExiste) return prev;
+        return [pedido, ...prev].slice(0, 5);
+      });
+    });
+    
+    socket.on('pedido_removido', (viagemId) => {
+      setViagensPendentes(prev => prev.filter(p => p._id !== viagemId));
+    });
+
+    return () => socket.disconnect();
+  }, [turnoAtivo?._id]);
 
   //Encontrar os dados da marca (id no marcasEModelos = marca na BD)
   const getDadosMarca = (idBD) => {

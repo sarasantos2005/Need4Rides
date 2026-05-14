@@ -134,6 +134,19 @@ exports.pedirTaxi = async (req, res) => {
 
     await novoPedido.save();
 
+    const turnosAtivos = await Turno.find({ estado: 'Ativo' });
+    const io = req.app.get('io');
+    
+    turnosAtivos.forEach(turno => {
+      io.to(`motorista_${turno._id}`).emit('novo_pedido', {
+        _id: novoPedido._id,
+        morada_inicial_viagem: pontoOrigem,
+        morada_final_viagem: pontoDestino,
+        n_passageiros: n_passageiros,
+        nivel_conforto: nivel_conforto,
+      });
+    });
+
     res.status(201).json({
       success: true,
       message: "Pedido de táxi registado. Aguarde resposta de um motorista.",
@@ -282,6 +295,11 @@ exports.cancelarViagem = async(req, res) => {
       res.status(500).json({ success: false, message: "Ocorreu um erro ao tentar eliminar a viagem."});
     }
     
+    const io = req.app.get('io');
+    const turnosAtivos = await Turno.find({ estado: 'Ativo' });
+    turnosAtivos.forEach(turno => {
+      io.to(`motorista_${turno._id}`).emit('pedido_removido', viagemId);
+    });
     
     res.status(200).json({ success: true, message: "Pedido ignorado." });
   } catch (error) {
@@ -379,6 +397,12 @@ exports.aceitarPedido = async (req, res) => {
       { motorista_proposto: turnoId }, 
       { returnDocument: 'after', strict: false }
     );
+
+    const io = req.app.get('io');
+    const turnosAtivos = await Turno.find({ estado: 'Ativo' });
+    turnosAtivos.forEach(turno => {
+      io.to(`motorista_${turno._id}`).emit('pedido_removido', viagemId);
+    });
 
     if (!pedido) {
       return res.status(404).json({ message: "Pedido não encontrado." });
