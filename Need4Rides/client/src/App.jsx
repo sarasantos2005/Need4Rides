@@ -38,59 +38,98 @@ function ViagemPoller() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    const tentarLigar = () => {
+    const setupSocket = () => {
       const token = localStorage.getItem('token');
       const viagemAtiva = JSON.parse(localStorage.getItem('viagemAtiva'));
 
-      if (!token || !viagemAtiva?.viagemId || viagemAtiva?.motorista) return;
-      if (socketRef.current?.connected) return;
+      if (!token || !viagemAtiva?.viagemId) {
+        if (socketRef.current) {
+          socketRef.current.disconnect();
+          socketRef.current = null;
+        }
+        return;
+      }
+      if (socketRef.current?.connected) return;  
 
-      socketRef.current?.disconnect();
-
-      const socket = io('http://localhost:3000', { auth: { token } });
+      const socket = io('http://localhost:3000', { auth: { token }, reconnection: true });
       socketRef.current = socket;
       console.log('SOCKET CRIADO:', socket.id);
 
       socket.on('connect', () => {
-        console.log('CONNECT DISPAROU:', socket.id);
         const viagemAtualizada = JSON.parse(localStorage.getItem('viagemAtiva'));
         if (viagemAtualizada?.viagemId) {
-          console.log('A ENTRAR NA SALA:', viagemAtualizada.viagemId);
           socket.emit('entrar_viagem', viagemAtualizada.viagemId);
-          window.dispatchEvent(new Event('sala_pronta'));
+          console.log('A ENTRAR NA SALA:', "viagem_" + viagemAtualizada.viagemId);
         }
       });
 
-      socket.on('connect_error', (err) => {
-        console.error('CONNECT_ERROR:', err.message, err);
-      });
-
-      socket.on('disconnect', (reason) => {
-        console.log('DISCONNECT:', reason);
+      socket.onAny((event, ...args) => {
+        console.log(`📩 EVENTO GLOBAL: ${event}`, args);
       });
 
       socket.on('motorista_encontrado', (data) => {
         const viagemAtual = JSON.parse(localStorage.getItem('viagemAtiva'));
-        localStorage.setItem('viagemAtiva', JSON.stringify({
+        console.log("ID no Storage:", viagemAtual?.viagemId);
+        console.log("Evento recebido para:", data);
+        
+        const novaViagem = {
           ...viagemAtual,
           motorista: data.motorista,
-          taxi: data.taxi
+          taxi: data.taxi,
+          status: 'aguardandoConfirmacao'
+        };
+        
+        localStorage.setItem('viagemAtiva', JSON.stringify(novaViagem));
+        window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new Event('viagem_atualizada'));
+      });
+
+      socket.on('viagem_iniciada', (data) => {
+        const viagemAtual = JSON.parse(localStorage.getItem('viagemAtiva'));
+        localStorage.setItem('viagemAtiva', JSON.stringify({
+          ...viagemAtual,
+          status: 'emCurso'
         }));
         window.dispatchEvent(new Event('storage'));
-        console.log('Dispatch');
-        socketRef.current?.disconnect();
+      });
+
+      socket.on('viagem_finalizada', (data) => {
+        localStorage.removeItem('viagemAtiva');
+
+        socket.disconnect();
+        navigate('/pagamento', { state: { viagemId: data.viagemId } });
+      });
+
+      socket.on('cliente_confirmou', (data) => {
+        const viagemAtual = JSON.parse(localStorage.getItem('viagemAtiva'));
+        localStorage.setItem('viagemAtiva', JSON.stringify({
+          ...viagemAtual,
+          status: 'aguardandoInicio'
+        }));
+        
+        navigate('/viagem'); 
+      });
+
+      socket.on('cliente_rejeitou', () => {
+        const viagemAtual = JSON.parse(localStorage.getItem('viagemAtiva'));
+        localStorage.setItem('viagemAtiva', JSON.stringify({
+          ...viagemAtual,
+          motorista: null,
+          status: 'procurando'
+        }));
       });
     };
 
-    // Tenta imediatamente
-    tentarLigar();
+    setupSocket();
+      
+    const handleStorageChange = () => setupSocket();
+    window.addEventListener('storage', handleStorageChange);
 
-    // Ouve mudanças no localStorage
-    window.addEventListener('storage', tentarLigar);
+    window.addEventListener('viagem_atualizada', setupSocket);
 
     return () => {
-      window.removeEventListener('storage', tentarLigar);
-      socketRef.current?.disconnect();
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('viagem_atualizada', setupSocket);
     };
   }, []);
 

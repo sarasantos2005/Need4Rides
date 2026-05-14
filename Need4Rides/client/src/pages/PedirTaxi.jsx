@@ -407,24 +407,15 @@ export default function PedirTaxi() {
         const novaViagem = {
           viagemId: response.data.pedido.id,
           form, 
-          estimate
+          estimate,
+          status: 'procurando'
         }
 
         setConfirmed(true);  
         localStorage.setItem('viagemAtiva', JSON.stringify(novaViagem));
-        window.dispatchEvent(new Event('storage'));
+        window.dispatchEvent(new Event('viagem_atualizada'));
         
-        const onSalaEntrada = () => {
-          window.removeEventListener('sala_pronta', onSalaEntrada);
-          navigate('/aguardar-taxi');
-        };
-
-        window.addEventListener('sala_pronta', onSalaEntrada);
-
-        setTimeout(() => {
-          window.removeEventListener('sala_pronta', onSalaEntrada);
-          navigate('/aguardar-taxi');
-        }, 2000);
+        navigate('/aguardar-taxi');
       }
     } catch (err) {
       alert("Erro ao pedir o táxi: " + (err.response?.data?.message || "Erro desconhecido"));

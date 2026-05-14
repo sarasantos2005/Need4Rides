@@ -30,6 +30,8 @@ export default function AguardarTaxi() {
       }
     };
 
+    console.log(status);
+
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
   }, []);
@@ -95,48 +97,37 @@ export default function AguardarTaxi() {
   // }, []);
 
   useEffect(() => {
-    
-    if (!viagemId) {
-      return;
-    }
-
-    const buscarStatus = async() => {
-      try {
-        const token = localStorage.getItem('token');
-
-        const response = await axios.get(`http://localhost:3000/api/viagem/status/${viagemId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const data = response.data;
-
-        setStatus(data.status); 
-        if (data.motorista) setDriver(data.motorista); 
-
-        if(data.status === "emCurso"){
-          localStorage.setItem('viagemAtiva', JSON.stringify({
-            ...JSON.parse(localStorage.getItem('viagemAtiva')),
-            status: 'emCurso'
-          }));
-          clearInterval(interval);
+    const onStorage = () => {
+      const atualizada = JSON.parse(localStorage.getItem('viagemAtiva'));
+      if (atualizada) {
+        if (atualizada.motorista) setDriver(atualizada.motorista);
+        if (atualizada.status) setStatus(atualizada.status);
+        
+        if (atualizada.status === 'emCurso') {
           navigate("/viagem");
-        } else if (data.status === 'finalizada') {
-          localStorage.removeItem('viagemAtiva');
-          clearInterval(interval);
-          navigate('/pedir-taxi');
-        } 
-      } catch (err) {
-        console.error("Erro ao buscar status:", err.message);
+        }
       }
     };
 
-    buscarStatus();
-    const interval = setInterval(buscarStatus, 3000);
+    window.addEventListener('storage', onStorage);
+    onStorage(); 
 
-    return () => clearInterval(interval);
-    }, [viagemId]);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [navigate]);
+
+  useEffect(() => {
+  const checkStatus = () => {
+    const ativa = JSON.parse(localStorage.getItem('viagemAtiva'));
+    if (ativa?.motorista) {
+      setDriver(ativa.motorista); 
+      setStatus('aguardandoConfirmacao');
+    }
+  };
+
+  window.addEventListener('storage', checkStatus);
+  checkStatus(); 
+  return () => window.removeEventListener('storage', checkStatus);
+}, []);
 
   const handleConfirmacao = async(aceite) => {
     try {
@@ -155,12 +146,13 @@ export default function AguardarTaxi() {
         })
       });
 
-      if(response.ok) {
-        if(aceite) {
-          setStatus("aguardandoInicio");
-        } else {
-          setStatus("procurando");
-        }
+      if(aceite) {
+        setStatus("aguardandoInicio");
+      } else {
+        setStatus("procurando");
+        setDriver(null);
+        const ativa = JSON.parse(localStorage.getItem('viagemAtiva'));
+        localStorage.setItem('viagemAtiva', JSON.stringify({ ...ativa, motorista: null }))
       }
     } catch (err) {
       console.error("Erro ao confirmar:", err);

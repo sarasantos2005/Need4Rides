@@ -24,6 +24,9 @@ exports.iniciarViagem = async (req, res) => {
       { new: true }
     );
 
+    const io = req.app.get('io');
+    io.to(`viagem_${viagemId}`).emit('viagem_iniciada', viagemIniciada);
+    
     res.status(200).json({ message: "Viagem iniciada com sucesso! ", viagem: viagemIniciada });
   } catch (error) {
     res.status(500).json({ success: false, message: "Erro ao registar viagem." });
@@ -79,6 +82,14 @@ exports.finalizarViagem = async (req, res) => {
         {new: true}
     );
 
+    const io = req.app.get('io');
+    io.to(`viagem_${viagemId}`).emit('viagem_finalizada', {
+      viagemId: viagemId,
+      precoFinal: preco,
+      distancia: km
+    });
+
+    io.in(`viagem_${viagemId}`).socketsLeave(`viagem_${viagemId}`);
 
     res.status(200).json({
       success: true,
@@ -168,6 +179,7 @@ exports.pedirTaxi = async (req, res) => {
 exports.confirmacaoCliente = async (req, res) => {
   try {
     const { viagemId, confirma, motoristaId } = req.body;
+    const io = req.app.get('io');
 
     if (!confirma) {
       const turno = await Turno.findById(motoristaId);
@@ -177,50 +189,53 @@ exports.confirmacaoCliente = async (req, res) => {
         $unset: { motorista_proposto: "" }, 
         $addToSet: { motoristas_rejeitados: turno.motorista }
       });
+
+      io.to(`viagem_${viagemId}`).emit('cliente_rejeitou', { status: 'procurando' });
+      
       return res.status(200).json({ message: "Motorista rejeitado. O pedido continua pendente. " });
+    } else {
+      const viagem = await Viagem.findById(viagemId);
+      const viagemAtualizada = await Viagem.findByIdAndUpdate(
+        viagemId,
+        { turno: viagem.motorista_proposto, $unset: { motorista_proposto: "" } },
+        { new: true }
+      ).populate({
+        path: 'turno',
+        populate: [
+          { path: 'motorista', select: 'nome email' },
+          { path: 'taxi', select: 'marca modelo matricula' }
+        ]
+      });
+      
+      const sala = io.sockets.adapter.rooms.get(`viagem_${viagemId}`);
+
+      io.to(`viagem_${viagemId}`).emit('cliente_confirmou', {
+        motorista: {
+          nome: viagemAtualizada.turno?.motorista?.nome,
+          email: viagemAtualizada.turno?.motorista?.email,
+        },
+        taxi: {
+          marca: viagemAtualizada.turno?.taxi?.marca,
+          modelo: viagemAtualizada.turno?.taxi?.modelo,
+          matricula: viagemAtualizada.turno?.taxi?.matricula,
+        }
+      });
+
+      io.to(`motorista_${viagemAtualizada.turno._id}`).emit('nova_viagem_atribuida', {
+        viagemId: viagemAtualizada._id,
+        status: viagemAtualizada.status,
+        viagem: {
+          origem: viagemAtualizada.morada_inicial_viagem,
+          destino: viagemAtualizada.morada_final_viagem,
+        },
+        cliente: viagemAtualizada.cliente,
+        info: viagemAtualizada
+      });
+
+      io.to(`viagem_${viagemId}`).emit('cliente_confirmou', { status: 'aguardandoInicio' });
+
+      res.status(200).json({ message: "Motorista confirmado! Aguarde a chegada. " });
     }
-
-    const viagem = await Viagem.findById(viagemId);
-    const viagemAtualizada = await Viagem.findByIdAndUpdate(
-      viagemId,
-      { turno: viagem.motorista_proposto, $unset: { motorista_proposto: "" } },
-      { new: true }
-    ).populate({
-      path: 'turno',
-      populate: [
-        { path: 'motorista', select: 'nome email' },
-        { path: 'taxi', select: 'marca modelo matricula' }
-      ]
-    });
-
-    const io = req.app.get('io');
-    
-    const sala = io.sockets.adapter.rooms.get(`viagem_${viagemId}`);
-
-    io.to(`viagem_${viagemId}`).emit('motorista_encontrado', {
-      motorista: {
-        nome: viagemAtualizada.turno?.motorista?.nome,
-        email: viagemAtualizada.turno?.motorista?.email,
-      },
-      taxi: {
-        marca: viagemAtualizada.turno?.taxi?.marca,
-        modelo: viagemAtualizada.turno?.taxi?.modelo,
-        matricula: viagemAtualizada.turno?.taxi?.matricula,
-      }
-    });
-
-    io.to(`motorista_${viagemAtualizada.turno._id}`).emit('nova_viagem_atribuida', {
-      viagemId: viagemAtualizada._id,
-      status: viagemAtualizada.status,
-      viagem: {
-        origem: viagemAtualizada.morada_inicial_viagem,
-        destino: viagemAtualizada.morada_final_viagem,
-      },
-      cliente: viagemAtualizada.cliente,
-      info: viagemAtualizada
-    });
-
-    res.status(200).json({ message: "Motorista confirmado! Aguarde a chegada. " });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -388,10 +403,14 @@ exports.listarPedidosParaMotorista = async (req, res) => {
 exports.aceitarPedido = async (req, res) => {
   try {
     const { viagemId, turnoId } = req.body;
+    const motoristaId = req.userId;
 
     const pedidoExistente = await Viagem.findById(viagemId);
     if (!pedidoExistente) return res.status(404).json({ message: "Pedido não encontrado." });
     
+    const turnoAtivo = await Turno.findById(turnoId);
+    if (!turnoAtivo) return res.status(404).json({ message: "Turno não encontrado." });
+
     if (pedidoExistente.turno || pedidoExistente.motorista_proposto) {
       return res.status(400).json({ message: "Este pedido já não está disponível." });
     }
@@ -399,25 +418,38 @@ exports.aceitarPedido = async (req, res) => {
     const pedido = await Viagem.findByIdAndUpdate(
       viagemId, 
       { motorista_proposto: turnoId }, 
-      { returnDocument: 'after', strict: false }
+      { new: true, strict: false }
     );
 
     const io = req.app.get('io');
-    const turnosAtivos = await Turno.find({ estado: 'Ativo' });
-    turnosAtivos.forEach(turno => {
-      io.to(`motorista_${turno._id}`).emit('pedido_removido', viagemId);
-    });
 
     if (!pedido) {
       return res.status(404).json({ message: "Pedido não encontrado." });
     }
 
-    await pedido.populate({
-      path: "motorista_proposto",
-      model: 'Viagem',
-      strictPopulate: false,
-      populate: {path: "motorista taxi"}
+    const turnosAtivos = await Turno.find({ estado: 'Ativo' });
+    turnosAtivos.forEach(turno => {
+      io.to(`motorista_${turno._id}`).emit('pedido_removido', viagemId);
     });
+
+    if(pedido.motorista_proposto){
+      await pedido.populate({
+        path: "motorista_proposto",
+        model: 'Turno',
+        populate: [
+          { path: "motorista", select: "nome email" },
+          { path: "taxi", select: "marca modelo matricula" }
+        ]
+      });
+
+      const viagemIdStr = viagemId.toString();
+      console.log(`viagem_${viagemIdStr}`, pedido.motorista_proposto);
+      io.to(`viagem_${viagemIdStr}`).emit('motorista_encontrado', {
+        motorista: pedido.motorista_proposto.motorista,
+        taxi: pedido.motorista_proposto.taxi
+      });
+      console.log("Aqui");
+    }
 
     res.status(200).json({
       message: "Aceitação enviada ao cliente. Aguarde confirmação. ",

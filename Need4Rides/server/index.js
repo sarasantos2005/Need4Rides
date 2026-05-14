@@ -49,6 +49,7 @@ app.set('io', io);
 io.on('connection', (socket) => {
   socket.on('entrar_viagem', (viagemId) => {
     socket.join(`viagem_${viagemId}`);
+    console.log(`Cliente entrou na sala: viagem_${viagemId}`);
   });
 
   socket.on('entrar_motorista', (turnoId) => {
