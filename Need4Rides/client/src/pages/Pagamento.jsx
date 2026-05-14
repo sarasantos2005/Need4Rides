@@ -87,7 +87,7 @@ export default function Pagamento() {
   const [paid, setPaid]               = useState(false);
   const [erro, setErro]               = useState(null);
 
-  const viagemId = location.state?.viagemId;
+  const viagemId = location.state?.viagemId || localStorage.getItem('pagamentoViagemId');
 
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
   useEffect(() => { document.body.className = tema; localStorage.setItem('tema', tema); }, [tema]);
@@ -196,7 +196,7 @@ export default function Pagamento() {
             <div className="pag-divider" />
 
             <Elements stripe={stripePromise} options={stripeOptions}>
-              <CheckoutForm viagemId={viagemId} preco={preco} onSuccess={() => setPaid(true)} />
+              <CheckoutForm viagemId={viagemId} preco={preco} onSuccess={() => { localStorage.removeItem('pagamentoViagemId'); setPaid(true); }} />
             </Elements>
           </div>
         )}

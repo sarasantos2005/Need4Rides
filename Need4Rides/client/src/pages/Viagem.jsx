@@ -125,9 +125,10 @@ export default function Viagem() {
         if (data.info) setCarro(data.info);
 
         if(data.status === "finalizada"){
+          localStorage.setItem('pagamentoViagemId', id);
           localStorage.removeItem('viagemAtiva');
           clearInterval(intervalRef.current);
-          navigate('/pagamento');
+          navigate('/pagamento', { state: { viagemId: id } });
         } else if (data.status === 'aguardandoConfirmacao' || data.status === 'procurando') {
           clearInterval(intervalRef.current);
           navigate('/aguardar-taxi');

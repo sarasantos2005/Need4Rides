@@ -61,11 +61,12 @@ exports.finalizarViagem = async (req, res) => {
     console.log("km calculado:", km);
 
     //RIA 20: Calclar preco com o nivel de conforto, e hora inicial e final
-    const preco = await calcularPreco(viagem.nivel_conforto, viagem.hora_inicial_viagem, horaFim);
+    const precoCalculado = await calcularPreco(viagem.nivel_conforto, viagem.hora_inicial_viagem, horaFim);
+    const preco = Math.max(0.50, precoCalculado);
 
     const viagemFinalizada = await Viagem.findByIdAndUpdate(
         viagemId,
-        {   
+        {
             hora_final_viagem: horaFim,
             morada_final_viagem: {
               morada: destino.morada,
