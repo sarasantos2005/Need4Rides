@@ -155,34 +155,20 @@ export default function HomeLogado() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    // Procuramos a viagem ativa tanto no estado como no storage
-    const ativa = activeTrip || JSON.parse(localStorage.getItem('viagemAtiva'));
-    
+    const ativa = JSON.parse(localStorage.getItem('viagemAtiva'));
+
     if (token && ativa?.viagemId) {
-      const socket = io('http://localhost:3000', { auth: { token } });
+      setActiveTrip(ativa);
 
-      socket.on('connect', () => {
-        console.log('Socket Conectado no Home. Sala:', ativa.viagemId);
-        socket.emit('entrar_viagem', ativa.viagemId);
-      });
+      const onStorage = () => {
+        const atualizada = JSON.parse(localStorage.getItem("viagemAtiva"));
+        if(atualizada?.viagemId) setActiveTrip(atualizada);
+      };
 
-      socket.on('motorista_encontrado', (data) => {
-        console.log('MOTORISTA RECEBIDO NO FRONT:', data);
-        
-        // IMPORTANTE: Ajustar para que 'driver' no storage e 'motorista' no controller coincidam
-        const dadosAtualizados = {
-          ...ativa,
-          motorista: data.motorista, // O controller envia 'motorista'
-          taxi: data.taxi
-        };
-
-        setActiveTrip(dadosAtualizados);
-        localStorage.setItem('viagemAtiva', JSON.stringify(dadosAtualizados));
-      });
-
-      return () => socket.disconnect();
+      window.addEventListener('storage', onStorage);
+      return () => window.removeEventListener('storage', onStorage);
     }
-  }, [activeTrip?.viagemId]); // Re-executa se o ID da viagem mudar
+  }, []);
 
   useEffect(() => {
     carregarDados();
@@ -339,7 +325,7 @@ export default function HomeLogado() {
                   <h3 className="dash-card-title">A caminho de <strong>{activeTrip.form?.destino?.morada ?? "..."}</strong></h3>
                   <p className="dash-card-sub">
                     {activeTrip.motorista
-                    ? `Motorista: ${activeTrip.motorista.nome} · Tempo de espera: ${activeTrip.eta?.wait}`
+                    ? `Motorista: ${activeTrip.motorista.nome} · Tempo de espera: ${activeTrip.estimate?.wait} min`
                     : 'A aguardar motorista...'}
                   </p>
                   <button className="dash-btn dash-btn--primary" onClick={() => navigate('/aguardar-taxi')}>

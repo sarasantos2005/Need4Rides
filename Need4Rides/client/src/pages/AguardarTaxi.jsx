@@ -21,6 +21,17 @@ export default function AguardarTaxi() {
     if (!stored?.viagemId) { navigate('/pedir-taxi'); return; }
 
     setViagemId(stored.viagemId);
+
+    const onStorage = () => {
+      const atualizada = JSON.parse(localStorage.getItem('viagemAtiva'));
+      if (atualizada?.motorista) {
+        setDriver(atualizada.motorista);
+        setStatus('aguardandoConfirmacao');
+      }
+    };
+
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
   
   const viagemAtiva = JSON.parse(localStorage.getItem('viagemAtiva')); 

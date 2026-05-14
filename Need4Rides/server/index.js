@@ -1,6 +1,8 @@
 const { loadEnvFile } = require('node:process');
 loadEnvFile();
 
+const { createServer } = require('http');
+const { Server } = require('socket.io');
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
@@ -27,10 +29,36 @@ if (!DB_URI) {
 }
 
 const app = express();
+const httpServer = createServer(app);
+const originsPermitidas = [
+  'http://localhost:5173', 
+  'http://localhost:5174', 
+  'http://localhost:5175',
+  'http://localhost:3000' 
+];
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: originsPermitidas ,  
+    methods: ['GET', 'POST']
+  }
+});
+
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  socket.on('entrar_viagem', (viagemId) => {
+    socket.join(`viagem_${viagemId}`);
+  });
+});
 
 // Middlewares existentes
 app.use(morgan('tiny'));
-app.use(cors());
+app.use(cors({
+      origin: originsPermitidas,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization']
+    }));
 app.use(helmet());
 app.use(bearer());
 app.use(express.json());
@@ -136,7 +164,7 @@ app.use((err, req, res, next) => {
     console.log("Dados de teste inseridos.");
     */
 
-    const server = app.listen(PORT, () => {
+    const server = httpServer.listen(PORT, () => {
       console.log("Servidor a correr em http://localhost:" + PORT);
     });
 

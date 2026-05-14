@@ -1,4 +1,7 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
+import { useEffect, useRef } from 'react';
+
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
@@ -28,9 +31,75 @@ import MotoristaRequisitarTaxi from './pages/MotoristaRequisitarTaxi';
 import MotoristaRelatorio from './pages/MotoristaRelatorio';
 import MotoristaLayout from './layouts/MotoristaLayout';
 
+//Método em que o sistema não pergunta se há motorista, é avisado quando houver - evitar sobrecarga com mts users
+function ViagemPoller() {
+  const navigate = useNavigate();
+  const socketRef = useRef(null);
+
+  useEffect(() => {
+    const tentarLigar = () => {
+      const token = localStorage.getItem('token');
+      const viagemAtiva = JSON.parse(localStorage.getItem('viagemAtiva'));
+
+      if (!token || !viagemAtiva?.viagemId || viagemAtiva?.motorista) return;
+      if (socketRef.current?.connected) return;
+
+      socketRef.current?.disconnect();
+
+      const socket = io('http://localhost:3000', { auth: { token } });
+      socketRef.current = socket;
+      console.log('SOCKET CRIADO:', socket.id);
+
+      socket.on('connect', () => {
+        console.log('CONNECT DISPAROU:', socket.id);
+        const viagemAtualizada = JSON.parse(localStorage.getItem('viagemAtiva'));
+        if (viagemAtualizada?.viagemId) {
+          console.log('A ENTRAR NA SALA:', viagemAtualizada.viagemId);
+          socket.emit('entrar_viagem', viagemAtualizada.viagemId);
+          window.dispatchEvent(new Event('sala_pronta'));
+        }
+      });
+
+      socket.on('connect_error', (err) => {
+        console.error('CONNECT_ERROR:', err.message, err);
+      });
+
+      socket.on('disconnect', (reason) => {
+        console.log('DISCONNECT:', reason);
+      });
+
+      socket.on('motorista_encontrado', (data) => {
+        const viagemAtual = JSON.parse(localStorage.getItem('viagemAtiva'));
+        localStorage.setItem('viagemAtiva', JSON.stringify({
+          ...viagemAtual,
+          motorista: data.motorista,
+          taxi: data.taxi
+        }));
+        window.dispatchEvent(new Event('storage'));
+        console.log('Dispatch');
+        socketRef.current?.disconnect();
+      });
+    };
+
+    // Tenta imediatamente
+    tentarLigar();
+
+    // Ouve mudanças no localStorage
+    window.addEventListener('storage', tentarLigar);
+
+    return () => {
+      window.removeEventListener('storage', tentarLigar);
+      socketRef.current?.disconnect();
+    };
+  }, []);
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <ViagemPoller />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<HomeLogado />} />

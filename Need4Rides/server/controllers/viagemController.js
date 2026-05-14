@@ -154,6 +154,7 @@ exports.pedirTaxi = async (req, res) => {
 exports.confirmacaoCliente = async (req, res) => {
   try {
     const { viagemId, confirma, motoristaId } = req.body;
+console.log('CONFIRMACAO CLIENTE - viagemId:', viagemId, '| confirma:', confirma);
 
     if (!confirma) {
       const turno = await Turno.findById(motoristaId);
@@ -179,7 +180,15 @@ exports.confirmacaoCliente = async (req, res) => {
       ]
     });
 
+    console.log('TURNO APÓS UPDATE:', viagemAtualizada?.turno);
+    console.log('MOTORISTA:', viagemAtualizada?.turno?.motorista);
+
     const io = req.app.get('io');
+    console.log('IO EXISTE?', !!io);
+    
+    const sala = io.sockets.adapter.rooms.get(`viagem_${viagemId}`);
+    console.log('CLIENTES NA SALA:', sala ? sala.size : 0);
+
     io.to(`viagem_${viagemId}`).emit('motorista_encontrado', {
       motorista: {
         nome: viagemAtualizada.turno?.motorista?.nome,
@@ -191,6 +200,7 @@ exports.confirmacaoCliente = async (req, res) => {
         matricula: viagemAtualizada.turno?.taxi?.matricula,
       }
     });
+    console.log('EVENTO EMITIDO');
 
 
     res.status(200).json({ message: "Motorista confirmado! Aguarde a chegada. " });

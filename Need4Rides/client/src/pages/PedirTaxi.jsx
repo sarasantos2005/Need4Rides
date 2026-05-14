@@ -404,14 +404,27 @@ export default function PedirTaxi() {
       });
 
       if(response.data.success){
-        setConfirmed(true);  
-        localStorage.setItem('viagemAtiva', JSON.stringify({
+        const novaViagem = {
           viagemId: response.data.pedido.id,
           form, 
           estimate
-        }));
+        }
+
+        setConfirmed(true);  
+        localStorage.setItem('viagemAtiva', JSON.stringify(novaViagem));
         window.dispatchEvent(new Event('storage'));
-        navigate('/aguardar-taxi');
+        
+        const onSalaEntrada = () => {
+          window.removeEventListener('sala_pronta', onSalaEntrada);
+          navigate('/aguardar-taxi');
+        };
+
+        window.addEventListener('sala_pronta', onSalaEntrada);
+
+        setTimeout(() => {
+          window.removeEventListener('sala_pronta', onSalaEntrada);
+          navigate('/aguardar-taxi');
+        }, 2000);
       }
     } catch (err) {
       alert("Erro ao pedir o táxi: " + (err.response?.data?.message || "Erro desconhecido"));

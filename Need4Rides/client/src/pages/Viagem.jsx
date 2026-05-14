@@ -127,7 +127,7 @@ export default function Viagem() {
         if(data.status === "finalizada"){
           localStorage.removeItem('viagemAtiva');
           clearInterval(intervalRef.current);
-          navigate('/pagamento', { state: { viagemId: id } });
+          navigate('/pagamento');
         } else if (data.status === 'aguardandoConfirmacao' || data.status === 'procurando') {
           clearInterval(intervalRef.current);
           navigate('/aguardar-taxi');
@@ -174,7 +174,7 @@ export default function Viagem() {
     from: form.origem.morada,
     to: form.destino.morada,
     eta: estimate.tempoMedio,
-    driver: motorista,
+    motorista: motorista,
     info: info
   };
 
@@ -296,17 +296,17 @@ export default function Viagem() {
             </div>
 
             {/* Motorista */}
-            {trip.driver && (
+            {trip.motorista && (
             <div className="viagem-driver-card">
               <div className="viagem-driver-avatar-ring">
                 <img src={ddImg} alt="Cliente" />
               </div>
               <div className="viagem-driver-info">
-                <span className="viagem-driver-name">{trip.driver.nome}</span>
+                <span className="viagem-driver-name">{trip.motorista.nome}</span>
                 <span className="viagem-driver-sub">{getDadosMarca(trip.info.marca)} {trip.info.modelo} · {trip.info.matricula}</span>
                 <div className="viagem-driver-rating">
-                  {'★'.repeat(Math.floor(trip.driver.rating))}
-                  <span>{trip.driver.rating}</span>
+                  {'★'.repeat(Math.floor(trip.motorista.rating))}
+                  <span>{trip.motorista.rating}</span>
                 </div>
               </div>
               <button className="viagem-call-btn">Contactar</button>
