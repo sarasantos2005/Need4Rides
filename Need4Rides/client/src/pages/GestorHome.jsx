@@ -8,6 +8,8 @@ import '../css/GestorMotoristas.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import Loading from '../components/Loading';
 import useMinLoading from '../hooks/useMinLoading';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 export default function GestorHome() {
   const navigate = useNavigate();
@@ -451,7 +453,7 @@ export default function GestorHome() {
       doc.save(`relatorio-${periodo}-${new Date().toISOString().split('T')[0]}.pdf`);
     } catch (error) {
       console.error('Erro na exportação:', error);
-      alert('Falha ao gerar o PDF. Verifica a consola do navegador.');
+      toastErro('Falha ao gerar o PDF. Verifica a consola do navegador.');
     } finally {
       setExporting(false);
     }

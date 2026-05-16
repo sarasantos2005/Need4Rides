@@ -5,6 +5,8 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/Profile.css';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -84,9 +86,9 @@ export default function Profile() {
         headers: { Authorization: `Bearer ${token}` }
       });
       localStorage.setItem('user_logado', JSON.stringify(response.data.user));
-      alert("Alterações guardadas!");
+      toastSucesso("Alterações guardadas!");
     } catch (err) {
-      alert(err.response?.data?.message || "Erro ao salvar alterações");
+      toastErro(err.response?.data?.message || "Erro ao salvar alterações");
     }
   }
 

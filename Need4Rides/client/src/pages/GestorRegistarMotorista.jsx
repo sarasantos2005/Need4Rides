@@ -4,6 +4,8 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/GestorRegistarMotorista.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/MotoristaHome.css';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 export default function GestorRegistarMotorista() {
   const navigate = useNavigate();
@@ -41,7 +43,7 @@ export default function GestorRegistarMotorista() {
       const localidade = [data.Localidade, data.Concelho].filter(Boolean).join(', ');
       setForm(f => ({ ...f, morada: localidade, lat: String(data.centro[0]), long: String(data.centro[1]) }));
     } catch {
-      alert('Código postal não encontrado. Verifique e tente novamente.');
+      toastErro('Código postal não encontrado. Verifique e tente novamente.');
     } finally {
       setCpLoading(false);
     }
@@ -50,7 +52,7 @@ export default function GestorRegistarMotorista() {
   const handleSubmit = async e => {
     e.preventDefault();
     if (!form.lat || !form.long) {
-      alert('Introduza um código postal válido para obter a localização.');
+      toastAviso('Introduza um código postal válido para obter a localização.');
       return;
     }
     try {
@@ -71,10 +73,10 @@ export default function GestorRegistarMotorista() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { alert(data.message || 'Erro ao registar motorista.'); return; }
+      if (!res.ok) { toastErro(data.message || 'Erro ao registar motorista.'); return; }
       navigate('/gestor/motoristas');
     } catch {
-      alert('Não foi possível ligar ao servidor.');
+      toastErro('Não foi possível ligar ao servidor.');
     }
   };
 

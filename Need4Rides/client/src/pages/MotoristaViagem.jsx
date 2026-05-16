@@ -8,6 +8,8 @@ import React from 'react';
 import L from "leaflet";
 import "leaflet-routing-machine";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 const STAGES = ['A aguardar motorista', 'Motorista a caminho', 'Em viagem', 'Concluída'];
 
@@ -299,12 +301,12 @@ export default function MotoristaViagem() {
           } 
         } catch (err) {
           console.error("Erro ao finalizar viagem no servidor:", err);
-          alert("Erro ao processar o fim da viagem.");
+          toastErro("Erro ao processar o fim da viagem.");
         }
 
       }, (error) => {
         console.error("Erro ao obter geolocalização:", error);
-        alert("Não foi possível obter a sua localização atual para finalizar a viagem.");
+        toastErro("Não foi possível obter a sua localização atual para finalizar a viagem.");
       });
 
     } catch (err) {

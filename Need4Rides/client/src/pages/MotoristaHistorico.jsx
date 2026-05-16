@@ -6,6 +6,8 @@ import AvatarDropdown from '../components/AvatarDropdown';
 import Loading from '../components/Loading';
 import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 const formatarDataHora = (isoString) => {
   if (!isoString) return { data: '---', hora: '---' };
@@ -90,15 +92,15 @@ export default function MotoristaHistorico() {
             { headers: { Authorization: `Bearer ${token}` } }
           );
 
-          alert("Fatura gerada com sucesso");
+          toastSucesso("Fatura gerada com sucesso");
           fetchDadosIniciais(token);
         } catch (err) {
-          alert("Erro ao gerar fatura no servidor.");
+          toastErro("Erro ao gerar fatura no servidor.");
         } finally {
           setLoading(false);
         }
     } catch (err) {
-      alert("Erro ao gerar fatura.");
+      toastErro("Erro ao gerar fatura.");
     }
   }
 

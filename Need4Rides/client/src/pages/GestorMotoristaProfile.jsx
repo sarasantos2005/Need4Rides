@@ -7,6 +7,8 @@ import Loading from '../components/Loading';
 import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
 import AvatarDropdown from '../components/AvatarDropdown';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 export default function GestorMotoristaProfile() {
   const navigate = useNavigate();
@@ -50,7 +52,7 @@ export default function GestorMotoristaProfile() {
       setApiStatus(prev => ({ ...prev, historico: true }));
     } catch (err) {
       console.error("Erro ao carregar perfil:", err);
-      alert("Erro ao carregar perfil do motorista");
+      toastErro("Erro ao carregar perfil do motorista");
       navigate('/gestor/motoristas');
     }
   }

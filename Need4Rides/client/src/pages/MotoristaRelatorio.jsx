@@ -7,6 +7,8 @@ import '../css/GestorMotoristas.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import Loading from '../components/Loading';
 import useMinLoading from '../hooks/useMinLoading';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 const todayStr = () => {
   const d = new Date();
@@ -221,7 +223,7 @@ export default function MotoristaRelatorio() {
       doc.save(`relatorio-motorista-${dataInicio}-${dataFim}.pdf`);
     } catch (err) {
       console.error('Erro ao exportar PDF:', err);
-      alert('Falha ao gerar o PDF.');
+      toastErro('Falha ao gerar o PDF.');
     } finally {
       setExporting(false);
     }

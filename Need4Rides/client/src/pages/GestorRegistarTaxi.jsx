@@ -5,6 +5,8 @@ import '../css/GestorRegistarTaxi.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/MotoristaHome.css';
 import VEICULOS from '../data/marcasEmodelos.js';
+import { toastAviso, toastErro } from '../components/toast.js';
+import '../css/global.css';
 
 const MARCAS = VEICULOS?.marcas ?? [];
 
@@ -61,7 +63,7 @@ export default function GestorRegistarTaxi() {
     e.preventDefault();
 
     if (!regexMatricula.test(form.matricula)) {
-      alert('Matrícula inválida. Formato XX-XX-XX com letras e dígitos (ex: AA-12-BB).');
+      toastAviso('Matrícula inválida. Formato XX-XX-XX com letras e dígitos (ex: AA-12-BB).');
       return;
     }
 
@@ -82,10 +84,10 @@ export default function GestorRegistarTaxi() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { alert(data.message || 'Erro ao registar táxi.'); return; }
+      if (!res.ok) { toastErro(data.message || 'Erro ao registar táxi.'); return; }
       navigate('/gestor/taxis');
     } catch {
-      alert('Não foi possível ligar ao servidor.');
+      toastErro('Não foi possível ligar ao servidor.');
     }
   };
 

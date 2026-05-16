@@ -4,6 +4,8 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/PedirTaxi.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import axios from 'axios';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
@@ -418,7 +420,7 @@ export default function PedirTaxi() {
         navigate('/aguardar-taxi');
       }
     } catch (err) {
-      alert("Erro ao pedir o táxi: " + (err.response?.data?.message || "Erro desconhecido"));
+      toastErro("Erro ao pedir o táxi: " + (err.response?.data?.message || "Erro desconhecido"));
     }
 
   };

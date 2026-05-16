@@ -6,6 +6,8 @@ import { useState, useEffect, useRef } from 'react';
 import Loading from '../components/Loading';
 import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
@@ -212,9 +214,9 @@ export default function MotoristaProfile() {
         headers: { Authorization: `Bearer ${token}` }
       });
       localStorage.setItem('user_logado', JSON.stringify(response.data.user));
-      alert("Alterações guardadas!");
+      toastSucesso("Alterações guardadas!");
     } catch (err) {
-      alert(err.response?.data?.message || "Erro ao salvar alterações");
+      toastErro(err.response?.data?.message || "Erro ao salvar alterações");
     }
   }
 
@@ -242,15 +244,15 @@ export default function MotoristaProfile() {
             { headers: { Authorization: `Bearer ${token}` } }
           );
 
-          alert("Fatura gerada com sucesso");
+          toastSucesso("Fatura gerada com sucesso");
           fetchProfileData(token);
         } catch (err) {
-          alert("Erro ao gerar fatura no servidor.");
+          toastErro("Erro ao gerar fatura no servidor.");
         } finally {
           setLoading(false);
         }
     } catch (err) {
-      alert("Erro ao gerar fatura.");
+      toastErro("Erro ao gerar fatura.");
     }
   }
 
@@ -367,7 +369,7 @@ export default function MotoristaProfile() {
                   setFormData({ ...formData, morada: address, localizacao: [coords[0], coords[1]] });
                   setShowMap(false);
                 } catch (err) {
-                  alert("Erro ao obter morada.");
+                  toastErro("Erro ao obter morada.");
                 }
               }}
             />

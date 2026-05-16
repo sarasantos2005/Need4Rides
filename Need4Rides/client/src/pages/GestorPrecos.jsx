@@ -4,6 +4,8 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/GestorPrecos.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/MotoristaHome.css';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 function calcularCusto(horaInicio, horaFim, valorMinuto, acrescimoNoturno) {
   const [hI, mI] = horaInicio.split(':').map(Number);
@@ -52,7 +54,7 @@ export default function GestorPrecos() {
     const luxuoso = parseFloat(precos.luxuoso);
     const acrescimo = parseFloat(precos.acrescimo_noturno);
     if (isNaN(basico) || isNaN(luxuoso) || isNaN(acrescimo)) {
-      alert('Preenche todos os campos corretamente.'); return;
+      toastAviso('Preenche todos os campos corretamente.'); return;
     }
     try {
       const res = await fetch('http://localhost:3000/api/preco', {
@@ -61,23 +63,23 @@ export default function GestorPrecos() {
         body: JSON.stringify({ basico, luxuoso, acrescimo_noturno: acrescimo }),
       });
       const data = await res.json();
-      if (!res.ok) { alert(data.message || 'Erro ao definir preços.'); return; }
-      alert('Preços definidos com sucesso!');
+      if (!res.ok) { toastErro(data.message || 'Erro ao definir preços.'); return; }
+      toastSucesso('Preços definidos com sucesso!');
       setPrecosAtuais({
         Básico: { valor_minuto: basico, acrescimo_noturno: acrescimo },
         Luxuoso: { valor_minuto: luxuoso, acrescimo_noturno: acrescimo },
       });
       setPrecos({ basico: '', luxuoso: '', acrescimo_noturno: '' });
     } catch {
-      alert('Não foi possível ligar ao servidor.');
+      toastErro('Não foi possível ligar ao servidor.');
     }
   };
 
   const handleCalc = e => {
     e.preventDefault();
-    if (!calc.horaInicio || !calc.horaFim) { alert('Introduz as horas de início e fim.'); return; }
+    if (!calc.horaInicio || !calc.horaFim) { toastAviso('Introduz as horas de início e fim.'); return; }
     const nivel = precosAtuais?.[calc.nivel];
-    if (!nivel) { alert('Não existem preços definidos para este nível de conforto.'); return; }
+    if (!nivel) { toastErro('Não existem preços definidos para este nível de conforto.'); return; }
     setResultado(calcularCusto(calc.horaInicio, calc.horaFim, nivel.valor_minuto, nivel.acrescimo_noturno ?? 0));
   };
 

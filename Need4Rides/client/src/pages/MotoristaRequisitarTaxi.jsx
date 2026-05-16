@@ -8,6 +8,8 @@ import useMinLoading from '../hooks/useMinLoading';
 import '../css/MotoristaRequisitarTaxi.css';
 import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 export default function MotoristaRequisitarTaxi() {
   const navigate = useNavigate();
@@ -82,7 +84,7 @@ export default function MotoristaRequisitarTaxi() {
       navigate('/motorista');
     } catch (err) {
       const msg = err.response?.data?.message || err.message;
-  alert("Erro: " + msg);
+  toastErro("Erro: " + msg);
     }
     
   };

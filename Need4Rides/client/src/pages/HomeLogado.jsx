@@ -12,6 +12,8 @@ import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-geosearch/dist/geosearch.css';
 import L from 'leaflet';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -283,7 +285,7 @@ export default function HomeLogado() {
       setShowMap(null);
       carregarLocais();
     } catch (err) {
-        alert("Erro ao guardar local");
+        toastErro("Erro ao guardar local");
     }
   };
 
