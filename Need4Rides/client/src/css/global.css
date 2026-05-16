@@ -1,0 +1,61 @@
+/* ============================================================
+   SweetAlert2 — Tema Escuro
+   ============================================================ */
+.swal-toast-escuro,
+.swal-confirm-escuro {
+  background: #1e1e2e !important;
+  color: #e0e0e0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Título */
+.swal-toast-escuro .swal2-title,
+.swal-confirm-escuro .swal2-title {
+  color: #e0e0e0 !important;
+}
+
+/* Texto secundário (confirmar) */
+.swal-confirm-escuro .swal2-html-container,
+.swal-confirm-escuro .swal2-content {
+  color: #a0a0b0 !important;
+}
+
+/* Barra de progresso do timer */
+.swal-toast-escuro .swal2-timer-progress-bar {
+  background: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Ícones — ajuste de cor de fundo para não contrastar mal */
+.swal-toast-escuro .swal2-icon {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+
+/* ============================================================
+   SweetAlert2 — Tema Claro
+   ============================================================ */
+.swal-toast-claro,
+.swal-confirm-claro {
+  background: #ffffff !important;
+  color: #1a1a2e !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Título */
+.swal-toast-claro .swal2-title,
+.swal-confirm-claro .swal2-title {
+  color: #1a1a2e !important;
+}
+
+/* Texto secundário (confirmar) */
+.swal-confirm-claro .swal2-html-container,
+.swal-confirm-claro .swal2-content {
+  color: #555577 !important;
+}
+
+/* Barra de progresso do timer */
+.swal-toast-claro .swal2-timer-progress-bar {
+  background: rgba(0, 0, 0, 0.2) !important;
+}

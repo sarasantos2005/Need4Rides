@@ -9,6 +9,8 @@ import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
 import { io } from 'socket.io-client';
+import '../css/global.css';
+import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 function minutosAgora() {
   const now = new Date();
@@ -175,10 +177,10 @@ export default function MotoristaHome() {
         fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
       ]);
 
-      alert("Táxi devolvido com sucesso!");
+      toastSucesso("Táxi devolvido com sucesso!");
     } catch (err) {
       console.error("Erro ao devolver táxi:", err);
-      alert("Erro ao devolver o táxi na base de dados.");
+      toastErro("Erro ao devolver o táxi na base de dados.");
     }
   };
 
@@ -187,7 +189,7 @@ export default function MotoristaHome() {
       const token = localStorage.getItem('token');
 
       if(!turnoAtivo || !turnoAtivo._id){
-        alert("Não podes aceitar viagens sem um turno ativo");
+        toastErro("Não podes aceitar viagens sem um turno ativo");
         return;
       }
 
@@ -203,7 +205,7 @@ export default function MotoristaHome() {
         setViagensPendentes(prev => prev.filter(p => p._id !== viagemId));
       }
 
-      alert(response.data.message);
+      toastSucesso(response.data.message);
 
       // Refresh aos dados
       await Promise.all([
@@ -212,7 +214,7 @@ export default function MotoristaHome() {
         fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
       ]);
     } catch (err) {
-      alert("Erro ao aceitar viagem");
+      toastErro("Erro ao aceitar viagem");
     }
   };
 
@@ -221,7 +223,7 @@ export default function MotoristaHome() {
       const token = localStorage.getItem('token');
 
       if(!turnoAtivo || !turnoAtivo._id){
-        alert("Não podes aceitar viagens sem um turno ativo");
+        toastErro("Não podes aceitar viagens sem um turno ativo");
         return;
       }
 
@@ -232,7 +234,7 @@ export default function MotoristaHome() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert(response.data.message);
+      toastSucesso(response.data.message);
 
       setViagensPendentes(prev => prev.filter(p => p._id !== viagemId));
 
@@ -243,7 +245,7 @@ export default function MotoristaHome() {
         fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
       ]);
     } catch (err) {
-      alert("Erro ao aceitar viagem");
+      toastErro("Erro ao aceitar viagem");
     }
   };
 
@@ -252,7 +254,12 @@ export default function MotoristaHome() {
       const token = localStorage.getItem('token');
 
       if(turnoAtivo && turnoAtivo.estado === "Ativo"){
-        if (!window.confirm("Deseja encerrar o seu turno agora? Esta ação é irreversível.")) return;
+         const result = await confirmar(
+          "Deseja encerrar o seu turno agora?",
+          "Esta ação é irreversível."
+        );
+
+        if (!result.isConfirmed) return;
 
         try {
           setLoading(true);
@@ -268,7 +275,7 @@ export default function MotoristaHome() {
           setEmTurno(false);
           localStorage.removeItem('motoristataxi');
         
-          alert("Turno encerrado com sucesso. Bom descanso!");
+          toastSucesso("Turno encerrado com sucesso. Bom descanso!");
           await Promise.all([
             fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
             fetchHistorico(token, setHistorico, setApiStatus),
@@ -276,7 +283,7 @@ export default function MotoristaHome() {
           ]);
         } catch (err) {
           console.error("Erro ao finalizar turno:", err);
-          alert("Erro ao encerrar o turno no servidor.");
+          toastErro("Erro ao encerrar o turno no servidor.");
         } finally {
           setLoading(false);
         }
@@ -284,7 +291,7 @@ export default function MotoristaHome() {
         navigate('/motorista/requisitar-taxi');
       }
     } catch (err) {
-      alert("Erro ao alterar estado do turno.");
+      toastErro("Erro ao alterar estado do turno.");
     }
   }
 
@@ -345,19 +352,19 @@ export default function MotoristaHome() {
             { headers: { Authorization: `Bearer ${token}` } }
           );
 
-          alert("Fatura gerada com sucesso");
+          toastSucesso("Fatura gerada com sucesso");
           await Promise.all([
             fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
             fetchHistorico(token, setHistorico, setApiStatus),
             fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
           ]);
         } catch (err) {
-          alert("Erro ao gerar fatura no servidor.");
+          toastErro("Erro ao gerar fatura no servidor.");
         } finally {
           setLoading(false);
         }
     } catch (err) {
-      alert("Erro ao gerar fatura.");
+      toastErro("Erro ao gerar fatura.");
     }
   }
 
