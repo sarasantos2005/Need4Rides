@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/MotoristaReabastecimento.css';
 import AvatarDropdown from '../components/AvatarDropdown';
-
+import '../css/global.css';
 
 const mockHistReab = [
   { id: 1, data: '28 Mar 2026', hora: '12:30', litros: 42, valor: '€63.00', posto: 'Galp — Marquês de Pombal' },

@@ -6,6 +6,7 @@ import heroBg from '../assets/images/LA.jpg';
 import stripeImg from '../assets/images/stripe.png';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/Pagamento.css';
+import '../css/global.css';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 

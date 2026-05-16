@@ -7,6 +7,7 @@ import AvatarDropdown from '../components/AvatarDropdown';
 import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
 import React from 'react';
+import '../css/global.css';
 
 import L from "leaflet";
 import "leaflet-routing-machine";

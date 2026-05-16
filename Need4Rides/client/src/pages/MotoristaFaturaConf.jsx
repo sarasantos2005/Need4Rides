@@ -4,7 +4,7 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/MotoristaFaturaConf.css';
 import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
-
+import '../css/global.css';
 
 function formatDuracao(s) {
   if (!s) return '—';

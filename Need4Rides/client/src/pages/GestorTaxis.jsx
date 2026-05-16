@@ -4,6 +4,7 @@ import '../css/GestorHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/GestorMotoristas.css';
 import '../css/MotoristaHome.css';
+import '../css/global.css';
 import { useState, useEffect } from 'react';
 
 const estadoClass = estado => {

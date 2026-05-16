@@ -5,6 +5,7 @@ import '../css/AguardarTaxi.css';
 import ddImg from '../assets/images/fennec.jpg';
 import AvatarDropdown from '../components/AvatarDropdown';
 import axios from "axios";
+import '../css/global.css';
 const DOTS = [
   'A procurar motoristas',
   'A procurar motoristas.',

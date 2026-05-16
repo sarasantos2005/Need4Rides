@@ -3,6 +3,7 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/Fatura.css';
 import { useState, useEffect } from "react";
 import axios from 'axios';
+import '../css/global.css';
 
 export default function Fatura() {
   const { state } = useLocation();

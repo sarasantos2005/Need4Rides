@@ -4,6 +4,7 @@ import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/GestorMotoristas.css';
 import { useState, useEffect } from 'react';
 import useMinLoading from '../hooks/useMinLoading';
+import '../css/global.css';
 
 export default function GestorMotoristas() {
   const navigate = useNavigate();

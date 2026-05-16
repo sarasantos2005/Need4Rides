@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Login.css';
+import '../css/global.css';
 
 function IconUser() {
   return (

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
 import '../css/MotoristaHome.css';
+import '../css/global.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 
 export default function GestorViagem() {
