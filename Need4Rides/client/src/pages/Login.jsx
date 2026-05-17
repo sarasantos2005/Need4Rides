@@ -139,6 +139,7 @@ export default function Login() {
       localStorage.setItem('user_logado', JSON.stringify(data.user));
       if (data.user.tipo === 'Motorista') navigate('/motorista');
       else if (data.user.tipo === 'Gestor') navigate('/gestor');
+      else if (localStorage.getItem('pagamentoViagemId')) navigate('/pagamento');
       else navigate('/home');
     } catch {
       setErro('Erro ao ligar ao servidor.');

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useEffect, useRef } from 'react';
 import { MotoristaViagemProvider } from './components/MotoristaViagemContext';
@@ -31,6 +31,11 @@ import GestorMotoristaProfile from './pages/GestorMotoristaProfile';
 import MotoristaRequisitarTaxi from './pages/MotoristaRequisitarTaxi';
 import MotoristaRelatorio from './pages/MotoristaRelatorio';
 import MotoristaLayout from './layouts/MotoristaLayout';
+
+function PagamentoRedirect({ children }) {
+  if (localStorage.getItem('pagamentoViagemId')) return <Navigate to="/pagamento" replace state={{ aviso: true }} />;
+  return children;
+}
 
 //Método em que o sistema não pergunta se há motorista, é avisado quando houver - evitar sobrecarga com mts users
 function ViagemPoller() {
@@ -91,8 +96,8 @@ function ViagemPoller() {
       });
 
       socket.on('viagem_finalizada', (data) => {
+        localStorage.setItem('pagamentoViagemId', data.viagemId);
         localStorage.removeItem('viagemAtiva');
-
         socket.disconnect();
         navigate('/pagamento', { state: { viagemId: data.viagemId } });
       });
@@ -147,11 +152,11 @@ export default function App() {
       <MotoristaViagemProvider>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/home" element={<HomeLogado />} />
+        <Route path="/home" element={<PagamentoRedirect><HomeLogado /></PagamentoRedirect>} />
         <Route path="/login" element={<Login />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/fatura" element={<Fatura />} />
-        <Route path="/pedir-taxi" element={<PedirTaxi />} />
+        <Route path="/profile" element={<PagamentoRedirect><Profile /></PagamentoRedirect>} />
+        <Route path="/fatura" element={<PagamentoRedirect><Fatura /></PagamentoRedirect>} />
+        <Route path="/pedir-taxi" element={<PagamentoRedirect><PedirTaxi /></PagamentoRedirect>} />
         <Route path="/viagem" element={<Viagem />} />
         <Route path="/pagamento" element={<Pagamento />} />
         <Route path="/aguardar-taxi" element={<AguardarTaxi />} />

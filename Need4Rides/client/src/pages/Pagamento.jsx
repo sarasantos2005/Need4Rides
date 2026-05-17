@@ -5,6 +5,7 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import heroBg from '../assets/images/LA.jpg';
 import stripeImg from '../assets/images/stripe.png';
 import AvatarDropdown from '../components/AvatarDropdown';
+import { toastAviso } from '../components/toast';
 import '../css/Pagamento.css';
 import '../css/global.css';
 
@@ -67,9 +68,6 @@ function CheckoutForm({ viagemId, preco, onSuccess }) {
       )}
 
       <div className="pag-actions">
-        <button type="button" className="pag-btn-back" onClick={() => window.history.back()}>
-          ← Voltar
-        </button>
         <button type="submit" className="pag-btn-pay" disabled={!stripe || processing}>
           {processing ? 'A processar...' : `Pagar €${preco}`}
         </button>
@@ -89,6 +87,17 @@ export default function Pagamento() {
   const [erro, setErro]               = useState(null);
 
   const viagemId = location.state?.viagemId || localStorage.getItem('pagamentoViagemId');
+
+  useEffect(() => {
+    if (location.state?.aviso) toastAviso('Tem uma viagem por pagar. Conclua o pagamento para continuar.');
+  }, []);
+
+  useEffect(() => {
+    if (paid) return;
+    const handler = (e) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [paid]);
 
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
   useEffect(() => { document.body.className = tema; localStorage.setItem('tema', tema); }, [tema]);
