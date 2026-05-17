@@ -52,9 +52,29 @@ exports.turnoAtual = async (req, res) => {
   }
 };
 
-//AINDA TEM DE SER ALTERADO NA TOTALIDADE
 exports.novoTurno = async (req, res) => {
-  
+  try {
+    const motoristaId = req.userId;
+
+    const turnoExistente = await Turno.findOne({ motorista: motoristaId, estado: 'Ativo' });
+    if (turnoExistente) {
+      return res.status(400).json({ message: "Já tens um turno ativo." });
+    }
+
+    const agora = new Date();
+    const horaFim = new Date(agora.getTime() + 8 * 60 * 60 * 1000);
+
+    const turno = await Turno.create({
+      motorista: motoristaId,
+      hora_inicio: agora,
+      hora_fim: horaFim,
+      estado: 'Ativo',
+    });
+
+    res.status(201).json(turno);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };  
 
 exports.devolverTaxiTurno = async (req, res) => {

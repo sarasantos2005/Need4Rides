@@ -288,7 +288,23 @@ export default function MotoristaHome() {
           setLoading(false);
         }
       } else {
-        navigate('/motorista/requisitar-taxi');
+        try {
+          setLoading(true);
+          const token = localStorage.getItem('token');
+          const res = await axios.post(
+            'http://localhost:3000/api/turno',
+            {},
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          setTurnoAtivo(res.data);
+          setEmTurno(true);
+          navigate('/motorista/requisitar-taxi');
+        } catch (err) {
+          const msg = err.response?.data?.message || err.message;
+          toastErro("Erro ao iniciar turno: " + msg);
+        } finally {
+          setLoading(false);
+        }
       }
     } catch (err) {
       toastErro("Erro ao alterar estado do turno.");

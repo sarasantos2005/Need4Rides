@@ -68,7 +68,11 @@ export default function MotoristaRequisitarTaxi() {
 
   const handleConfirmar = async () => {
     if (!selecionado) return;
-      
+    if (!turnoAtivo) {
+      toastErro("Precisas de iniciar um turno primeiro.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const turnoId = turnoAtivo._id;
