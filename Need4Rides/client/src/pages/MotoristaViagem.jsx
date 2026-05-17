@@ -314,6 +314,25 @@ export default function MotoristaViagem() {
     }
   }
 
+  async function abandonarViagem() {
+    const token = localStorage.getItem('token');
+    const viagemAtiva = JSON.parse(localStorage.getItem('viagemAtivaMotorista'));
+    if (!viagemAtiva?.viagemId) { navigate('/motorista'); return; }
+
+    try {
+      await axios.post(
+        'http://localhost:3000/api/viagem/motorista/abandonar',
+        { viagemId: viagemAtiva.viagemId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      localStorage.removeItem('viagemAtivaMotorista');
+      navigate('/motorista');
+    } catch (err) {
+      toastErro('Erro ao abandonar viagem.');
+      console.error(err);
+    }
+  }
+
   const originCoord = useMemo(() => tripAtiva?.from?.localizacao?.coordinates, [tripAtiva?.from?.localizacao?.coordinates]);
   const destCoord = useMemo(() => tripAtiva?.to?.localizacao?.coordinates, [tripAtiva?.to?.localizacao?.coordinates]);
 
@@ -438,9 +457,14 @@ export default function MotoristaViagem() {
             </div>
 
             {estado === 'aguardandoInicio' ? (
-              <button className="mvg-btn start" onClick={iniciarViagem}>
-                ▶&nbsp; Iniciar Viagem
-              </button>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button className="mvg-btn start" onClick={iniciarViagem}>
+                  ▶&nbsp; Iniciar Viagem
+                </button>
+                <button className="mvg-btn end" onClick={abandonarViagem} style={{ background: 'linear-gradient(135deg,#555,#333)' }}>
+                  ✕&nbsp; Abandonar
+                </button>
+              </div>
             ) : (
               <button className="mvg-btn end" onClick={terminarViagem}>
                 ■&nbsp; Terminar Viagem

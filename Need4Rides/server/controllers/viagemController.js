@@ -344,6 +344,30 @@ exports.cancelarViagem = async(req, res) => {
   }
 }
 
+exports.abandonarViagem = async (req, res) => {
+  try {
+    const { viagemId } = req.body;
+    const motoristaId = req.userId;
+
+    const viagem = await Viagem.findById(viagemId).populate('turno');
+    if (!viagem) return res.status(404).json({ success: false, message: "Viagem não encontrada." });
+
+    if (!viagem.turno || viagem.turno.motorista.toString() !== motoristaId) {
+      return res.status(403).json({ success: false, message: "Sem permissão para abandonar esta viagem." });
+    }
+
+    await Viagem.findByIdAndDelete(viagemId);
+
+    const io = req.app.get('io');
+    io.to(`viagem_${viagemId}`).emit('viagem_cancelada', { message: "O motorista abandonou a viagem." });
+    io.in(`viagem_${viagemId}`).socketsLeave(`viagem_${viagemId}`);
+
+    res.status(200).json({ success: true, message: "Viagem abandonada." });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 //US7 - Mostrar viagens ao motorista
 exports.listarPedidosParaMotorista = async (req, res) => {
   try {
