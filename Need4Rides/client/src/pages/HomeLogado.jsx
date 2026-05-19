@@ -154,7 +154,15 @@ export default function HomeLogado() {
   const [showMap, setShowMap] = useState(null);
   const [userData, setUserData] = useState({ nome: 'Utilizador' });
   const [userLocation, setUserLocation] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
+  const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+  const alternarTema = () => setTema(prev => prev === 'escuro' ? 'claro' : 'escuro');
+  
   useEffect(() => {
     const token = localStorage.getItem('token');
     const ativa = JSON.parse(localStorage.getItem('viagemAtiva'));
@@ -301,8 +309,33 @@ export default function HomeLogado() {
       {/* Navbar */}
       <nav className="navbar">
         <span className="navbar-logo">Need4Rides</span>
-        <ul className="navbar-links">          
-          <li className="mh-profile-li">
+
+        <div
+          className={`mh-hamburger ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>  
+          <li className="mh-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/profile" avatarClass="mh-avatar" />
+            <span className="mh-profile-pill-name">{USERNAME}</span>
+          </li>
+
+          <li><a className="active">Home</a></li>
+          <li><a onClick={() => { navigate('/services'); setMenuOpen(false); }}>Serviços</a></li>
+          <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
+          <li><a onClick={() => { navigate('/viagem'); setMenuOpen(false); }}>Viagem</a></li>
+          <li>
+            <button className="pt-theme-btn" onClick={alternarTema}>
+              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+            </button>
+          </li>
+
+          <li className="mh-profile-li avatarNormal">
             <div className="mh-profile-pill">
               <span className="mh-profile-pill-name">{USERNAME}</span>
               <AvatarDropdown profilePath="/profile" avatarClass="mh-avatar" />
