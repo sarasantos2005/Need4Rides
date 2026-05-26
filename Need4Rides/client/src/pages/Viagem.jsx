@@ -190,11 +190,11 @@ export default function Viagem() {
       <div className="viagem-overlay" />
 
       {/* Navbar */}
-      <nav className="viagem-navbar">
-        <span className="viagem-logo" onClick={() => navigate('/home')}>Need4Rides</span>
+      <nav className="gb-navbar">
+        <span className="gb-logo" onClick={() => navigate('/home')}>Need4Rides</span>
 
         <div
-          className={`viagem-hamburger ${menuOpen ? 'open' : ''}`}
+          className={`gb-hamburger ${menuOpen ? 'open' : ''}`}
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span></span>
@@ -202,24 +202,24 @@ export default function Viagem() {
           <span></span>
         </div>
 
-        <ul className={`viagem-nav-links ${menuOpen ? 'active' : ''}`}>
-          <li className="mh-profile-li avatarHamburguer">
-            <AvatarDropdown profilePath="/profile" avatarClass="mh-avatar" />
-            <span className="mh-profile-pill-name">{USERNAME}</span>
+        <ul className={`gb-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="gb-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/profile" avatarClass="gb-avatar" />
+            <span className="gb-profile-pill-name">{USERNAME}</span>
           </li>
           <li><a onClick={() => { navigate('/home'); setMenuOpen(false); }}>Home</a></li>
           <li><a onClick={() => { navigate('/services'); setMenuOpen(false); }}>Serviços</a></li>
           <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
           <li><a className="active">Viagem</a></li>
           <li>
-            <button className="viagem-theme-btn" onClick={alternarTema}>
+            <button className="gb-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li className="mh-profile-li avatarNormal">
-            <div className="mh-profile-pill">
-              <span className="mh-profile-pill-name">{USERNAME}</span>
-              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="viagem-avatar" />
+          <li className="gb-profile-li avatarNormal">
+            <div className="gb-profile-pill">
+              <span className="gb-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="gb-avatar" />
             </div>
           </li>
         </ul>
