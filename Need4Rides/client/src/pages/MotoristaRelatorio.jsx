@@ -240,17 +240,17 @@ export default function MotoristaRelatorio() {
     <div className="mhist-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mhist-overlay" />
 
-      <nav className="mh-navbar">
-        <span className="mh-logo">Need4Rides</span>
+      <nav className="gb-navbar">
+        <span className="gb-logo">Need4Rides</span>
 
-        <div className={`mh-hamburger ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
+        <div className={`gb-hamburger ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
           <span /><span /><span />
         </div>
 
-        <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
-          <li className="mh-profile-li avatarHamburguer">
-            <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
-            <span className="mh-profile-pill-name">{USERNAME}</span>
+        <ul className={`gb-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="gb-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/motorista/perfil" avatarClass="gb-avatar" />
+            <span className="gb-profile-pill-name">{USERNAME}</span>
           </li>
           <li><a onClick={() => navigate('/motorista')}>Dashboard</a></li>
           <li><a onClick={() => navigate('/motorista/reabastecimento')}>Reabastecimento</a></li>
@@ -258,14 +258,14 @@ export default function MotoristaRelatorio() {
           <li><a className="active">Relatório</a></li>
           <li><a onClick={() => navigate('/motorista/suporte')}>Suporte</a></li>
           <li>
-            <button className="mh-theme-btn" onClick={alternarTema}>
+            <button className="gb-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li className="mh-profile-li avatarNormal">
-            <div className="mh-profile-pill">
-              <span className="mh-profile-pill-name">{USERNAME}</span>
-              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+          <li className="gb-profile-li avatarNormal">
+            <div className="gb-profile-pill">
+              <span className="gb-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="gb-avatar" />
             </div>
           </li>
         </ul>
