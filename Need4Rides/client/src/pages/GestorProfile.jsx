@@ -45,7 +45,7 @@ export default function GestorProfile() {
               </div>
             </div>
             <div className="profile-actions">
-              <button className="profile-theme-btn" onClick={alternarTema}>
+              <button className="gb-theme-btn" onClick={alternarTema}>
                 {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
               </button>
               <button className="profile-back-btn" onClick={() => navigate('/gestor')}>
