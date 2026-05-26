@@ -110,6 +110,7 @@
 .avatarNormal {
   position: absolute;
   right: 2.5rem;
+  display: flex!important;
 }
 
 .avatarHamburguer {
@@ -720,7 +721,16 @@ body.claro .map-modal-header h3, body.claro .leaflet-container a {
 }
 
 /* ─── Responsive ────────────────────────────────────────── */
-@media (max-width: 768px) {
+@media (min-device-width: 900px) and (max-device-width: 1065px) {
+  .avatarHamburguer {
+    display: none!important;
+  }
+
+  .avatarNormal {
+    display: flex!important;
+  }
+}
+@media (max-width: 900px) {
   .pt-hamburger {
     display: flex;
   }
@@ -789,4 +799,6 @@ body.claro .map-modal-header h3, body.claro .leaflet-container a {
 @media (max-width: 480px) {
   .pt-navbar { padding: 0 1.2rem; }
   .pt-form { padding: 1.6rem 1.2rem; }
+  .avatarHamburguer { display: flex!important }
+  .avatarNormal { display: none!important }
 }

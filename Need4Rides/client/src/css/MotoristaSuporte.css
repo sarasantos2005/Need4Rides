@@ -434,7 +434,7 @@
 }
 
 /* ─── RESPONSIVE ────────────────────────────────────────── */
-@media (max-width: 1060px) {
+@media (max-width: 1300px) {
   .mreab-content {
     grid-template-columns: 1fr;
   }

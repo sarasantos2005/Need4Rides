@@ -23,13 +23,39 @@ function formatHora(minutos) {
   return `${h}:${m}`;
 }
 
+let coordsCache = null;
+let coordsCacheTime = 0;
+const COORDS_TTL = 30_000;
+
 const getCoords = () =>
-  new Promise((resolve, reject) =>
+  new Promise((resolve, reject) => {
+    const now = Date.now();
+    if(coordsCache && now - coordsCacheTime < COORDS_TTL){
+      return resolve(coordsCache);
+    }
+
     navigator.geolocation.getCurrentPosition(
-      (pos) => resolve(pos.coords),
-      (err) => reject(err)
-    )
-  );
+      (pos) => {
+        coordsCache = pos.coords;
+        coordsCacheTime = Date.now();
+        resolve(pos.coords);
+      },
+      reject,
+      {maximumAge: COORDS_TTL, timeout: 10_000}
+    );
+});
+
+const apiFecthViagensPendentes = async(token, coords) => {
+  const res = await axios.get(`http://localhost:3000/api/viagem/disponiveis`, {
+    headers: { Authorization: `Bearer ${token}` }, 
+    params: { lat: coords.latitude, lng: coords.longitude }, 
+  });
+  return res.data;
+};
+
+const apiFetchHistorico = async (token) => {
+  const res = await axios.get(`http://localhost:3000/api/viagem/motorista`, config);
+}
 
 const fetchViagensPendentes = async (token, setViagensPendentes, setApiStatus) => {
   if (!token) { console.error("Token ausente"); return; }

@@ -83,7 +83,7 @@ body.claro .gh-date-label {
 }
 
 .mh-page {
-  min-heimht: 100vh;
+  min-height: 100vh;
   background-size: cover;
   background-position: center;
   position: relative;
@@ -95,63 +95,6 @@ body.claro .gh-date-label {
   inset: 0;
   background: rgba(0, 0, 0, 0.74);
   z-index: 0;
-}
-
-/* ─── Navbar ────────────────────────────────────────────── */
-.mh-navbar {
-  position: fixed;
-  top: 0; left: 0; rimht: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2.5rem;
-  heimht: 64px;
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-.mh-logo {
-  font-size: 1.4rem;
-  font-weimht: 700;
-  color: #fff;
-}
-
-.mh-nav-links {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.mh-nav-links li { display: flex; align-items: center; }
-
-.mh-nav-links a {
-  color: #ddd;
-  font-weimht: 700;
-  font-size: 0.95rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.mh-nav-links a:hover,
-.mh-nav-links a.active { color: #f5c518; }
-
-.mh-avatar {
-  width: 36px; heimht: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #f5c518;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.mh-avatar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
 }
 
 /* ─── Wrapper ───────────────────────────────────────────── */
@@ -178,7 +121,7 @@ body.claro .gh-date-label {
 
 .mh-card-title {
   font-size: 0.95rem;
-  font-weimht: 700;
+  font-weight: 700;
   color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -201,7 +144,7 @@ body.claro .gh-date-label {
 }
 
 .mh-welcome-avatar-ring {
-  width: 64px; heimht: 64px;
+  width: 64px; height: 64px;
   border-radius: 50%;
   border: 3px solid #f5c518;
   padding: 2px;
@@ -209,7 +152,7 @@ body.claro .gh-date-label {
 }
 
 .mh-welcome-avatar-ring img {
-  width: 100%; heimht: 100%;
+  width: 100%; height: 100%;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -222,7 +165,7 @@ body.claro .gh-date-label {
 
 .mh-welcome-name {
   font-size: 1.7rem;
-  font-weimht: 800;
+  font-weight: 800;
   color: #fff;
   margin: 0 0 0.4rem;
   letter-spacing: -0.5px;
@@ -230,7 +173,7 @@ body.claro .gh-date-label {
 
 .mh-role-badge {
   font-size: 0.78rem;
-  font-weimht: 700;
+  font-weight: 700;
   padding: 0.25rem 0.8rem;
   border-radius: 50px;
   background: rgba(245, 197, 24, 0.15);
@@ -245,7 +188,7 @@ body.claro .gh-date-label {
   background: rgba(255, 107, 107, 0.1);
   color: #ff6b6b;
   font-size: 0.95rem;
-  font-weimht: 700;
+  font-weight: 700;
   cursor: pointer;
   transition: background 0.2s, transform 0.15s;
   white-space: nowrap;
@@ -260,7 +203,7 @@ option {
   color: black;
 }
 
-option :hover {
+option:hover {
   background-color: pink;
   color: black;
 }
@@ -289,7 +232,7 @@ option :hover {
 
 .mh-stat-label {
   font-size: 0.72rem;
-  font-weimht: 600;
+  font-weight: 600;
   color: #e9e9e9;
   text-transform: uppercase;
   letter-spacing: 0.7px;
@@ -297,7 +240,7 @@ option :hover {
 
 .mh-stat-value {
   font-size: 1.25rem;
-  font-weimht: 800;
+  font-weight: 800;
   color: #f0f0f0;
 }
 
@@ -323,8 +266,8 @@ option :hover {
   background: #f5c518;
   color: #111;
   font-size: 0.72rem;
-  font-weimht: 800;
-  width: 22px; heimht: 22px;
+  font-weight: 800;
+  width: 22px; height: 22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -356,12 +299,12 @@ option :hover {
   gap: 0.4rem;
   font-size: 0.87rem;
   color: #ddd;
-  font-weimht: 500;
+  font-weight: 500;
   flex: 1;
 }
 
 .mh-dot {
-  width: 8px; heimht: 8px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -383,7 +326,7 @@ option :hover {
 
 .mh-status-badge {
   font-size: 0.72rem;
-  font-weimht: 700;
+  font-weight: 700;
   padding: 0.2rem 0.7rem;
   border-radius: 50px;
   white-space: nowrap;
@@ -427,13 +370,13 @@ option :hover {
 
 .mh-motorista-nome {
   font-size: 0.9rem;
-  font-weimht: 600;
+  font-weight: 600;
   color: #e0e0e0;
 }
 
 .mh-motorista-estado {
   font-size: 0.75rem;
-  font-weimht: 600;
+  font-weight: 600;
 }
 
 .mh-motorista-estado.online  { color: #43e97b; }
@@ -449,132 +392,11 @@ option :hover {
 
 .mh-motorista-ganhos {
   font-size: 0.95rem;
-  font-weimht: 700;
-  color: #f5c518;
-}
-
-/* ─── Responsive ────────────────────────────────────────── */
-@media (max-width: 900px) {
-  .mh-stats-row  { grid-template-columns: repeat(2, 1fr); }
-  .mh-middle-row { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 560px) {
-  .mh-navbar  { padding: 0 1.2rem; }
-  .mh-wrapper { padding: 76px 1rem 2rem; }
-  .mh-welcome { gap: 1rem; }
-  .mh-logout-btn { width: 100%; }
-}
-
-/* ─── RESPONSIVE ────────────────────────────────────────── */
-.mh-hamburger {
-  display: none;
-  width: 30px;
-  heimht: 22px;
-  position: relative;
-  cursor: pointer;
-  z-index: 200;
-}
-
-.mh-hamburger span {
-  position: absolute;
-  heimht: 3px;
-  width: 100%;
-  background: #fff;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-}
-
-.mh-hamburger span:nth-child(1) { top: -10px; }
-.mh-hamburger span:nth-child(2) { top: -1px; }
-.mh-hamburger span:nth-child(3) { top: 8px; }
-
-.mh-hamburger.open span:nth-child(1) {
-  transform: rotate(45deg);
-  top: 9px;
-}
-
-.mh-hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-
-.mh-hamburger.open span:nth-child(3) {
-  transform: rotate(-45deg);
-  top: 9px;
-}
-@media (max-width: 1060px) {
-
-  .mh-hamburger {
-    display: block;
-  }
-
-  .mh-nav-links {
-    position: absolute;
-    top: 64px;
-    rimht: 0;
-
-    width: 240px;
-    padding: 1rem;
-
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
-    background: rgba(10, 10, 10, 0.95);
-    backdrop-filter: blur(12px);
-
-    border-left: 1px solid rgba(255,255,255,0.08);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-
-    transform: translateX(100%);
-    opacity: 0;
-    pointer-events: none;
-
-    transition: all 0.25s ease;
-  }
-
-  .mh-nav-links.active {
-    transform: translateX(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-.mh-theme-btn {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.2);
-  color: #ddd;
-  padding: 0.4rem 0.9rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weimht: 600;
-  transition: all 0.2s;
-}
-
-.mh-theme-btn:hover {
-  border-color: #f5c518;
+  font-weight: 700;
   color: #f5c518;
 }
 
 /* ─── MODO CLARO ───────────────────────────────────────── */
-
-body.claro .mh-navbar {
-  background: rgba(255, 255, 255, 0.85);
-}
-
-body.claro .mh-logo {
-  color: #111;
-}
-
-body.claro .mh-nav-links a {
-  color: #333;
-}
-
-body.claro .mh-nav-links a:hover,
-body.claro .mh-nav-links a.active {
-  color: #f5c518;
-}
-
 body.claro .mh-card,
 body.claro .mh-stat-card {
   background: rgba(255, 255, 255, 0.85);
@@ -647,7 +469,7 @@ body.claro .mh-status-badge {
   position: absolute;
   top: 100%;
   left: 0;
-  rimht: 0;
+  right: 0;
   background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
@@ -671,21 +493,23 @@ body.claro .mh-status-badge {
   background: rgba(255, 255, 255, 0.1);
 }
 
-@media (max-width: 768px) {
+/* ─── Responsividade do Conteúdo ────────────────────────── */
+@media (max-width: 900px) {
+  .mh-stats-row  { grid-template-columns: repeat(2, 1fr); }
+  .mh-middle-row { grid-template-columns: 1fr; }
+}
 
-  /* evita cortes laterais */
+@media (max-width: 768px) {
   .mh-wrapper {
     padding: 80px 0.8rem 2rem;
   }
 
-  /* HEADER WELCOME -> vertical */
   .mh-welcome {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
 
-  /* botão grupo fica coluna */
   .mh-welcome > div:last-child {
     width: 100%;
     flex-direction: column !important;
@@ -693,18 +517,15 @@ body.claro .mh-status-badge {
     gap: 10px;
   }
 
-  /* dropdown + botão */
   .custom-dropdown,
   .mh-welcome button {
     width: 100%;
   }
 
-  /* EXPORT BUTTON FULL WIDTH */
   button {
     width: 100%;
   }
 
-  /* STATS mais pequenas */
   .mh-stats-row {
     grid-template-columns: 1fr 1fr;
     gap: 0.7rem;
@@ -714,12 +535,10 @@ body.claro .mh-status-badge {
     padding: 1rem;
   }
 
-  /* VIAGENS + MOTORISTAS em coluna */
   .mh-middle-row {
     grid-template-columns: 1fr;
   }
 
-  /* evitar cortes horizontais em rows */
   .mh-viagem-row,
   .mh-hist-row {
     flex-direction: column;
@@ -727,20 +546,15 @@ body.claro .mh-status-badge {
     gap: 0.4rem;
   }
 
-  /* texto mais pequeno */
   .mh-stat-value {
     font-size: 1rem;
   }
+}
 
-  /* navbar mais segura */
-  .mh-navbar {
-    padding: 0 1rem;
-  }
-
-  /* evitar overflow geral */
-  .mh-page {
-    overflow-x: hidden;
-  }
+@media (max-width: 560px) {
+  .mh-wrapper { padding: 76px 1rem 2rem; }
+  .mh-welcome { gap: 1rem; }
+  .mh-logout-btn { width: 100%; }
 }
 
 * {

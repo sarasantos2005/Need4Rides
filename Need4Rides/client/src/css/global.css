@@ -82,3 +82,154 @@
   background: #d9b120;
   cursor: pointer;
 }
+
+/* ─── Navbar Geral ────────────────────────────────────────── */
+.gb-navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  padding: 0 2.5rem;
+  height: 64px;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.gb-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  min-width: 160px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.gb-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  list-style: none;
+  margin: 0 1.5rem;
+  padding: 0;
+  flex: 1;
+  justify-content: center;
+}
+
+.gb-nav-links a {
+  color: #ddd;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.gb-nav-links a:hover { color: #f5c518; }
+
+/* ─── Botão Hambúrguer ────────────────────────────────────── */
+.gb-hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.gb-hamburger span {
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  transition: 0.3s;
+  display: block;
+}
+
+.gb-hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.gb-hamburger.open span:nth-child(2) { opacity: 0; }
+.gb-hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+/* ─── Avatar e Perfis ────────────────────────────────────── */
+.gb-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c518;
+  transition: transform 0.2s;
+}
+
+.avatarNormal { margin-left: auto; display: flex; }
+.avatarHamburguer { display: none !important; }
+.gb-theme-li-hamburger { display: none; }
+
+.gb-profile-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 4px 4px 4px 10px;
+  border-radius: 999px;
+}
+
+.gb-profile-pill-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #f5c518;
+  white-space: nowrap;
+}
+
+.gb-theme-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ─── Responsividade (Menu aos 1300px) ────────────────────── */
+@media (max-width: 1300px) {
+  .gb-hamburger { display: flex; }
+  .gb-navbar { justify-content: space-between; padding: 0 1.5rem; }
+
+  .gb-nav-links {
+    position: fixed;
+    top: 64px; right: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    background: rgba(10, 10, 10, 0.97);
+    width: 230px;
+    padding: 0.5rem 1rem 1rem;
+    margin: 0;
+    display: none;
+    border-left: 1px solid rgba(255,255,255,0.07);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    border-radius: 0 0 0 16px;
+  }
+
+  .gb-nav-links.active { display: flex; }
+  .gb-nav-links li { width: 100%; }
+
+  .gb-nav-links a {
+    padding: 0.7rem 0.5rem;
+    width: 100%;
+    display: block;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .avatarNormal { display: none !important; }
+  .avatarHamburguer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 1.2rem 0.5rem 0.8rem !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .avatarHamburguer .gb-profile-pill { flex-direction: column !important; padding: 0 !important; gap: 0.25rem !important; }
+  .avatarHamburguer .gb-avatar { width: 52px !important; height: 52px !important; }
+  .gb-theme-li-hamburger { display: flex !important; padding: 0.6rem 0.5rem 0.2rem; width: 100%; }
+  .gb-theme-li-hamburger .gb-theme-btn { width: 100%; }
+}
