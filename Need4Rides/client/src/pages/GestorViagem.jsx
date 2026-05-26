@@ -35,11 +35,11 @@ export default function GestorViagem() {
     <div className="mh-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mh-overlay" />
 
-      <nav className="mh-navbar">
-        <span className="mh-logo">Need4Rides</span>
+      <nav className="gb-navbar">
+        <span className="gb-logo">Need4Rides</span>
 
         <div
-          className={`mh-hamburger ${menuOpen ? 'open' : ''}`}
+          className={`gb-hamburger ${menuOpen ? 'open' : ''}`}
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span></span>
@@ -47,19 +47,19 @@ export default function GestorViagem() {
           <span></span>
         </div>
 
-        <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
-          <li className="mh-profile-li avatarHamburguer">
-            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
-            <span className="mh-profile-pill-name">{USERNAME}</span>
+        <ul className={`gb-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="gb-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="gb-avatar" />
+            <span className="gb-profile-pill-name">{USERNAME}</span>
           </li>
           <li><a onClick={() => navigate('/gestor')}>Dashboard</a></li>
           <li><a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a></li>
           <li><a onClick={() => navigate('/gestor/taxis')}>Táxis</a></li>
           <li><a onClick={() => navigate('/gestor/precos')}>Preços</a></li>
-          <li className="mh-profile-li avatarNormal">
-            <div className="mh-profile-pill">
-              <span className="mh-profile-pill-name">{USERNAME}</span>
-              <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+          <li className="gb-profile-li avatarNormal">
+            <div className="gb-profile-pill">
+              <span className="gb-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/gestor/perfil" avatarClass="gb-avatar" />
             </div>
           </li>
         </ul>
