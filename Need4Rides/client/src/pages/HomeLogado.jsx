@@ -326,7 +326,6 @@ export default function HomeLogado() {
           </li>
 
           <li><a className="active">Home</a></li>
-          <li><a onClick={() => { navigate('/services'); setMenuOpen(false); }}>Serviços</a></li>
           <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
           <li><a onClick={() => { navigate('/viagem'); setMenuOpen(false); }}>Viagem</a></li>
           <li>
