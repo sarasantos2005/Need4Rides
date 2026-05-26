@@ -187,6 +187,8 @@
   font-weight: 600;
 }
 
+.active { color: #f5c518!important; }
+
 /* ─── Responsividade (Menu aos 1300px) ────────────────────── */
 @media (max-width: 1300px) {
   .gb-hamburger { display: flex; }
