@@ -16,74 +16,6 @@
   z-index: 0;
 }
 
-/* ─── Navbar ────────────────────────────────────────────── */
-.pag-navbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2.5rem;
-  height: 64px;
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-.pag-logo {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #fff;
-  cursor: pointer;
-}
-
-.pag-nav-links {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.pag-nav-links li { display: flex; align-items: center; }
-
-.pag-nav-links a {
-  color: #ddd;
-  font-weight: 700;
-  font-size: 0.95rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.pag-nav-links a:hover,
-.pag-nav-links a.active { color: #f5c518; }
-
-.pag-login-btn {
-  background: transparent;
-  border: none;
-  color: #f5c518;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.pag-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #f5c518;
-  cursor: pointer;
-  display: block;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.pag-avatar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
-}
-
 /* ─── Wrapper ───────────────────────────────────────────── */
 .pag-wrapper {
   position: relative;
@@ -362,49 +294,6 @@
   width: 100%;
 }
 
-/* ─── Theme button ──────────────────────────────────────── */
-.pag-theme-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #fff;
-  padding: 0.4rem 0.9rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.pag-theme-btn:hover {
-  background: rgba(245, 197, 24, 0.2);
-}
-
-/* ─── Hamburger ─────────────────────────────────────────── */
-.pag-hamburger {
-  display: none;
-  flex-direction: column;
-  cursor: pointer;
-  gap: 5px;
-}
-
-.pag-hamburger span {
-  width: 22px;
-  height: 2px;
-  background: #fff;
-  transition: 0.3s;
-}
-
-.pag-hamburger.open span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-
-.pag-hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-
-.pag-hamburger.open span:nth-child(3) {
-  transform: rotate(-45deg) translate(5px, -5px);
-}
-
 /* ─── Modo Claro ─────────────────────────────────────────── */
 body.claro .pag-overlay {
   background: rgba(0, 0, 0, 0.72);
@@ -476,31 +365,6 @@ body.claro .pag-success h2 {
 body.claro .pag-success p {
   color: #555;
 }
-
-/* ─── Responsive ────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .pag-hamburger {
-    display: flex;
-  }
-
-  .pag-nav-links {
-    position: absolute;
-    top: 64px;
-    right: 0;
-    flex-direction: column;
-    background: rgba(10, 10, 10, 0.95);
-    width: 220px;
-    padding: 1rem;
-    display: none;
-    gap: 1rem;
-  }
-
-  .pag-nav-links.active {
-    display: flex;
-  }
-}
-
 @media (max-width: 480px) {
-  .pag-navbar { padding: 0 1.2rem; }
   .pag-card { padding: 1.5rem 1.2rem; }
 }

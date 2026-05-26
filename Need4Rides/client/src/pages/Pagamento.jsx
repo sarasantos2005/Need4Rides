@@ -139,27 +139,38 @@ export default function Pagamento() {
     },
   };
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+
   return (
     <div className="pag-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="pag-overlay" />
 
-      <nav className="pag-navbar">
-        <span className="pag-logo" onClick={() => navigate('/')}>Need4Rides</span>
+      <nav className="gb-navbar">
+        <span className="gb-logo" onClick={() => navigate('/')}>Need4Rides</span>
 
-        <div className={`pag-hamburger ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
+        <div className={`gb-hamburger ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(!menuOpen)}>
           <span /><span /><span />
         </div>
 
-        <ul className={`pag-nav-links ${menuOpen ? 'active' : ''}`}>
+        <ul className={`gb-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="gb-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/profile" avatarClass="gb-avatar" />
+            <span className="gb-profile-pill-name">{USERNAME}</span>
+          </li>
           <li><a onClick={() => { navigate('/home'); setMenuOpen(false); }}>Home</a></li>
           <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
           <li><a className="active">Pagamento</a></li>
           <li>
-            <button className="pag-theme-btn" onClick={alternarTema}>
+            <button className="gb-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li><AvatarDropdown profilePath="/profile" avatarClass="pag-avatar" /></li>
+          <li className="gb-profile-li avatarNormal">
+            <div className="gb-profile-pill">
+              <span className="gb-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="gb-avatar" />
+            </div>
+          </li>
         </ul>
       </nav>
 
