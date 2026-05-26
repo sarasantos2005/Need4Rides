@@ -14,121 +14,6 @@
   z-index: 0;
 }
 
-/* ─── Navbar ────────────────────────────────────────────── */
-.viagem-navbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2.5rem;
-  height: 64px;
-  background: rgba(10, 10, 10, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-.viagem-logo {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #fff;
-  min-width: 160px;
-  flex-shrink: 0;
-}
-
-.viagem-nav-links {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  flex: 1;
-  justify-content: center;
-}
-
-.viagem-nav-links li { display: flex; align-items: center; }
-
-.viagem-nav-links a {
-  color: #ddd;
-  font-weight: 700;
-  font-size: 0.95rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.viagem-nav-links a:hover,
-.viagem-nav-links a.active { color: #f5c518; }
-
-.viagem-login-btn {
-  background: transparent;
-  border: none;
-  color: #f5c518;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 0;
-  transition: color 0.2s;
-}
-
-.mh-profile-pill {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 4px 4px 4px 10px;
-  border-radius: 999px;
-  transition: background 0.2s, border-color 0.2s;
-  position: absolute;
-  right: 2.5rem;
-}
-
-.mh-profile-pill-name {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #e9e9e9;
-  white-space: nowrap;
-}
-
-.mh-profile-pill-name {
-  color: #f5c518;
-}
-
-.navbar-login-btn:hover {
-  color: #ffd740;
-}
-
-.viagem-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #f5c518;
-  cursor: pointer;
-  display: block;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.viagem-avatar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
-}
-
-.navbar-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #f5c518;
-  cursor: pointer;
-  display: block;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.navbar-avatar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 0 3px rgba(245, 197, 24, 0.4);
-}
-
 /* ─── Wrapper ───────────────────────────────────────────── */
 .viagem-wrapper {
   position: relative;
@@ -497,49 +382,6 @@
   margin: 0;
 }
 
-/* ─── Theme button ──────────────────────────────────────── */
-.viagem-theme-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #fff;
-  padding: 0.4rem 0.9rem;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.viagem-theme-btn:hover {
-  background: rgba(245, 197, 24, 0.2);
-}
-
-/* ─── Hamburger ─────────────────────────────────────────── */
-.viagem-hamburger {
-  display: none;
-  flex-direction: column;
-  cursor: pointer;
-  gap: 5px;
-}
-
-.viagem-hamburger span {
-  width: 22px;
-  height: 2px;
-  background: #fff;
-  transition: 0.3s;
-}
-
-.viagem-hamburger.open span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-
-.viagem-hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-
-.viagem-hamburger.open span:nth-child(3) {
-  transform: rotate(-45deg) translate(5px, -5px);
-}
-
 /* ─── Modo Claro ─────────────────────────────────────────── */
 body.claro .viagem-overlay {
   background: rgba(0, 0, 0, 0.72);
@@ -651,27 +493,6 @@ body.claro .viagem-status-badge.active {
 /* ─── Responsive ────────────────────────────────────────── */
 @media (max-width: 768px) {
   .viagem-bottom { grid-template-columns: 1fr; }
-  .viagem-navbar { padding: 0 1.2rem; }
-
-  .viagem-hamburger {
-    display: flex;
-  }
-
-  .viagem-nav-links {
-    position: absolute;
-    top: 64px;
-    right: 0;
-    flex-direction: column;
-    background: rgba(10, 10, 10, 0.95);
-    width: 220px;
-    padding: 1rem;
-    display: none;
-    gap: 1rem;
-  }
-
-  .viagem-nav-links.active {
-    display: flex;
-  }
 
   .viagem-driver-card {
     flex-wrap: wrap;
