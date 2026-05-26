@@ -96,7 +96,7 @@
   letter-spacing: 0.5px;
 }
 
-/* ─── Actions (tema + voltar) ───────────────────────────── */
+/* ─── Actions (voltar) ──────────────────────────────────── */
 .profile-actions {
   display: flex;
   flex-direction: column;
@@ -120,24 +120,6 @@
 
 .profile-back-btn:hover {
   background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-}
-
-.profile-theme-btn {
-  padding: 0.45rem 1.1rem;
-  border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.06);
-  color: #ddd;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-  white-space: nowrap;
-}
-
-.profile-theme-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
   color: #fff;
 }
 
@@ -352,10 +334,9 @@ body.claro .profile-select option {
   color: #43e97b;
   border: 1px solid rgba(67, 233, 123, 0.3);
   border-radius: 50px;
-  padding: 0.15rem 0.7rem;
+  padding: 0.15rem 0.7 Counseling;
   font-weight: 600;
 }
-
 
 /* ─── MOBILE ────────────────────────────────────────────── */
 @media (max-width: 540px) {
@@ -478,17 +459,6 @@ body.claro .profile-back-btn {
 }
 
 body.claro .profile-back-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  color: #111;
-}
-
-body.claro .profile-theme-btn {
-  background: rgba(0, 0, 0, 0.05);
-  color: #333;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-}
-
-body.claro .profile-theme-btn:hover {
   background: rgba(0, 0, 0, 0.1);
   color: #111;
 }

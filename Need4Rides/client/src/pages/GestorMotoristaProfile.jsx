@@ -1,13 +1,13 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import ddImg from '../assets/images/fennec.jpg';
 import heroBg from '../assets/images/LA.jpg';
+import '../css/global.css';
 import '../css/Profile.css';
 import { useState, useEffect } from 'react';
 import Loading from '../components/Loading';
 import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
 import AvatarDropdown from '../components/AvatarDropdown';
-import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 export default function GestorMotoristaProfile() {
@@ -16,6 +16,7 @@ export default function GestorMotoristaProfile() {
   const [userData, setUserData] = useState(null);
   const [historico, setHistorico] = useState([]);
   const [loading, setLoading] = useMinLoading();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [apiStatus, setApiStatus] = useState({
     user: false,
     historico: false
@@ -98,10 +99,24 @@ export default function GestorMotoristaProfile() {
       <div className="profile-overlay" />
 
       {/* NAVBAR */}
-      <nav className="mh-navbar">
-        <span className="mh-logo">Need4Rides</span>
 
-        <ul className="mh-nav-links">
+      <nav className="gb-navbar">
+        <span className="gb-logo">Need4Rides</span>
+
+        <div
+          className={`gb-hamburger ${menuOpen ? 'open' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+
+        <ul className={`gb-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="gb-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/gestor/perfil" avatarClass="gb-avatar" />
+            <span className="gb-profile-pill-name">{USERNAME}</span>
+          </li>
           <li>
             <a onClick={() => navigate('/gestor')}>Dashboard</a>
           </li>
@@ -112,14 +127,14 @@ export default function GestorMotoristaProfile() {
             <a onClick={() => navigate('/gestor/taxis')}>Táxis</a>
           </li>
           <li>
-            <button className="mh-theme-btn" onClick={alternarTema}>
+            <button className="gb-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li className="mh-profile-li avatarNormal">
-            <div className="mh-profile-pill">
-              <span className="mh-profile-pill-name">{USERNAME}</span>
-              <AvatarDropdown profilePath="/gestor/perfil" avatarClass="mh-avatar" />
+          <li className="gb-profile-li avatarNormal">
+            <div className="gb-profile-pill">
+              <span className="gb-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/gestor/perfil" avatarClass="gb-avatar" />
             </div>
           </li>
         </ul>

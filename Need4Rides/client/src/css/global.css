@@ -205,6 +205,7 @@
     border-left: 1px solid rgba(255,255,255,0.07);
     border-bottom: 1px solid rgba(255,255,255,0.07);
     border-radius: 0 0 0 16px;
+    text-align: center;
   }
 
   .gb-nav-links.active { display: flex; }
