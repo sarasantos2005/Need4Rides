@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/MotoristaFaturaConf.css';
-import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/global.css';
 
@@ -47,18 +46,20 @@ export default function MotoristaFaturaConf() {
 
   if (!trip) return null;
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
+
   return (
     <div className="mfc-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="mfc-overlay" />
 
       {/* Navbar — reutiliza classes mh- */}
-      <nav className="mh-navbar">
-        <span className="mh-logo" onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>
+      <nav className="gb-navbar">
+        <span className="gb-logo" onClick={() => navigate('/motorista')} style={{ cursor: 'pointer' }}>
           Need4Rides
         </span>
 
         <div
-          className={`mh-hamburger ${menuOpen ? 'open' : ''}`}
+          className={`gb-hamburger ${menuOpen ? 'open' : ''}`}
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span></span>
@@ -66,7 +67,11 @@ export default function MotoristaFaturaConf() {
           <span></span>
         </div>
 
-        <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+        <ul className={`gb-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="gb-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/profile" avatarClass="gb-avatar" />
+            <span className="gb-profile-pill-name">{USERNAME}</span>
+          </li>
           <li><a onClick={() => { navigate('/motorista'); setMenuOpen(false); }}>Dashboard</a></li>
           <li><a onClick={() => { navigate('/motorista/reabastecimento'); setMenuOpen(false); }}>Reabastecimento</a></li>
           <li><a onClick={() => { navigate('/motorista/historico'); setMenuOpen(false); }}>Histórico</a></li>
@@ -74,11 +79,16 @@ export default function MotoristaFaturaConf() {
           <li><a onClick={() => { navigate('/motorista/suporte'); setMenuOpen(false); }}>Suporte</a></li>
           <li><a className="active" onClick={() => { navigate('/motorista/viagem'); setMenuOpen(false); }}>Viagem</a></li>
           <li>
-            <button className="mh-theme-btn" onClick={alternarTema}>
+            <button className="gb-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li><AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" /></li>
+          <li className="gb-profile-li avatarNormal">
+            <div className="gb-profile-pill">
+              <span className="gb-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="gb-avatar" />
+            </div>
+          </li>
         </ul>
       </nav>
 

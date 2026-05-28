@@ -208,7 +208,6 @@ export default function Viagem() {
             <span className="gb-profile-pill-name">{USERNAME}</span>
           </li>
           <li><a onClick={() => { navigate('/home'); setMenuOpen(false); }}>Home</a></li>
-          <li><a onClick={() => { navigate('/services'); setMenuOpen(false); }}>Serviços</a></li>
           <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
           <li><a className="active">Viagem</a></li>
           <li>

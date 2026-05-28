@@ -329,7 +329,7 @@ export default function HomeLogado() {
           <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
           <li><a onClick={() => { navigate('/viagem'); setMenuOpen(false); }}>Viagem</a></li>
           <li>
-            <button className="pt-theme-btn" onClick={alternarTema}>
+            <button className="gb-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>

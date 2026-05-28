@@ -88,10 +88,10 @@
 }
 
 .viagem-step-dot {
-  width: 28px; height: 28px;
+  width: 40px; height: 40px;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(33, 31, 31);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,10 +110,14 @@
 }
 
 .viagem-pulse {
-  width: 10px; height: 10px;
+  width: 30px!important; height: 30px!important;
   border-radius: 50%;
   background: #f5c518;
   animation: pulse 1.4s ease-in-out infinite;
+}
+
+.viagem-step-dot.filled span {
+  width: 10px; height: 20px;
 }
 
 @keyframes pulse {
@@ -136,7 +140,7 @@
 
 .viagem-step-line {
   position: absolute;
-  top: 14px;
+  top: 20px;
   left: 50%;
   right: -50%;
   height: 2px;
