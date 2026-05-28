@@ -4,12 +4,34 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/MotoristaReabastecimento.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/global.css';
+import axios from 'axios';
+import VEICULOS from "../../../server/data/marcasEmodelos";
 
 const mockHistReab = [
   { id: 1, data: '28 Mar 2026', hora: '12:30', litros: 42, valor: '€63.00', posto: 'Galp — Marquês de Pombal' },
   { id: 2, data: '24 Mar 2026', hora: '08:15', litros: 38, valor: '€57.00', posto: 'BP — Aeroporto' },
   { id: 3, data: '19 Mar 2026', hora: '17:45', litros: 45, valor: '€67.50', posto: 'Repsol — Cascais' },
 ];
+
+const fetchTaxis = async (token, setTaxi) => {
+  if (!token) { console.error("Token ausente"); return; }
+  try {
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+    const res = await axios.get(`http://localhost:3000/api/turno/atual`, config);
+    if (res.data && res.data.taxi) {
+      setTaxi(res.data.taxi);
+    }
+  } catch (err) {
+    console.error("Erro ao procurar turno atual", err.response?.data || err.message);
+  }
+};
+
+const getDadosMarca = (idBD) => {
+  const marcaEncontrada = VEICULOS.marcas.find(m => m.id === idBD);
+  return marcaEncontrada ? marcaEncontrada.nome : idBD;
+};
+
+
 
 export default function MotoristaReabastecimento() {
   const navigate = useNavigate();
@@ -19,6 +41,22 @@ export default function MotoristaReabastecimento() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [litrosFocused, setLitrosFocused] = useState(false);
   const [valorFocused, setValorFocused] = useState(false);
+  const [taxi, setTaxi] = useState(() => {
+    const saved = localStorage.getItem('motoristataxi');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  useEffect(() => {
+      const token = localStorage.getItem('token');
+  
+      if (!token) {
+        navigate('/login'); 
+      } else {
+        if (token) {
+          Promise.all[(fetchTaxis(token, setTaxi))];
+        }
+      }
+  }, [navigate]);
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -111,9 +149,9 @@ export default function MotoristaReabastecimento() {
           <div>
             <h1 className="mreab-title">Registar Reabastecimento</h1>
             <div className="mreab-veiculo">
-              <span className="mreab-veiculo-modelo">Toyota Corolla</span>
+              <span className="mreab-veiculo-modelo">{taxi ? getDadosMarca(taxi.marca) + " " + taxi.modelo : "---" }</span>
               <span className="mreab-veiculo-sep">●</span>
-              <span className="mreab-veiculo-matricula">00-AA-00</span>
+              <span className="mreab-veiculo-matricula">{taxi ? taxi.matricula : "---"}</span>
             </div>
           </div>
           <button className="mreab-back-btn" onClick={() => navigate('/motorista')}>Voltar</button>
@@ -224,9 +262,19 @@ export default function MotoristaReabastecimento() {
                   />
                 </div>
 
+                {taxi ? (
+                <>
                 <button type="submit" className="mreab-btn-submit" disabled={!isValid}>
                   Registar Reabastecimento
                 </button>
+                </>
+                ) : (
+                <>
+                  <button type="submit" className="mreab-btn-submit" disabled={true}>
+                    Registar Reabastecimento
+                  </button>
+                </>
+                )}
 
               </form>
             )}

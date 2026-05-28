@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
-import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import Loading from '../components/Loading';
 import useMinLoading from '../hooks/useMinLoading';
+import '../css/global.css';
 import '../css/MotoristaRequisitarTaxi.css';
 import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
-import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 export default function MotoristaRequisitarTaxi() {
@@ -99,6 +98,7 @@ export default function MotoristaRequisitarTaxi() {
     return marcaEncontrada ? marcaEncontrada.nome : idBD;
   };
 
+  const USERNAME = JSON.parse(localStorage.getItem("user_logado")).nome;
 
   return (
     <>
@@ -112,11 +112,11 @@ export default function MotoristaRequisitarTaxi() {
       <div className="mh-overlay" />
 
       {/* Navbar */}
-      <nav className="mh-navbar">
-        <span className="mh-logo">Need4Rides</span>
+      <nav className="gb-navbar">
+        <span className="gb-logo">Need4Rides</span>
 
         <div
-          className={`mh-hamburger ${menuOpen ? 'open' : ''}`}
+          className={`gb-hamburger ${menuOpen ? 'open' : ''}`}
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span></span>
@@ -124,19 +124,27 @@ export default function MotoristaRequisitarTaxi() {
           <span></span>
         </div>
 
-        <ul className={`mh-nav-links ${menuOpen ? 'active' : ''}`}>
+        <ul className={`gb-nav-links ${menuOpen ? 'active' : ''}`}>
+          <li className="gb-profile-li avatarHamburguer">
+            <AvatarDropdown profilePath="/motorista/perfil" avatarClass="gb-avatar" />
+            <span className="gb-profile-pill-name">{USERNAME}</span>
+          </li>
+
           <li><a style={{ cursor: 'pointer' }} onClick={() => { navigate('/motorista'); setMenuOpen(false); }}>Dashboard</a></li>
           <li><a onClick={() => { navigate('/motorista/historico'); setMenuOpen(false); }} style={{ cursor: 'pointer' }}>Histórico</a></li>
           <li><a onClick={() => { navigate('/motorista/relatorio'); setMenuOpen(false); }} style={{ cursor: 'pointer' }}>Relatório</a></li>
           <li><a onClick={() => { navigate('/motorista/suporte'); setMenuOpen(false); }} style={{ cursor: 'pointer' }}>Suporte</a></li>
           <li><a className="active">Requisitar Táxi</a></li>
           <li>
-            <button className="mh-theme-btn" onClick={alternarTema}>
+            <button className="gb-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
-          <li>
-            <AvatarDropdown profilePath="/motorista/perfil" avatarClass="mh-avatar" />
+          <li className="gb-profile-li avatarNormal">
+            <div className="gb-profile-pill">
+              <span className="gb-profile-pill-name">{USERNAME}</span>
+              <AvatarDropdown profilePath="/motorista/perfil" avatarClass="gb-avatar" />
+            </div>
           </li>
         </ul>
       </nav>
@@ -173,14 +181,6 @@ export default function MotoristaRequisitarTaxi() {
                 </div>
               </div>
 
-              <div className="mrt-fuel-row">
-                <span className="mrt-fuel-label">Combustível / Carga</span>
-                <span className="mrt-fuel-pct">{t.nivel_combustivel_carga}%</span>
-              </div>
-              <div className="mrt-fuel-bar-bg">
-                <div className="mrt-fuel-bar" style={{ width: `${t.nivel_combustivel_carga}%` }} />
-              </div>
-              <div className="mrt-autonomia">≈ {t.autonomia_maxima} km de autonomia</div>
               <div className="mrt-turno">Ano: {t.ano_compra} | Cor: {t.cor}</div>
 
               {selecionado?._id === t._id && (
@@ -200,6 +200,7 @@ export default function MotoristaRequisitarTaxi() {
             Confirmar Requisição
           </button>
         </div>
+        
       </div>
     </div>
     </>

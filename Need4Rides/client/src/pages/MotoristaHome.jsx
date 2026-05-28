@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
+import '../css/global.css';
 import '../css/MotoristaHome.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import Loading from '../components/Loading';
@@ -9,7 +10,6 @@ import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
 import { io } from 'socket.io-client';
-import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 
 function minutosAgora() {
@@ -552,17 +552,6 @@ export default function MotoristaHome() {
                     <span className="mh-car-label">Conforto</span>
                     <span className="mh-car-value">{taxi.nivel_conforto}</span>
                   </div>
-                </div>
-                <div className="mh-fuel-row">
-                  <span className="mh-car-label">Combustível / Carga</span>
-                  <span className="mh-car-label">{taxi.nivel_combustivel_carga}%</span>
-                </div>
-                <div className="mh-fuel-bar-bg">
-                  <div className="mh-fuel-bar" style={{ width: `${taxi.nivel_combustivel_carga}%` }} />
-                </div>
-                <div className="mh-reab-row">
-                  <span className="mh-car-label">Autonomia Máxima</span>
-                  <span className="mh-reab-val">≈ {taxi.autonomia_maxima} km</span>
                 </div>
                 <button className="mh-btn-requisitar" style={{ marginTop: '1rem' }}
                   onClick={devolverTaxi}>

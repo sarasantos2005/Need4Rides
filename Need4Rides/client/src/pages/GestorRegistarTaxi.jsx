@@ -233,27 +233,11 @@ export default function GestorRegistarTaxi() {
               </div>
             </div>
 
-            {form.tipo_motor === 'Elétrico' && (
-              <div className="grm-row">
-                <div className="grm-field grm-field-wide">
-                  <label>Autonomia Máxima (km)</label>
-                  <input
-                    type="number"
-                    name="autonomia_maxima"
-                    placeholder="Ex: 500"
-                    min="1"
-                    value={form.autonomia_maxima}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-            )}
-
             <div className="grm-actions">
               <button type="button" className="grm-btn-cancel" onClick={() => navigate('/gestor/taxis')}>
                 Cancelar
               </button>
+              
               <button type="submit" className="grm-btn-submit">
                 Registar Táxi
               </button>
