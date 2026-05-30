@@ -156,16 +156,14 @@ function FormFinalizar({ reab, tipoMotor, onFinalizado, onCancelar }) {
     const [valor, setValor] = useState('');
     const [litros, setLitros] = useState('');
     const [kWh, setKWh] = useState('');
-    const [erro, setErro] = useState('');
     const [valorFocused, setValorFocused] = useState(false);
     const [litrosFocused, setLitrosFocused] = useState(false);
     const [kWhFocused, setKWhFocused] = useState(false);
  
     const handleFinalizar = async () => {
-        setErro('');
-        if (!fim || !valor) { setErro("Preenche o fim e o valor."); return; }
-        if (tipoMotor === "Combustão" && !litros) { setErro("Preenche os litros."); return; }
-        if (tipoMotor === "Elétrico" && !kWh) { setErro("Preenche os kWh."); return; }
+        if (!fim || !valor) { toastAviso("Preenche todos os parâmetros."); return; }
+        if (tipoMotor === "Combustão" && !litros) { toastAviso("Preenche todos os parâmetros."); return; }
+        if (tipoMotor === "Elétrico" && !kWh) { toastAviso("Preenche todos os parâmetros."); return; }
  
         try {
             const token = localStorage.getItem('token');
@@ -179,7 +177,7 @@ function FormFinalizar({ reab, tipoMotor, onFinalizado, onCancelar }) {
             }, config);
             onFinalizado();
         } catch (err) {
-            setErro(err.response?.data?.message || "Erro ao finalizar.");
+            toastErro(err.response?.data?.message || "Erro ao finalizar.");
         }
     };
  
@@ -227,7 +225,6 @@ function FormFinalizar({ reab, tipoMotor, onFinalizado, onCancelar }) {
                 <label>Fim</label>
                 <input type="datetime-local" value={fim} onChange={e => setFim(e.target.value)} />
             </div>
-            {erro && <div className="mreab-erro">{erro}</div>}
             <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                 <button type="button" className="mreab-btn-submit" onClick={handleFinalizar}>
                     Finalizar
@@ -389,7 +386,7 @@ export default function MotoristaReabastecimento() {
 
   const isValid = form.inicio && form.quilometragem && postoMorada && 
                   (!temQualquerOpcional || (
-                    form.fim && form.valor && form.litros && 
+                    form.fim && form.valor && 
                     (taxi?.tipo_motor === "Combustão" ? form.litros : form.kWh)
                   ));
   const temEmCurso = historico.some(r => r.estado === "Em curso");
@@ -640,7 +637,6 @@ export default function MotoristaReabastecimento() {
                     onChange={handleChange}
                   />
                 </div>
-
                 <button type="submit" className="mreab-btn-submit" disabled={!isValid || !taxi || !turnoId || temEmCurso}>
                     {temFim ? 'Registar Reabastecimento' : '⚡ Iniciar Reabastecimento'}
                 </button>
