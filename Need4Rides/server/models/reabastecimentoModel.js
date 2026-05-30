@@ -32,7 +32,7 @@ const reabastecimentoSchema = new mongoose.Schema({
 
     valor_pago: { 
         type: Number, 
-        required: true, 
+        required: false, 
         min: 0 
     },    
     

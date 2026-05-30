@@ -39,19 +39,19 @@ async function runSeed() {
 
         //Taxis
         const taxis = await Taxi.insertMany([
-            { matricula: "AA-00-BB", marca: "tesla", modelo: "Model 3", tipo_motor: "Elétrico", nivel_conforto: "Luxuoso", ano_compra: 2023, cor: "#000000", nivel_combustivel_carga: 68, autonomia_maxima: 500 },
-            { matricula: "CC-11-DD", marca: "mercedes", modelo: "Classe E", tipo_motor: "Combustão", nivel_conforto: "Luxuoso", ano_compra: 2022, cor: "#000000", nivel_combustivel_carga: 80, autonomia_maxima: 200 },
-            { matricula: "EE-22-FF", marca: "skoda", modelo: "Octavia", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2021, cor: "#8B0000", nivel_combustivel_carga: 70, autonomia_maxima: 400 },
-            { matricula: "GG-33-HH", marca: "peugeot", modelo: "308", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2010, cor: "#FF0000", nivel_combustivel_carga: 90, autonomia_maxima: 500 },
-            { matricula: "II-44-JJ", marca: "volkswagen", modelo: "Golf", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2012, cor: "#F8F8FF", nivel_combustivel_carga: 49, autonomia_maxima: 300 },
-            { matricula: "KK-55-LL", marca: "renault", modelo: "Clio", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2021, cor: "#B0E0E6", nivel_combustivel_carga: 28, autonomia_maxima: 600 },
-            { matricula: "MM-66-NN", marca: "bmw", modelo: "X1", tipo_motor: "Combustão", nivel_conforto: "Luxuoso", ano_compra: 2025, cor: "#D8BFD8", nivel_combustivel_carga: 88, autonomia_maxima: 500 },
-            { matricula: "OO-77-PP", marca: "audi", modelo: "TT", tipo_motor: "Combustão", nivel_conforto: "Luxuoso", ano_compra: 2004, cor: "#8B008B", nivel_combustivel_carga: 99, autonomia_maxima: 120 },
-            { matricula: "QQ-88-RR", marca: "ford", modelo: "Fiesta", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2021, cor: "#FF1493", nivel_combustivel_carga: 73, autonomia_maxima: 450 },
-            { matricula: "SS-99-TT", marca: "tesla", modelo: "Cybertruck", tipo_motor: "Elétrico", nivel_conforto: "Luxuoso", ano_compra: 2020, cor: "#00FF00", nivel_combustivel_carga: 92, autonomia_maxima: 550 },
-            { matricula: "UU-00-VV", marca: "tesla", modelo: "Model S Plaid", tipo_motor: "Elétrico", nivel_conforto: "Luxuoso", ano_compra: 2022, cor: "#0000CD", nivel_combustivel_carga: 68, autonomia_maxima: 380 },
-            { matricula: "WW-22-XX", marca: "dacia", modelo: "Sandero", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2026, cor: "#363636", nivel_combustivel_carga: 68, autonomia_maxima: 820 },
-            { matricula: "YY-33-ZZ", marca: "dacia", modelo: "Sandero", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2024, cor: "#C0C0C0", nivel_combustivel_carga: 82, autonomia_maxima: 820 }
+            { matricula: "AA-00-BB", marca: "tesla", modelo: "Model 3", tipo_motor: "Elétrico", nivel_conforto: "Luxuoso", ano_compra: 2023, cor: "#000000" },
+            { matricula: "CC-11-DD", marca: "mercedes", modelo: "Classe E", tipo_motor: "Combustão", nivel_conforto: "Luxuoso", ano_compra: 2022, cor: "#000000"},
+            { matricula: "EE-22-FF", marca: "skoda", modelo: "Octavia", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2021, cor: "#8B0000"},
+            { matricula: "GG-33-HH", marca: "peugeot", modelo: "308", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2010, cor: "#FF0000"},
+            { matricula: "II-44-JJ", marca: "volkswagen", modelo: "Golf", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2012, cor: "#F8F8FF"},
+            { matricula: "KK-55-LL", marca: "renault", modelo: "Clio", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2021, cor: "#B0E0E6"},
+            { matricula: "MM-66-NN", marca: "bmw", modelo: "X1", tipo_motor: "Combustão", nivel_conforto: "Luxuoso", ano_compra: 2025, cor: "#D8BFD8"},
+            { matricula: "OO-77-PP", marca: "audi", modelo: "TT", tipo_motor: "Combustão", nivel_conforto: "Luxuoso", ano_compra: 2004, cor: "#8B008B"},
+            { matricula: "QQ-88-RR", marca: "ford", modelo: "Fiesta", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2021, cor: "#FF1493"},
+            { matricula: "SS-99-TT", marca: "tesla", modelo: "Cybertruck", tipo_motor: "Elétrico", nivel_conforto: "Luxuoso", ano_compra: 2020, cor: "#00FF00"},
+            { matricula: "UU-00-VV", marca: "tesla", modelo: "Model S Plaid", tipo_motor: "Elétrico", nivel_conforto: "Luxuoso", ano_compra: 2022, cor: "#0000CD"},
+            { matricula: "WW-22-XX", marca: "dacia", modelo: "Sandero", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2026, cor: "#363636"},
+            { matricula: "YY-33-ZZ", marca: "dacia", modelo: "Sandero", tipo_motor: "Combustão", nivel_conforto: "Básico", ano_compra: 2024, cor: "#C0C0C0"}
         ]);
 
         //Preco
@@ -189,10 +189,7 @@ async function runSeed() {
                 taxi: taxis[1]._id, 
                 turno: turno[0]._id,
                 inicio_abastecimento: new Date(inicioDoTurno.getTime() + 30 * 60000),
-                fim_abastecimento: new Date(inicioDoTurno.getTime() + 40 * 60000),
-                quilometragem: 50150, // R26: Maior que os 50000 anteriores
-                valor_pago: 20.00,
-                litros: 12.0,
+                quilometragem: 50155, // R26: Maior que os 50150 anteriores
                 estado: 'Em curso',
                 posto: {
                     morada: "Estação de Carregamento GALP",

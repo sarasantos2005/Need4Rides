@@ -151,6 +151,96 @@ const getDadosMarca = (idBD) => {
   return marcaEncontrada ? marcaEncontrada.nome : idBD;
 };
 
+function FormFinalizar({ reab, tipoMotor, onFinalizado, onCancelar }) {
+    const [fim, setFim] = useState('');
+    const [valor, setValor] = useState('');
+    const [litros, setLitros] = useState('');
+    const [kWh, setKWh] = useState('');
+    const [erro, setErro] = useState('');
+    const [valorFocused, setValorFocused] = useState(false);
+    const [litrosFocused, setLitrosFocused] = useState(false);
+    const [kWhFocused, setKWhFocused] = useState(false);
+ 
+    const handleFinalizar = async () => {
+        setErro('');
+        if (!fim || !valor) { setErro("Preenche o fim e o valor."); return; }
+        if (tipoMotor === "Combustão" && !litros) { setErro("Preenche os litros."); return; }
+        if (tipoMotor === "Elétrico" && !kWh) { setErro("Preenche os kWh."); return; }
+ 
+        try {
+            const token = localStorage.getItem('token');
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            await axios.patch(`http://localhost:3000/api/reabastecimento/${reab._id}`, {
+                reabastecimentoId: reab._id,
+                fim,
+                valor_pago: parseFloat(valor),
+                litros: parseFloat(litros) || undefined,
+                kWh: parseFloat(kWh) || undefined,
+            }, config);
+            onFinalizado();
+        } catch (err) {
+            setErro(err.response?.data?.message || "Erro ao finalizar.");
+        }
+    };
+ 
+    return (
+        <div className="mreab-card mreab-form-card">
+          <div className="mreab-form">
+            {tipoMotor === "Combustão" && (
+                <div className="mreab-field">
+                    <label>Litros</label>
+                    <input
+                        type="text"
+                        placeholder="0.00L"
+                        value={litrosFocused ? litros : (litros ? litros + 'L' : '')}
+                        onFocus={() => setLitrosFocused(true)}
+                        onBlur={() => setLitrosFocused(false)}
+                        onChange={e => { const r = e.target.value.replace(/L/gi,'').trim(); if (r==='' || /^\d*\.?\d*$/.test(r)) setLitros(r); }}
+                    />
+                </div>
+            )}
+            {tipoMotor === "Elétrico" && (
+                <div className="mreab-field">
+                    <label>kWh</label>
+                    <input
+                        type="text"
+                        placeholder="0.00kWh"
+                        value={kWhFocused ? kWh : (kWh ? kWh + 'kWh' : '')}
+                        onFocus={() => setKWhFocused(true)}
+                        onBlur={() => setKWhFocused(false)}
+                        onChange={e => { const r = e.target.value.replace(/kWh/gi,'').trim(); if (r==='' || /^\d*\.?\d*$/.test(r)) setKWh(r); }}
+                    />
+                </div>
+            )}
+            <div className="mreab-field">
+              <label>Valor (€)</label>
+              <input
+                  type="text"
+                  placeholder="€0.00"
+                  value={valorFocused ? valor : (valor ? '€' + valor : '')}
+                  onFocus={() => setValorFocused(true)}
+                  onBlur={() => setValorFocused(false)}
+                  onChange={e => { const r = e.target.value.replace(/€/g,'').trim(); if (r==='' || /^\d*\.?\d*$/.test(r)) setValor(r); }}
+              />
+            </div>
+            <div className="mreab-field">
+                <label>Fim</label>
+                <input type="datetime-local" value={fim} onChange={e => setFim(e.target.value)} />
+            </div>
+            {erro && <div className="mreab-erro">{erro}</div>}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <button type="button" className="mreab-btn-submit" onClick={handleFinalizar}>
+                    Finalizar
+                </button>
+                <button type="button" className="mreab-back-btn" onClick={onCancelar}>
+                    Cancelar
+                </button>
+            </div>
+          </div>
+        </div>
+    );
+}
+
 export default function MotoristaReabastecimento() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ litros: '', kWh: '', valor: '', inicio: '', fim: '', posto: '', obs: '', quilometragem: '' });
@@ -162,6 +252,7 @@ export default function MotoristaReabastecimento() {
   const [valorFocused, setValorFocused] = useState(false);
   const [erroSubmit, setErroSubmit] = useState('');
   const [turnoId, setTurnoId] = useState(null);
+  const [finalizandoId, setFinalizandoId] = useState(null);
   
   const [postoMorada, setPostoMorada] = useState('');
   const [postoCoords, setPostoCoords] = useState(null); // [lat, lng]
@@ -178,7 +269,7 @@ export default function MotoristaReabastecimento() {
     try {
       const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      const resHistorico = await axios.get(`http://localhost:3000/api/reabastecimento/${taxi._id}`, config);
+      const resHistorico = await axios.get(`http://localhost:3000/api/reabastecimento/${taxiAtual._id}`, config);
       setHistorico(resHistorico.data);
     } catch (err) {
       if (err.response?.status === 404) {
@@ -259,8 +350,16 @@ export default function MotoristaReabastecimento() {
     }
   };
 
-  const isValid = (form.litros || form.kWh) && form.valor && form.inicio && form.quilometragem && postoMorada;
+  const temFim = !!form.fim;
+  const temQualquerOpcional = form.fim || form.valor || form.litros || form.kWh;
   
+  const isValid = form.inicio && form.quilometragem && postoMorada && 
+                  (!temQualquerOpcional || (
+                    form.fim && form.valor && form.litros && 
+                    (taxi?.tipo_motor === "Combustão" ? form.litros : form.kWh)
+                  ));
+  const temEmCurso = historico.some(r => r.estado === "Em curso");
+
   /*Tema */
     const [tema, setTema] = useState(() => {
       return localStorage.getItem('tema') || 'escuro';
@@ -359,7 +458,7 @@ export default function MotoristaReabastecimento() {
                 <div className="mreab-form-row">
                   {taxi?.tipo_motor === "Combustão" && (
                     <div className="mreab-field">
-                      <label>Litros</label>
+                      <label>Litros {!temQualquerOpcional && <span className="mreab-label-hint">(opcional)</span>}</label>
                       <input
                         type="text"
                         name="litros"
@@ -373,14 +472,14 @@ export default function MotoristaReabastecimento() {
                             setForm(f => ({ ...f, litros: raw }));
                           }
                         }}
-                        required
+                        required={!!temQualquerOpcional}
                       />
                     </div>
                   )}
 
                   {taxi?.tipo_motor === "Elétrico" && (
                     <div className="mreab-field">
-                      <label>kWh</label>
+                      <label>kWh {!temQualquerOpcional && <span className="mreab-label-hint">(opcional)</span>}</label>
                       <input
                         type="text"
                         name="kWh"
@@ -394,13 +493,13 @@ export default function MotoristaReabastecimento() {
                             setForm(f => ({ ...f, kWh: raw }));
                           }
                         }}
-                        required
+                        required={!!temQualquerOpcional}
                       />
                     </div>
                   )}
 
                   <div className="mreab-field">
-                    <label>Valor Total (€)</label>
+                    <label>Valor Total (€) {!temQualquerOpcional && <span className="mreab-label-hint">(opcional)</span>}</label>
                     <input
                       type="text"
                       name="valor"
@@ -414,7 +513,7 @@ export default function MotoristaReabastecimento() {
                           setForm(f => ({ ...f, valor: raw }));
                         }
                       }}
-                      required
+                      required={!!temQualquerOpcional}
                     />
                   </div>
                 </div>
@@ -438,12 +537,13 @@ export default function MotoristaReabastecimento() {
                   </div>
 
                   <div className="mreab-field">
-                    <label>Fim</label>
+                    <label>Fim {!temQualquerOpcional && <span className="mreab-label-hint">(opcional)</span>}</label>
                     <input
                       type="datetime-local"
                       name="fim"
                       value={form.fim}
                       onChange={handleChange}
+                      required={!!temQualquerOpcional}
                     />
                   </div>
                 </div>
@@ -469,6 +569,7 @@ export default function MotoristaReabastecimento() {
                               placeholder="Seleciona no mapa..."
                               value={postoMorada}
                               readOnly
+                              required
                               style={{ flex: 1, cursor: 'default' }}
                           />
                           <button
@@ -513,19 +614,9 @@ export default function MotoristaReabastecimento() {
                 </div>
 
                 {erroSubmit && <div className="mreab-erro">{erroSubmit}</div>}
-                {taxi ? (
-                <>
-                <button type="submit" className="mreab-btn-submit" disabled={!isValid || !taxi || !turnoId}>
-                  Registar Reabastecimento
+                <button type="submit" className="mreab-btn-submit" disabled={!isValid || !taxi || !turnoId || temEmCurso}>
+                    {temFim ? 'Registar Reabastecimento' : '⚡ Iniciar Reabastecimento'}
                 </button>
-                </>
-                ) : (
-                <>
-                  <button type="submit" className="mreab-btn-submit" disabled={true}>
-                    Registar Reabastecimento
-                  </button>
-                </>
-                )}
 
               </form>
             )}
@@ -535,32 +626,46 @@ export default function MotoristaReabastecimento() {
           <div className="mreab-card mreab-hist-card">
             <h3 className="mreab-card-title">Reabastecimentos Anteriores</h3>
             <div className="mreab-hist-list">
-              {historico && historico.length > 0 ? historico.map(r => (
-                <div className="mreab-hist-row" key={r._id}>
-                  <div className="mreab-hist-info">
-                    <span className="mreab-hist-posto">{r.posto?.morada}</span>
-                    <span className="mreab-hist-date">
-                      {new Date(r.inicio_abastecimento).toLocaleDateString('pt-PT')} às{" "}
-                      {new Date(r.inicio_abastecimento).toLocaleTimeString('pt-PT', {hour: '2-digit', minute:'2-digit'})}
-                    </span>
-                    {r.estado === "Em curso" && (
-                      <span className="mreab-hist-estado-emcurso">⚡ Em curso</span>
-                    )}
+              {historico.length > 0 ? historico.map(r => (
+                  <div className="mreab-hist-row" key={r._id} style={{ flexDirection: 'column', alignItems: 'stretch', gap: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <div className="mreab-hist-info">
+                              <span className="mreab-hist-posto">{r.posto?.morada || '—'}</span>
+                              <span className="mreab-hist-date">
+                                  {new Date(r.inicio_abastecimento).toLocaleDateString('pt-PT')} às{" "}
+                                  {new Date(r.inicio_abastecimento).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                          </div>
+                          <div className="mreab-hist-values">
+                              {r.litros > 0 && <span className="mreab-hist-litros">{r.litros} L</span>}
+                              {r.kWh > 0 && <span className="mreab-hist-litros">{r.kWh} kWh</span>}
+                              {r.valor_pago > 0 && <span className="mreab-hist-valor">{r.valor_pago}€</span>}
+                          </div>
+                      </div>
+
+                      {r.estado === "Em curso" && finalizandoId !== r._id && (
+                          <button
+                              type="button"
+                              className="mreab-btn-submit"
+                              style={{ margin: 0, padding: '6px 14px', fontSize: '0.85rem' }}
+                              onClick={() => setFinalizandoId(r._id)}
+                          >
+                              Finalizar
+                          </button>
+                      )}
+
+                      {r.estado === "Em curso" && finalizandoId === r._id && (
+                          <FormFinalizar
+                              reab={r}
+                              tipoMotor={taxi?.tipo_motor}
+                              onFinalizado={async () => {
+                                  setFinalizandoId(null);
+                                  await fetchHistorico(taxi);
+                              }}
+                              onCancelar={() => setFinalizandoId(null)}
+                          />
+                      )}
                   </div>
-                  <div className="mreab-hist-values">
-                    {r.litros > 0 && (
-                      <>
-                      <span className="mreab-hist-litros">{r.litros} Litros</span>
-                      </>
-                    )}
-                    {r.kWh > 0 && (
-                      <>
-                      <span className="mreab-hist-litros">{r.kWh} kWh</span>
-                      </>
-                    )}
-                    <span className="mreab-hist-valor">{r.valor_pago}€</span>
-                  </div>
-                </div>
               )) : "Não há reabastecimentos anteriores"}
             </div>
           </div>
