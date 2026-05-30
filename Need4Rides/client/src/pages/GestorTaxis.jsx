@@ -5,6 +5,7 @@ import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/GestorMotoristas.css';
 import '../css/global.css';
 import { useState, useEffect } from 'react';
+import { toastSucesso, toastErro } from '../components/toast.js';
 
 const estadoClass = estado => {
   if (estado === 'Em serviço')  return 'servico';
@@ -19,6 +20,8 @@ export default function GestorTaxis() {
   const [sortDir, setSortDir] = useState(1);
   const [taxis, setTaxis] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [taxiParaRemover, setTaxiParaRemover] = useState(null);
+  const [removendo, setRemovendo] = useState(false);
 
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
 
@@ -27,13 +30,33 @@ export default function GestorTaxis() {
     localStorage.setItem('tema', tema);
   }, [tema]);
 
-  useEffect(() => {
+  const fetchTaxis = () => {
+    setLoading(true);
     fetch('http://localhost:3000/api/taxi/all')
       .then(r => r.json())
       .then(data => setTaxis(data.taxis ?? []))
       .catch(() => setTaxis([]))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { fetchTaxis(); }, []);
+
+  const confirmarRemover = async () => {
+    if (!taxiParaRemover) return;
+    setRemovendo(true);
+    try {
+      const res = await fetch(`http://localhost:3000/api/taxi/${taxiParaRemover._id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) { toastErro(data.message || 'Erro ao remover táxi.'); return; }
+      toastSucesso('Táxi removido com sucesso.');
+      setTaxiParaRemover(null);
+      fetchTaxis();
+    } catch {
+      toastErro('Não foi possível ligar ao servidor.');
+    } finally {
+      setRemovendo(false);
+    }
+  };
 
   const alternarTema = () => setTema(prev => prev === 'escuro' ? 'claro' : 'escuro');
 
@@ -64,6 +87,22 @@ export default function GestorTaxis() {
   return (
     <div className="gm-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="grm-overlay" />
+
+      {/* MODAL DE CONFIRMAÇÃO DE REMOÇÃO */}
+      {taxiParaRemover && (
+        <div className="gt-modal-overlay" onClick={() => setTaxiParaRemover(null)}>
+          <div className="gt-modal" onClick={e => e.stopPropagation()}>
+            <h3>Remover táxi</h3>
+            <p>Tens a certeza que queres remover o táxi <strong>{taxiParaRemover.matricula}</strong>?<br />Esta ação não pode ser desfeita.</p>
+            <div className="gt-modal-actions">
+              <button className="gt-btn-editar" onClick={() => setTaxiParaRemover(null)} disabled={removendo}>Cancelar</button>
+              <button className="gt-btn-remover" onClick={confirmarRemover} disabled={removendo}>
+                {removendo ? 'A remover...' : 'Remover'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* NAVBAR */}
       <nav className="gb-navbar">
@@ -141,13 +180,15 @@ export default function GestorTaxis() {
                     Ano <SortIcon col="ano_compra" />
                   </th>
                   <th>Cor</th>
+                  <th>Editar</th>
+                  <th>Remover</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>A carregar táxis...</td></tr>
+                  <tr><td colSpan={9} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>A carregar táxis...</td></tr>
                 ) : sorted.length === 0 ? (
-                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Nenhum táxi registado.</td></tr>
+                  <tr><td colSpan={9} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Nenhum táxi registado.</td></tr>
                 ) : sorted.map(t => (
                   <tr key={t._id}>
                     <td className="gm-nome">{t.matricula}</td>
@@ -173,6 +214,16 @@ export default function GestorTaxis() {
                         }}
                         title={t.cor}
                       />
+                    </td>
+                    <td>
+                      <button className="gt-btn-editar" onClick={() => navigate(`/gestor/editar-taxi/${t._id}`)}>
+                        Editar
+                      </button>
+                    </td>
+                    <td>
+                      <button className="gt-btn-remover" onClick={() => setTaxiParaRemover(t)}>
+                        Remover
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -221,6 +272,10 @@ export default function GestorTaxis() {
                 <div className="gm-m-row">
                   <span className="gm-m-label">Ano</span>
                   <span className="gm-muted">{t.ano_compra}</span>
+                </div>
+                <div className="gm-m-row" style={{ marginTop: '0.5rem', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                  <button className="gt-btn-editar" onClick={() => navigate(`/gestor/editar-taxi/${t._id}`)}>Editar</button>
+                  <button className="gt-btn-remover" onClick={() => setTaxiParaRemover(t)}>Remover</button>
                 </div>
               </div>
             ))}

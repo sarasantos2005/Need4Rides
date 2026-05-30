@@ -288,3 +288,91 @@ th.desc .sort-icon .up { color: rgba(255,255,255,.2); }
   .gm-wrapper { padding: 70px 1rem 2rem; }
 }
 
+/* Botões de ação (editar / remover) na tabela */
+.gt-btn-editar, .gt-btn-remover {
+  border: none;
+  border-radius: 8px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.12s;
+  white-space: nowrap;
+}
+
+.gt-btn-editar {
+  background: rgba(79, 172, 254, 0.15);
+  color: #4facfe;
+  border: 1px solid rgba(79, 172, 254, 0.3);
+}
+
+.gt-btn-editar:hover {
+  background: rgba(79, 172, 254, 0.28);
+  transform: translateY(-1px);
+}
+
+.gt-btn-remover {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.gt-btn-remover:hover {
+  background: rgba(255, 107, 107, 0.28);
+  transform: translateY(-1px);
+}
+
+/* Modal de confirmação de remoção */
+.gt-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.gt-modal {
+  background: rgba(18, 18, 26, 0.97);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+}
+
+.gt-modal h3 {
+  color: #e0e0e0;
+  margin: 0 0 0.6rem;
+  font-size: 1.1rem;
+}
+
+.gt-modal p {
+  color: #999;
+  font-size: 0.88rem;
+  margin: 0 0 1.5rem;
+}
+
+.gt-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.gt-modal-actions .gt-btn-editar,
+.gt-modal-actions .gt-btn-remover {
+  padding: 0.55rem 1.4rem;
+  font-size: 0.85rem;
+}
+
+body.claro .gt-modal {
+  background: rgba(255,255,255,0.97);
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+body.claro .gt-modal h3 { color: #111; }
+body.claro .gt-modal p  { color: #555; }
+
