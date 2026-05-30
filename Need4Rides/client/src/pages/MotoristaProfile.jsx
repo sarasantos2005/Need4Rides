@@ -202,18 +202,82 @@ export default function MotoristaProfile() {
   }
 
   const handleSave = async() => {
+    const nomeTrim = formData.nome?.trim();
+    const emailTrim = formData.email?.trim();
+    const cartaTrim = formData.n_carta_conducao?.trim();
+    const moradaTrim = formData.morada?.trim();
+
+    if (!nomeTrim) {
+      toastAviso("O campo Nome é obrigatório e não pode conter apenas espaços.");
+      return;
+    }
+    if (!emailTrim) {
+      toastAviso("O campo Email é obrigatório.");
+      return;
+    }
+    if (!cartaTrim) {
+      toastAviso("O número da Carta de Condução é obrigatório.");
+      return;
+    }
+    if (!moradaTrim) {
+      toastAviso("Por favor, selecione uma morada válida utilizando o mapa.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailTrim)) {
+      toastErro("O formato do email introduzido não é válido (Ex: utilizador@dominio.com).");
+      return;
+    }
+
+    const cartaRegex = /^[a-z]{2}\s\d{6}\s[a-z]{1}$/i;
+    if (!cartaRegex.test(cartaTrim)) {
+      toastErro("Formato da carta inválido. Use o padrão: XX 000000 Y (Ex: LX 123456 A)");
+      return;
+    }
+
+    if (nomeTrim.length < 3) {
+      toastErro("O nome deve conter pelo menos 3 caracteres.");
+      return;
+    }
+
+    if (cartaTrim.length < 5 || cartaTrim.length > 20) {
+      toastErro("O número da carta de condução introduzido parece inválido.");
+      return;
+    }
+
+    const anoAtual = new Date().getFullYear();
+    const anoNascimentoNum = Number(formData.ano_nascimento);
+
+    if (!formData.ano_nascimento || isNaN(anoNascimentoNum)) {
+      toastAviso("Por favor, selecione o seu ano de nascimento.");
+      return;
+    }
+
+    if (anoAtual - anoNascimentoNum < 18) {
+      toastErro("O motorista deve ser maior de idade (18 anos).");
+      return;
+    }
+
+    if (formData.senha_acesso_web && formData.senha_acesso_web.length < 6) {
+      toastErro("A nova password deve conter pelo menos 6 caracteres.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
 
       const dadosParaEnviar = {
         ...formData,
-        ano_nascimento: formData.ano_nascimento ? Number(formData.ano_nascimento) : undefined
+        ano_nascimento: anoNascimentoNum
       };
 
       const response = await axios.patch(`http://localhost:3000/api/user/`, dadosParaEnviar, {
         headers: { Authorization: `Bearer ${token}` }
       });
+
       localStorage.setItem('user_logado', JSON.stringify(response.data.user));
+      setUserData(response.data.user);
       toastSucesso("Alterações guardadas!");
     } catch (err) {
       toastErro(err.response?.data?.message || "Erro ao salvar alterações");

@@ -264,12 +264,12 @@ exports.editarPerfil = async(req, res) => {
       }
 
       if (updates.n_carta_conducao) {
-        const regexCartaPortugal = /^([A-Z]{2}-\d{5} \d|[A-Z0-9]{7,12})$/;
+        const regexCartaPortugal = /^[a-z]{2}\s\d{6}\s[a-z]{1}$/i;
         const cartaFormatada = updates.n_carta_conducao.toUpperCase().trim();
         if (!regexCartaPortugal.test(cartaFormatada)) {
           return res.status(400).json({ 
             success: false, 
-            message: "Formato da Carta de Condução inválido (Campo 5). Ex: LX-12345 6 ou Alfanumérico." 
+            message: "Formato da carta inválido. Use o padrão: XX 000000 Y (Ex: LX 123456 A)" 
           });
         }
 
