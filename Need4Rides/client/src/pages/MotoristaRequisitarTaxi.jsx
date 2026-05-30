@@ -50,8 +50,14 @@ export default function MotoristaRequisitarTaxi() {
             setTurnoAtivo(resTurno.data);
             setApiStatus(prev => ({ ...prev, turno: true }));
 
+            const turno = resTurno.data;
+            console.log(turno);
             const res = await axios.get('http://localhost:3000/api/taxi/', {
-              headers: { Authorization: `Bearer ${token}` }
+              headers: { Authorization: `Bearer ${token}` },
+              params: {
+                inicio: new Date(turno.hora_inicio).toISOString(),
+                fim: new Date(turno.hora_fim).toISOString()
+              }
             });
             setTaxis(res.data);
             setApiStatus({ taxi: true, turno: true });
