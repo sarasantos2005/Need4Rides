@@ -304,7 +304,7 @@ export default function MotoristaProfile() {
                 Voltar
               </button>
 
-              <button className="profile-theme-btn" onClick={alternarTema}>
+              <button className="gb-theme-btn" onClick={alternarTema}>
                 {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
               </button>
             </div>
