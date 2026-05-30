@@ -9,13 +9,25 @@ const reabastecimentoSchema = new mongoose.Schema({
 
     fim_abastecimento: { 
         type: Date, 
-        required: true 
+        required: false 
     },
 
     quilometragem: { 
         type: Number, 
         required: true, 
-        min: 0 
+        min: 1
+    },
+
+    posto: {
+        morada: { 
+            type: String, 
+            required: true 
+        },
+
+        localizacao: {
+            type: { type: String, default: 'Point' },
+            coordinates: { type: [Number], required: true }
+        }
     },
 
     valor_pago: { 
@@ -48,8 +60,13 @@ const reabastecimentoSchema = new mongoose.Schema({
 
     estado: {
         type: String, 
-        enum: ['Em curso', 'Concluído', 'Cancelado'], 
+        enum: ['Em curso', 'Concluído'], 
         required: true
+    },
+
+    obs: {
+        type: String,
+        required: false
     }
 });
 

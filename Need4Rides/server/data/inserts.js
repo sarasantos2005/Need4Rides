@@ -139,7 +139,14 @@ async function runSeed() {
                 quilometragem: 50000, // R25
                 valor_pago: 65.50,    // R24
                 litros: 40.5,         // R22
-                estado: 'Concluído'
+                estado: 'Concluído',
+                posto: {
+                    morada: "Estação de Carregamento GALP",
+                    localizacao: {
+                        type: "Point",
+                        coordinates: [38.76717664396921, -9.1648639241786] 
+                    }   
+                }
             },
             {
                 // CENÁRIO 2: TAXI ELÉTRICO (R10: Início dentro do turno, fim pode ser fora)
@@ -150,7 +157,14 @@ async function runSeed() {
                 quilometragem: 12000, // R25
                 valor_pago: 15.00,    // R24
                 kWh: 35.0,            // R23 
-                estado: 'Em curso'  
+                estado: 'Concluído',
+                posto: {
+                    morada: "Estação de Carregamento GALP",
+                    localizacao: {
+                        type: "Point",
+                        coordinates: [38.76470539584935, -9.15820918715102] 
+                    }   
+                }
             },
             {
                 // CENÁRIO 3: KM CRESCENTES (R26)
@@ -161,18 +175,32 @@ async function runSeed() {
                 quilometragem: 50150, // R26: Maior que os 50000 anteriores
                 valor_pago: 20.00,
                 litros: 12.0,
-                estado: 'Concluído'
+                estado: 'Concluído',
+                posto: {
+                    morada: "Estação de Carregamento GALP",
+                    localizacao: {
+                        type: "Point",
+                        coordinates: [38.76717664396921, -9.1648639241786] 
+                    }   
+                }
             },
             {
-                // CENÁRIO 4: REABASTECIMENTO CANCELADO
-                taxi: taxis[2]._id,
-                turno: turno[2]._id,
-                inicio_abastecimento: agora,
-                fim_abastecimento: new Date(agora.getTime() + 15 * 60000),
-                quilometragem: 30000,
-                valor_pago: 0, 
-                litros: 0,
-                estado: 'Cancelado'
+                // CENÁRIO 4: Em curso
+                taxi: taxis[1]._id, 
+                turno: turno[0]._id,
+                inicio_abastecimento: new Date(inicioDoTurno.getTime() + 30 * 60000),
+                fim_abastecimento: new Date(inicioDoTurno.getTime() + 40 * 60000),
+                quilometragem: 50150, // R26: Maior que os 50000 anteriores
+                valor_pago: 20.00,
+                litros: 12.0,
+                estado: 'Em curso',
+                posto: {
+                    morada: "Estação de Carregamento GALP",
+                    localizacao: {
+                        type: "Point",
+                        coordinates: [38.76717664396921, -9.1648639241786] 
+                    }   
+                }
             }
             
         ]);
