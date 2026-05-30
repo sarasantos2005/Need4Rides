@@ -118,7 +118,6 @@ export default function MotoristaHome() {
     turno: false,
     historico: false
   });
-  const [emTurno, setEmTurno] = useState(true);
   const [agora, setAgora] = useState(minutosAgora());
   const [taxi, setTaxi] = useState(() => {
     const saved = localStorage.getItem('motoristataxi');
@@ -275,6 +274,24 @@ export default function MotoristaHome() {
     }
   };
 
+  const iniciarTurno = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const res = await axios.post('http://localhost:3000/api/turno', {}, { headers: { Authorization: `Bearer ${token}` } });
+
+      setTurnoAtivo(res.data);
+      toastSucesso("Turno criado com sucesso!");
+      navigate('')
+    } catch(err) {
+      toastErro("Erro ao iniciar turno: " + err.response?.data?.message || err.message); 
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const handleAlterarTurno = async() => {
     try {
       const token = localStorage.getItem('token');
@@ -288,7 +305,6 @@ export default function MotoristaHome() {
         if (!result.isConfirmed) return;
 
         try {
-          setLoading(true);
 
           await axios.patch(`http://localhost:3000/api/turno/finalizar`, 
             { turnoId: turnoAtivo._id },
@@ -296,17 +312,14 @@ export default function MotoristaHome() {
           );
 
           setTurnoAtivo(null);
-          setTaxi(null);
+          devolverTaxi();
           setViagensPendentes([]);
           setEmTurno(false);
           localStorage.removeItem('motoristataxi');
         
           toastSucesso("Turno encerrado com sucesso. Bom descanso!");
-          await Promise.all([
-            fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
-            fetchHistorico(token, setHistorico, setApiStatus),
-            fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
-          ]);
+
+          setLoading(true);
         } catch (err) {
           console.error("Erro ao finalizar turno:", err);
           toastErro("Erro ao encerrar o turno no servidor.");
@@ -314,23 +327,7 @@ export default function MotoristaHome() {
           setLoading(false);
         }
       } else {
-        try {
-          setLoading(true);
-          const token = localStorage.getItem('token');
-          const res = await axios.post(
-            'http://localhost:3000/api/turno',
-            {},
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          setTurnoAtivo(res.data);
-          setEmTurno(true);
-          navigate('/motorista/requisitar-taxi');
-        } catch (err) {
-          const msg = err.response?.data?.message || err.message;
-          toastErro("Erro ao iniciar turno: " + msg);
-        } finally {
-          setLoading(false);
-        }
+        navigate("/motorista/turno");
       }
     } catch (err) {
       toastErro("Erro ao alterar estado do turno.");
@@ -494,7 +491,7 @@ export default function MotoristaHome() {
               <p className="mh-welcome-sub">Bem-vindo de volta,</p>
               <h1 className="mh-welcome-name">{userData.nome.split(' ')[0]}</h1>
               <span className={`mh-status-badge ${turnoAtivo ? 'online' : 'offline'}`}>
-                {emTurno ? '● Em turno' : '○ Fora de turno'}
+                {turnoAtivo ? '● Em turno' : '○ Fora de turno'}
               </span>
             </div>
           </div>
@@ -531,44 +528,47 @@ export default function MotoristaHome() {
         <div className="mh-middle-row">
 
           {/* ── Info do carro ── */}
-          <div className="mh-card mh-car-card">
-            <h3 className="mh-card-title">Veículo</h3>
-            {taxi ? (
-              <>
-                <div className="mh-car-grid">
-                  <div className="mh-car-item">
-                    <span className="mh-car-label">Matrícula</span>
-                    <span className="mh-car-value">{taxi.matricula}</span>
+          {turnoAtivo && (
+            <div className="mh-card mh-car-card">
+                <h3 className="mh-card-title">Veículo</h3>
+              {taxi ? (
+                <>
+                  <div className="mh-car-grid">
+                    <div className="mh-car-item">
+                      <span className="mh-car-label">Matrícula</span>
+                      <span className="mh-car-value">{taxi.matricula}</span>
+                    </div>
+                    <div className="mh-car-item">
+                      <span className="mh-car-label">Marca e Modelo</span>
+                      <span className="mh-car-value">{getDadosMarca(taxi.marca)} {taxi.modelo}</span>
+                    </div>
+                    <div className="mh-car-item">
+                      <span className="mh-car-label">Tipo</span>
+                      <span className="mh-car-value">{taxi.tipo_motor}</span>
+                    </div>
+                    <div className="mh-car-item">
+                      <span className="mh-car-label">Conforto</span>
+                      <span className="mh-car-value">{taxi.nivel_conforto}</span>
+                    </div>
                   </div>
-                  <div className="mh-car-item">
-                    <span className="mh-car-label">Marca e Modelo</span>
-                    <span className="mh-car-value">{getDadosMarca(taxi.marca)} {taxi.modelo}</span>
-                  </div>
-                  <div className="mh-car-item">
-                    <span className="mh-car-label">Tipo</span>
-                    <span className="mh-car-value">{taxi.tipo_motor}</span>
-                  </div>
-                  <div className="mh-car-item">
-                    <span className="mh-car-label">Conforto</span>
-                    <span className="mh-car-value">{taxi.nivel_conforto}</span>
-                  </div>
+                  <button className="mh-btn-requisitar" style={{ marginTop: '1rem' }}
+                    onClick={devolverTaxi}>
+                    Devolver Táxi
+                  </button>
+                </>
+              ) : (
+                <div className="mh-no-taxi">
+                  <p>Nenhum táxi requisitado</p>
+                    <button className="mh-btn-requisitar" onClick={() => navigate('/motorista/requisitar-taxi')}>
+                      Requisitar Táxi
+                    </button>
                 </div>
-                <button className="mh-btn-requisitar" style={{ marginTop: '1rem' }}
-                  onClick={devolverTaxi}>
-                  Devolver Táxi
-                </button>
-              </>
-            ) : (
-              <div className="mh-no-taxi">
-                <p>Nenhum táxi requisitado</p>
-                <button className="mh-btn-requisitar" onClick={() => navigate('/motorista/requisitar-taxi')}>
-                  Requisitar Táxi
-                </button>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* ── Tempo de turno ── */}
+          {turnoAtivo  && (
           <div className="mh-card mh-turno-card">
             <h3 className="mh-card-title">Tempo de Turno</h3>
             <div className="mh-turno-circle-wrap">
@@ -601,10 +601,12 @@ export default function MotoristaHome() {
               <div className="mh-progress-bar" style={{ width: `${progressoReal}%` }} />
             </div>
           </div>
+          )}
 
         </div>
 
         {/* ── Pedidos pendentes ── */}
+        {(taxi && turnoAtivo) && (
         <div className="mh-card">
           <div className="mh-section-header">
             <h3 className="mh-card-title">Pedidos Pendentes</h3>
@@ -642,6 +644,7 @@ export default function MotoristaHome() {
           )}
           </div>
         </div>
+        )}
 
         {/* ── Histórico de viagens ── */}
         <div className="mh-card">

@@ -31,6 +31,7 @@ import GestorPrecos from './pages/GestorPrecos';
 import GestorMotoristaProfile from './pages/GestorMotoristaProfile';
 import MotoristaRequisitarTaxi from './pages/MotoristaRequisitarTaxi';
 import MotoristaRelatorio from './pages/MotoristaRelatorio';
+import MotoristaTurno from './pages/MotoristaTurno';
 import MotoristaLayout from './layouts/MotoristaLayout';
 
 function PagamentoRedirect({ children }) {
@@ -171,6 +172,7 @@ export default function App() {
           <Route path="/motorista/viagem" element={<MotoristaViagem />} />
           <Route path="/motorista/fatura-conf" element={<MotoristaFaturaConf />} />
           <Route path="/motorista/relatorio" element={<MotoristaRelatorio />} />
+          <Route path="/motorista/turno" element={<MotoristaTurno />} />
         </Route>
         <Route path="/gestor" element={<GestorHome />} />
         <Route path="/gestor/registar-motorista" element={<GestorRegistarMotorista />} />

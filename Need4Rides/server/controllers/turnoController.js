@@ -55,20 +55,58 @@ exports.turnoAtual = async (req, res) => {
 exports.novoTurno = async (req, res) => {
   try {
     const motoristaId = req.userId;
+    const { hora_inicio, hora_fim, taxiId } = req.body;
+    if (!hora_inicio || !hora_fim || !taxiId) {
+      return res.status(400).json({ message: "Faltam dados obrigatórios: início, fim ou veículo." });
+    }
+
+    const dataInicio = new Date(hora_inicio);
+    const dataFim = new Date(hora_fim);
 
     const turnoExistente = await Turno.findOne({ motorista: motoristaId, estado: 'Ativo' });
     if (turnoExistente) {
       return res.status(400).json({ message: "Já tens um turno ativo." });
     }
 
-    const agora = new Date();
-    const horaFim = new Date(agora.getTime() + 8 * 60 * 60 * 1000);
+    if (dataInicio >= dataFim) {
+      return res.status(400).json({ message: "Restrição 1: A hora de início deve ser anterior à hora de fim." });
+    }
+    const diffHoras = (dataFim - dataInicio) / (1000 * 60 * 60);
+    if (diffHoras > 8) {
+      return res.status(400).json({ message: "Restrição 2: O turno não pode ter uma duração superior a 8 horas." });
+    }
+
+    const motoristaOcupado = await Turno.findOne({
+      motorista: motoristaId,
+      estado: { $in: ["Ativo", "Agendado"] },
+      $or: [
+        { hora_inicio: { $lt: dataFim }, hora_fim: { $gt: dataInicio } }
+      ]
+    });
+
+    if (motoristaOcupado) {
+      return res.status(400).json({ message: "Já tens um turno agendado/ativo que se sobrepõe a este período." });
+    }
+    const taxiOcupado = await Turno.findOne({
+      taxi: taxiId,
+      estado: { $in: ["Ativo", "Agendado"] },
+      $or: [
+        { hora_inicio: { $lt: dataFim }, hora_fim: { $gt: dataInicio } }
+      ]
+    });
+
+    if (taxiOcupado) {
+      return res.status(400).json({ message: "Este veículo já foi requisitado por outro motorista para este período." });
+    }
+
+    const estadoTurno = new Date() >= dataInicio ? "Ativo" : "Agendado";
 
     const turno = await Turno.create({
       motorista: motoristaId,
-      hora_inicio: agora,
-      hora_fim: horaFim,
-      estado: 'Ativo',
+      taxi: taxiId,
+      hora_inicio: dataInicio,
+      hora_fim: dataFim,
+      estado: estadoTurno,
     });
 
     res.status(201).json(turno);
@@ -126,6 +164,7 @@ exports.terminarTurno = async (req, res) => {
 
     res.status(200).json({ message: "Turno terminado com sucesso", turno: turnoAtualizado });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };

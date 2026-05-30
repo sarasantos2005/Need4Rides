@@ -141,13 +141,29 @@ exports.update = async (req, res) => {
 
 exports.listarDisponiveis = async (req, res) => {
   try {
-    const turnosOcupados = await Turno.find({
-      estado: {$in: ["Ativo", "Agendado"]}
+    const {inicio, fim} = req.query;
+
+    if(!inicio || !fim){
+      return res.status(400).json({ message: "As datas de início e fim são obrigatórias para a verificação." });
+    }
+
+    const dataInicio = new Date(inicio);
+    const dataFim = new Date(fim);
+
+    const turnosSobrepostos = await Turno.find({
+      estado: { $in: ["Ativo", "Agendado"] }, 
+      taxi: { $ne: null },
+      $or: [
+        { hora_inicio: { $lt: dataFim }, hora_fim: { $gt: dataInicio } }
+      ]
     }).distinct("taxi");
 
-    const taxis = await Taxi.find({_id: {$nin: turnosOcupados}});
-    res.json(taxis);
+    const taxisDisponiveis = await Taxi.find({
+      _id: { $nin: turnosSobrepostos }
+    });
+    res.json(taxisDisponiveis);
   } catch (error) {
+    console.error("Erro ao listar táxis disponíveis:", error);
     res.status(500).json({ message: "Erro ao procurar táxis." });
   }
 }
