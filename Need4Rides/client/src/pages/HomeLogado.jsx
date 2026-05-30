@@ -308,7 +308,7 @@ export default function HomeLogado() {
     <div className="home">
       {/* Navbar */}
       <nav className="gb-navbar">
-        <span className="gb-navbar-logo">Need4Rides</span>
+        <span className="gb-logo">Need4Rides</span>
 
         <div
           className={`gb-hamburger ${menuOpen ? 'open' : ''}`}
@@ -319,7 +319,7 @@ export default function HomeLogado() {
           <span></span>
         </div>
 
-        <ul className={`gb-nav-links ${menuOpen ? 'active' : ''}`}>  
+        <ul className={`gb-nav-links ${menuOpen ? 'active' : ''}`}>
           <li className="gb-profile-li avatarHamburguer">
             <AvatarDropdown profilePath="/profile" avatarClass="gb-avatar" />
             <span className="gb-profile-pill-name">{USERNAME}</span>
@@ -328,6 +328,7 @@ export default function HomeLogado() {
           <li><a className="active">Home</a></li>
           <li><a onClick={() => { navigate('/pedir-taxi'); setMenuOpen(false); }}>Pedir Táxi</a></li>
           <li><a onClick={() => { navigate('/viagem'); setMenuOpen(false); }}>Viagem</a></li>
+
           <li>
             <button className="gb-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}

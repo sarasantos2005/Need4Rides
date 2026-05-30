@@ -158,8 +158,8 @@
   transition: transform 0.2s;
 }
 
-.avatarNormal { margin-left: auto; display: flex; }
-.avatarHamburguer { display: none !important; }
+.avatarNormal { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; }
+.avatarHamburguer { display: none; }
 .gb-theme-li-hamburger { display: none; }
 
 .gb-profile-pill {
@@ -222,17 +222,61 @@
 
   .avatarNormal { display: none !important; }
   .avatarHamburguer {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    padding: 1.2rem 0.5rem 0.8rem !important;
-    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.2rem 0.5rem 0.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  .avatarHamburguer .gb-profile-pill { flex-direction: column !important; padding: 0 !important; gap: 0.25rem !important; }
-  .avatarHamburguer .gb-avatar { width: 52px !important; height: 52px !important; }
-  .gb-theme-li-hamburger { display: flex !important; padding: 0.6rem 0.5rem 0.2rem; width: 100%; }
+  .avatarHamburguer .gb-profile-pill { flex-direction: column; padding: 0; gap: 0.25rem; }
+  .avatarHamburguer .gb-avatar { width: 52px; height: 52px; }
+  .gb-theme-li-hamburger { display: flex; padding: 0.6rem 0.5rem 0.2rem; width: 100%; }
   .gb-theme-li-hamburger .gb-theme-btn { width: 100%; }
+}
+
+/* ─── Modo Claro – Navbar ─────────────────────────────── */
+body.claro .gb-navbar {
+  background: rgba(248, 248, 248, 0.96);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+body.claro .gb-logo,
+body.claro .gb-navbar-logo {
+  color: #1a1a1a;
+}
+
+body.claro .gb-nav-links a {
+  color: #444;
+}
+
+body.claro .gb-nav-links .active { color: #b8860b !important; }
+body.claro .gb-nav-links a:hover { color: #b8860b; }
+
+body.claro .gb-hamburger span { background: #333; }
+
+body.claro .gb-theme-btn {
+  background: rgba(0, 0, 0, 0.07);
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #333;
+}
+
+body.claro .gb-profile-pill-name { color: #b8860b; }
+
+@media (max-width: 1300px) {
+  body.claro .gb-nav-links {
+    background: rgba(248, 248, 248, 0.97);
+    border-left: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  body.claro .gb-nav-links a {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  body.claro .avatarHamburguer {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
 }
