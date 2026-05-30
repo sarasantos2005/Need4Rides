@@ -22,9 +22,9 @@ export default function Home() {
   return (
     <div className="home">
       {/* Navbar */}
-      <nav className="navbar">
-        <span className="navbar-logo">Need4Rides</span>
-        <ul className="navbar-links">
+      <nav className="gb-navbar">
+        <span className="gb-logo">Need4Rides</span>
+        <ul className="gb-nav-links">
           <li>
             <button
               className="navbar-login-btn"
