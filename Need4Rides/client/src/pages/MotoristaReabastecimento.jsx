@@ -250,9 +250,9 @@ export default function MotoristaReabastecimento() {
   const [litrosFocused, setLitrosFocused] = useState(false);
   const [kWhFocused, setkWhFocused] = useState(false);
   const [valorFocused, setValorFocused] = useState(false);
-  const [erroSubmit, setErroSubmit] = useState('');
   const [turnoId, setTurnoId] = useState(null);
   const [finalizandoId, setFinalizandoId] = useState(null);
+  const [expandedObsId, setExpandedObsId] = useState(null);
   
   const [postoMorada, setPostoMorada] = useState('');
   const [postoCoords, setPostoCoords] = useState(null); // [lat, lng]
@@ -299,16 +299,44 @@ export default function MotoristaReabastecimento() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setErroSubmit('');
 
     if (!turnoId) {
-      setErroSubmit("Não foi possível identificar o turno ativo. Tenta recarregar a página.");
+      toastErro("Não foi possível identificar o turno ativo. Tenta recarregar a página.");
       return;
     }
 
     if (!postoMorada) {
-      setErroSubmit("Seleciona o posto no mapa.");
+      toastErro("Seleciona o posto no mapa.");
       return;
+    }
+
+    if (temEmCurso) {
+      toastErro("Tens um reabastecimento em curso. Finaliza-o antes de iniciar outro.");
+      return;
+    }
+
+    if (!form.inicio) {
+      toastErro("Preenche a hora de início.");
+      return;
+    }
+
+    if (!form.quilometragem || Number(form.quilometragem) <= 0) {
+      toastErro("Preenche a quilometragem com um valor positivo.");
+      return;
+    }
+
+    if (temQualquerOpcional) {
+        if (!form.fim) { toastErro("Se preencheste dados do fim, indica também a hora de fim."); return; }
+        if (!form.valor || parseFloat(form.valor) <= 0) { toastErro("O valor pago deve ser positivo."); return; }
+        if (taxi?.tipo_motor === "Combustão" && (!form.litros || parseFloat(form.litros) <= 0)) {
+            toastErro("Os litros de combustível devem ser positivos."); return;
+        }
+        if (taxi?.tipo_motor === "Elétrico" && (!form.kWh || parseFloat(form.kWh) <= 0)) {
+            toastErro("Os kWh devem ser positivos."); return;
+        }
+        if (new Date(form.fim) <= new Date(form.inicio)) {
+            toastErro("O fim deve ser posterior ao início."); return;
+        }
     }
 
     try {
@@ -333,10 +361,13 @@ export default function MotoristaReabastecimento() {
         obs: form.obs
       };
 
-      await axios.post(`http://localhost:3000/api/reabastecimento`, novoRegisto, config);
-      setSubmitted(true);
+      const res = await axios.post(`http://localhost:3000/api/reabastecimento`, novoRegisto, config);
       
-      await fetchHistorico(taxi);
+      if (res.data.success) {
+        toastSucesso("Reabastecimento registado com sucesso!");
+        setHistorico(h => [res.data.registo, ...h]);
+        setSubmitted(true);
+      }
  
       setTimeout(() => {
         setSubmitted(false);
@@ -345,14 +376,17 @@ export default function MotoristaReabastecimento() {
         setForm({ litros: '', kWh: '', valor: '', inicio: '', fim: '', posto: '', obs: '', quilometragem: '' });
       }, 2500);
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.error || "Erro ao registar reabastecimento.";
-      setErroSubmit(msg);
+      toastErro("Erro ao registar o reabastecimento");
     }
   };
 
   const temFim = !!form.fim;
   const temQualquerOpcional = form.fim || form.valor || form.litros || form.kWh;
   
+  const toggleObservacao = (id) => {
+    setExpandedObsId(prevId => (prevId === id ? null : id));
+  };
+
   const isValid = form.inicio && form.quilometragem && postoMorada && 
                   (!temQualquerOpcional || (
                     form.fim && form.valor && form.litros && 
@@ -446,13 +480,6 @@ export default function MotoristaReabastecimento() {
           {/* Formulário */}
           <div className="mreab-card mreab-form-card">
             <h3 className="mreab-card-title">Novo Registo</h3>
-
-            {submitted ? (
-              <div className="mreab-success">
-                <div className="mreab-success-icon">✓</div>
-                <span>Reabastecimento registado!</span>
-              </div>
-            ) : (
               <form className="mreab-form" onSubmit={handleSubmit}>
 
                 <div className="mreab-form-row">
@@ -555,6 +582,7 @@ export default function MotoristaReabastecimento() {
                     name="quilometragem"
                     placeholder="Ex: 142000"
                     value={form.quilometragem}
+                    min="1"
                     onChange={handleChange}
                     required
                   />
@@ -613,13 +641,11 @@ export default function MotoristaReabastecimento() {
                   />
                 </div>
 
-                {erroSubmit && <div className="mreab-erro">{erroSubmit}</div>}
                 <button type="submit" className="mreab-btn-submit" disabled={!isValid || !taxi || !turnoId || temEmCurso}>
                     {temFim ? 'Registar Reabastecimento' : '⚡ Iniciar Reabastecimento'}
                 </button>
 
               </form>
-            )}
           </div>
 
           {/* Histórico de reabastecimentos */}
@@ -634,6 +660,7 @@ export default function MotoristaReabastecimento() {
                               <span className="mreab-hist-date">
                                   {new Date(r.inicio_abastecimento).toLocaleDateString('pt-PT')} às{" "}
                                   {new Date(r.inicio_abastecimento).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
+                                  {" "} • {r.quilometragem}km
                               </span>
                           </div>
                           <div className="mreab-hist-values">
@@ -665,8 +692,32 @@ export default function MotoristaReabastecimento() {
                               onCancelar={() => setFinalizandoId(null)}
                           />
                       )}
+                      {r.obs && r.obs.trim() !== "" && (
+                        <button
+                          type="button"
+                          className="mreab-back-btn"
+                          style={{ margin: 0, padding: '4px 8px', fontSize: '0.75rem', height: 'fit-content' }}
+                          onClick={() => toggleObservacao(r._id)}
+                        >
+                          {expandedObsId === r._id ? "Ocultar Notas" : "Ver Notas"}
+                        </button>
+                      )}
+                      {expandedObsId === r._id && (
+                        <div style={{
+                          marginTop: '8px',
+                          padding: '8px 12px',
+                          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                          borderRadius: '6px',
+                          borderLeft: '3px solid #f5c518',
+                          fontSize: '0.85rem',
+                          color: '#ddd',
+                          fontStyle: 'italic'
+                        }}>
+                          <strong>Observações:</strong> {r.obs}
+                        </div>
+                      )}
                   </div>
-              )) : "Não há reabastecimentos anteriores"}
+              )) : (<p style={{color: '#aaa', textAlign: 'center', padding: '20px'}}>Não há reabastecimentos anteriores.</p>)}
             </div>
           </div>
 
