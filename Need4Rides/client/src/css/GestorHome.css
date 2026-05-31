@@ -36,7 +36,7 @@
 }
 
 body.claro .gh-date-input {
-  background: rgba(255, 255, 255, 0.85);
+  background: #fff;
   border-color: rgba(0, 0, 0, 0.2);
   color: #222;
   color-scheme: light;
@@ -332,7 +332,8 @@ option:hover {
   white-space: nowrap;
 }
 
-.mh-status-badge.active {
+.mh-status-badge.active,
+.mh-status-badge.online {
   background: rgba(67, 233, 123, 0.1);
   color: #43e97b;
   border: 1px solid rgba(67, 233, 123, 0.25);
@@ -342,6 +343,13 @@ option:hover {
   background: rgba(245, 197, 24, 0.1);
   color: #f5c518;
   border: 1px solid rgba(245, 197, 24, 0.25);
+}
+
+body.claro .mh-status-badge.active,
+body.claro .mh-status-badge.online {
+  background: rgba(34, 160, 74, 0.12);
+  color: #1a7c3e;
+  border: 1px solid rgba(34, 160, 74, 0.3);
 }
 
 /* ─── Motoristas ────────────────────────────────────────── */
@@ -411,6 +419,10 @@ body.claro .mh-stat-label {
 
 body.claro .mh-stat-value {
   color: #111;
+}
+
+body.claro .mh-stat-card.accent .mh-stat-value {
+  color: #b08c00;
 }
 
 body.claro .mh-welcome-sub {

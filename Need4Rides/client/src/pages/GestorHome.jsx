@@ -604,7 +604,7 @@ export default function GestorHome() {
                   onChange={e => setDataInicio(e.target.value)}
                 />
               </div>
-              <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '18px', marginTop: '16px' }}>—</span>
+              <span style={{ color: tema === 'claro' ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.35)', fontSize: '18px', marginTop: '16px' }}>—</span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                 <label className="gh-date-label">
                   Até
@@ -703,7 +703,7 @@ export default function GestorHome() {
                   </div>
                 ))
               ) : (
-                <div style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+                <div style={{ textAlign: 'center', color: tema === 'claro' ? '#444' : '#888', padding: '20px' }}>
                   Nenhuma viagem em curso
                 </div>
               )}

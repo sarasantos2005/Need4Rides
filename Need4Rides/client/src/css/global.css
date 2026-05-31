@@ -239,7 +239,7 @@
 
 /* ─── Modo Claro – Navbar ─────────────────────────────── */
 body.claro .gb-navbar {
-  background: rgba(248, 248, 248, 0.96);
+  background: #f5f5f5;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -258,9 +258,10 @@ body.claro .gb-nav-links a:hover { color: #b8860b; }
 body.claro .gb-hamburger span { background: #333; }
 
 body.claro .gb-theme-btn {
-  background: rgba(0, 0, 0, 0.07);
+  background: #e2e2e2;
   border-color: rgba(0, 0, 0, 0.2);
-  color: #333;
+  color: #111;
+  font-weight: 700;
 }
 
 body.claro .gb-profile-pill-name { color: #b8860b; }
