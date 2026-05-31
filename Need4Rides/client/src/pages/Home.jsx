@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import taxiImg from '../assets/images/taxi.png';
 import heroBg from '../assets/images/LA.jpg';
@@ -18,6 +19,14 @@ const services = [
 
 export default function Home() {
   const navigate = useNavigate();
+  const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+
+  const alternarTema = () => setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
 
   return (
     <div className="home">
@@ -25,6 +34,11 @@ export default function Home() {
       <nav className="gb-navbar">
         <span className="gb-logo">Need4Rides</span>
         <ul className="gb-nav-links">
+          <li>
+            <button className="gb-theme-btn" onClick={alternarTema}>
+              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+            </button>
+          </li>
           <li>
             <button
               className="navbar-login-btn"

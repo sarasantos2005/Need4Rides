@@ -14,6 +14,14 @@ export default function GestorViagem() {
   const storedUser = localStorage.getItem('user_logado');
   const userData = storedUser ? JSON.parse(storedUser) : { nome: 'Utilizador' };
   const [menuOpen, setMenuOpen] = useState(false);
+  const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
+
+  useEffect(() => {
+    document.body.className = tema;
+    localStorage.setItem('tema', tema);
+  }, [tema]);
+
+  const alternarTema = () => setTema(prev => (prev === 'escuro' ? 'claro' : 'escuro'));
 
   useEffect(() => {
     if (!token || !storedUser) {
@@ -56,6 +64,11 @@ export default function GestorViagem() {
           <li><a onClick={() => navigate('/gestor/motoristas')}>Motoristas</a></li>
           <li><a onClick={() => navigate('/gestor/taxis')}>Táxis</a></li>
           <li><a onClick={() => navigate('/gestor/precos')}>Preços</a></li>
+          <li>
+            <button className="gb-theme-btn" onClick={alternarTema}>
+              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
+            </button>
+          </li>
           <li className="gb-profile-li avatarNormal">
             <div className="gb-profile-pill">
               <span className="gb-profile-pill-name">{USERNAME}</span>
