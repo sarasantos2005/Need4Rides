@@ -571,7 +571,9 @@ export default function GestorHome() {
             </button>
           </li>
           <li>
-            <button className="gb-logout-btn" onClick={() => {
+            <button className="gb-logout-btn" onClick={async () => {
+              const result = await confirmar('Terminar Sessão', 'Tem a certeza que quer terminar sessão?');
+              if (!result.isConfirmed) return;
               localStorage.removeItem('token');
               localStorage.removeItem('user_logado');
               localStorage.removeItem('viagemAtiva');

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ddImg from '../assets/images/fennec.jpg';
 import './AvatarDropdown.css';
+import { confirmar } from './toast';
 
 export default function AvatarDropdown({ profilePath = '/profile', avatarClass = 'avatar-img' }) {
   const navigate = useNavigate();
@@ -14,14 +15,16 @@ export default function AvatarDropdown({ profilePath = '/profile', avatarClass =
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    setOpen(false);
+    const result = await confirmar('Terminar Sessão', 'Tem a certeza que quer terminar sessão?');
+    if (!result.isConfirmed) return;
     localStorage.removeItem('token');
     localStorage.removeItem('user_logado');
     localStorage.removeItem('viagemAtiva');
     localStorage.removeItem('pagamentoViagemId');
     localStorage.removeItem('motoristataxi');
     localStorage.removeItem('turnoId');
-    setOpen(false);
     navigate('/login');
   };
 
