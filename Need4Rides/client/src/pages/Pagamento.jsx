@@ -8,6 +8,9 @@ import AvatarDropdown from '../components/AvatarDropdown';
 import { toastAviso } from '../components/toast';
 import '../css/Pagamento.css';
 import '../css/global.css';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 

@@ -6,6 +6,9 @@ import '../css/MotoristaHome.css';
 import '../css/GestorHome.css';
 import '../css/global.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 export default function GestorViagem() {
   const navigate = useNavigate();

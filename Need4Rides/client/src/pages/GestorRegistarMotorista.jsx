@@ -5,6 +5,9 @@ import '../css/GestorRegistarMotorista.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 export default function GestorRegistarMotorista() {
   const navigate = useNavigate();

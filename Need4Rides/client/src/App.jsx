@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-route
 import { io } from 'socket.io-client';
 import { useEffect, useRef } from 'react';
 import { MotoristaViagemProvider } from './components/MotoristaViagemContext';
+import { setupAxiosInterceptor } from './components/axiosInterceptor';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -38,6 +39,44 @@ import MotoristaLayout from './layouts/MotoristaLayout';
 function PagamentoRedirect({ children }) {
   if (localStorage.getItem('pagamentoViagemId')) return <Navigate to="/pagamento" replace state={{ aviso: true }} />;
   return children;
+}
+
+function AuthPoller() {
+  const navigate = useNavigate();
+ 
+  useEffect(() => {
+    setupAxiosInterceptor(navigate);
+ 
+    const checkToken = () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+ 
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const agora = Math.floor(Date.now() / 1000);
+ 
+        if (payload.exp && payload.exp < agora) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user_logado');
+          localStorage.removeItem('viagemAtiva');
+          localStorage.removeItem('pagamentoViagemId');
+          localStorage.removeItem('motoristataxi');
+          navigate('/', { replace: true });
+        }
+      } catch {
+        localStorage.removeItem('token');
+        console.log('Token expirado, a redirecionar...');
+        navigate('/', { replace: true });
+      }
+    };
+ 
+    checkToken();
+    const interval = setInterval(checkToken, 60_000); 
+ 
+    return () => clearInterval(interval);
+  }, [navigate]);
+ 
+  return null;
 }
 
 //Método em que o sistema não pergunta se há motorista, é avisado quando houver - evitar sobrecarga com mts users
@@ -151,6 +190,7 @@ function ViagemPoller() {
 export default function App() {
   return (
     <BrowserRouter>
+      <AuthPoller />
       <ViagemPoller />
       <MotoristaViagemProvider>
       <Routes>

@@ -8,6 +8,9 @@ import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
 import React from 'react';
 import '../css/global.css';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 import L from "leaflet";
 import "leaflet-routing-machine";

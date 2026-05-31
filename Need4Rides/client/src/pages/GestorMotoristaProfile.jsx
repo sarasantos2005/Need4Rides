@@ -9,6 +9,9 @@ import useMinLoading from '../hooks/useMinLoading';
 import axios from 'axios';
 import AvatarDropdown from '../components/AvatarDropdown';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 export default function GestorMotoristaProfile() {
   const navigate = useNavigate();

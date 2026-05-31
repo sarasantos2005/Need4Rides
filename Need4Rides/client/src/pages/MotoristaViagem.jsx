@@ -10,6 +10,9 @@ import "leaflet-routing-machine";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 const STAGES = ['A aguardar motorista', 'Motorista a caminho', 'Em viagem', 'Concluída'];
 

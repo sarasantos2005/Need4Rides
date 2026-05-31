@@ -7,6 +7,9 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 export default function Profile() {
   const navigate = useNavigate();

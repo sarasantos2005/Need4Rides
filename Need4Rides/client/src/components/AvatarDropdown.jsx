@@ -15,10 +15,12 @@ export default function AvatarDropdown({ profilePath = '/profile', avatarClass =
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('motoristataxi');
     localStorage.removeItem('token');
     localStorage.removeItem('user_logado');
-    localStorage.removeItem("viagemAtiva");
+    localStorage.removeItem('viagemAtiva');
+    localStorage.removeItem('pagamentoViagemId');
+    localStorage.removeItem('motoristataxi');
+    localStorage.removeItem('turnoId');
     setOpen(false);
     navigate('/login');
   };

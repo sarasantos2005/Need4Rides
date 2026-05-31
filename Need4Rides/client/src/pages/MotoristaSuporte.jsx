@@ -4,6 +4,9 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/global.css';
 import '../css/MotoristaSuporte.css';
 import AvatarDropdown from '../components/AvatarDropdown';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 const TOPICOS = [
   {

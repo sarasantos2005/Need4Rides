@@ -11,6 +11,9 @@ import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
 import { io } from 'socket.io-client';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 function minutosAgora() {
   const now = new Date();

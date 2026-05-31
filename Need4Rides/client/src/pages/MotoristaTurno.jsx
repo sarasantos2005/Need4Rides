@@ -6,6 +6,9 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/global.css';
 import '../css/MotoristaTurno.css';
 import VEICULOS from "../../../server/data/marcasEmodelos";
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 export default function MotoristaTurno() {
     const navigate = useNavigate();

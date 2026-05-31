@@ -6,6 +6,9 @@ import '../css/GestorMotoristas.css';
 import '../css/global.css';
 import { useState, useEffect } from 'react';
 import { toastSucesso, toastErro } from '../components/toast.js';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 const estadoClass = estado => {
   if (estado === 'Em serviço')  return 'servico';

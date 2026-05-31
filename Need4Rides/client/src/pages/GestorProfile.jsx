@@ -4,6 +4,9 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/Profile.css';
 import { useState, useEffect } from 'react';
 import '../css/global.css';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 const mockAtividade = [
   { id: 1, acao: 'Motorista registado', detalhe: 'Carlos Mendes adicionado à plataforma', data: '31 Mar 2026', hora: '10:12' },

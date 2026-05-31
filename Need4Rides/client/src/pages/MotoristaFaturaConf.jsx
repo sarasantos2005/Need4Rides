@@ -4,6 +4,9 @@ import heroBg from '../assets/images/LA.jpg';
 import '../css/MotoristaFaturaConf.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/global.css';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 function formatDuracao(s) {
   if (!s) return '—';

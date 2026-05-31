@@ -6,6 +6,10 @@ import ddImg from '../assets/images/fennec.jpg';
 import AvatarDropdown from '../components/AvatarDropdown';
 import axios from "axios";
 import '../css/global.css';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
+
 const DOTS = [
   'A procurar motoristas',
   'A procurar motoristas.',

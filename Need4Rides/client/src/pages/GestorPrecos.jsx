@@ -6,6 +6,9 @@ import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/MotoristaHome.css';
 import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 function calcularCusto(horaInicio, horaFim, valorMinuto, acrescimoNoturno) {
   const [hI, mI] = horaInicio.split(':').map(Number);

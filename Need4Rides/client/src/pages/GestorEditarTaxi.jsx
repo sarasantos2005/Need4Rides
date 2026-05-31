@@ -6,6 +6,9 @@ import AvatarDropdown from '../components/AvatarDropdown';
 import VEICULOS from '../data/marcasEmodelos.js';
 import { toastAviso, toastErro, toastSucesso } from '../components/toast.js';
 import '../css/global.css';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 const MARCAS = VEICULOS?.marcas ?? [];
 const anoAtual = new Date().getFullYear();

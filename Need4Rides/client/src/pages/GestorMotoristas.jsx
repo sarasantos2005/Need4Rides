@@ -6,6 +6,9 @@ import { useState, useEffect } from 'react';
 import useMinLoading from '../hooks/useMinLoading';
 import '../css/global.css';
 import { toastSucesso, toastErro } from '../components/toast.js';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 export default function GestorMotoristas() {
   const navigate = useNavigate();

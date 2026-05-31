@@ -6,6 +6,9 @@ import '../css/Home.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import useAuthGuard from '../hooks/authGuard';
+
+useAuthGuard();
 
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
