@@ -164,7 +164,7 @@ export default function MotoristaHistorico() {
           <li><a onClick={() => navigate('/motorista/suporte')}>Suporte</a></li>
           <li><a onClick={() => navigate('/motorista/viagem')}>Viagem</a></li>
 
-          <li className="gb-theme-li-hamburger">
+          <li>
             <button className="gb-theme-btn" onClick={alternarTema}>
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>

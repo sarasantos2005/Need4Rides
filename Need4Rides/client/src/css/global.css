@@ -268,16 +268,16 @@ body.claro .gb-profile-pill-name { color: #b8860b; }
 
 @media (max-width: 1300px) {
   body.claro .gb-nav-links {
-    background: rgba(248, 248, 248, 0.97);
-    border-left: 1px solid rgba(0, 0, 0, 0.08);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(10, 10, 10, 0.97);
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   }
 
   body.claro .gb-nav-links a {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   body.claro .avatarHamburguer {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
   }
 }
