@@ -137,10 +137,10 @@ export default function GestorPrecos() {
                   <div key={n} className="gp-atuais-item">
                     <span className="gp-nivel">{n}</span>
                     <span className="gp-valor">€{precosAtuais[n].valor_minuto.toFixed(4)}<small>/min</small></span>
-                    <span className="gp-noturno">+{precosAtuais[n].acrescimo_noturno ?? 0}% noturno (21h–6h)</span>
                   </div>
                 ))}
               </div>
+              <span className="gp-noturno">+{(precosAtuais['Básico'] ?? precosAtuais['Luxuoso'])?.acrescimo_noturno ?? 0}% noturno (21h–6h)</span>
             </div>
           </div>
         )}
@@ -158,12 +158,12 @@ export default function GestorPrecos() {
               <div className="gp-fields">
                 <div className="gp-field">
                   <label>Básico (€/min)</label>
-                  <input type="number" step="0.0001" min="0.0001" placeholder="Ex: 0.25"
+                  <input type="number" step="0.0001" min="0.0001" placeholder="Sugestão: €0.08 – €0.27"
                     value={precos.basico} onChange={e => setPrecos(p => ({ ...p, basico: e.target.value }))} required />
                 </div>
                 <div className="gp-field">
                   <label>Luxuoso (€/min)</label>
-                  <input type="number" step="0.0001" min="0.0001" placeholder="Ex: 0.45"
+                  <input type="number" step="0.0001" min="0.0001" placeholder="Sugestão: €0.16 – €0.30"
                     value={precos.luxuoso} onChange={e => setPrecos(p => ({ ...p, luxuoso: e.target.value }))} required />
                 </div>
                 <div className="gp-field">

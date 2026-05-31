@@ -60,10 +60,10 @@ async function runSeed() {
         ontem.setDate(agora.getDate() - 1);
 
         await Preco.insertMany([
-            { nivel_conforto: "Básico", valor_minuto: 0.80, acrescimo_noturno: 0.20, data_definicao: ontem, gestor: users[4]._id },
-            { nivel_conforto: "Luxuoso", valor_minuto: 1.50, acrescimo_noturno: 0.50, data_definicao: ontem, gestor: users[4]._id },
-            { nivel_conforto: "Básico", valor_minuto: 0.60, acrescimo_noturno: 0.30, data_definicao: new Date(), gestor: users[6]._id },
-            { nivel_conforto: "Luxuoso", valor_minuto: 1.20, acrescimo_noturno: 0.60, data_definicao: new Date(), gestor: users[6]._id }
+            { nivel_conforto: "Básico", valor_minuto: 0.18, acrescimo_noturno: 20, data_definicao: ontem, gestor: users[4]._id },
+            { nivel_conforto: "Luxuoso", valor_minuto: 0.28, acrescimo_noturno: 20, data_definicao: ontem, gestor: users[4]._id },
+            { nivel_conforto: "Básico", valor_minuto: 0.20, acrescimo_noturno: 20, data_definicao: new Date(), gestor: users[6]._id },
+            { nivel_conforto: "Luxuoso", valor_minuto: 0.30, acrescimo_noturno: 20, data_definicao: new Date(), gestor: users[6]._id }
         ]);
 
         //Turno
