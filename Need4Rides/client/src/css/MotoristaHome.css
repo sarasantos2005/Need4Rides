@@ -1244,3 +1244,136 @@ body.claro .av-item-logout {
 body.claro .mh-motorista-row:hover {
   background: rgba(245, 197, 24, 0.1);
 }
+
+.mh-agendado-card-row {
+  border-left: 4px solid #ffc107 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 16px 20px !important;
+  margin-top: 1rem;
+}
+
+.mh-agendado-tempo-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 180px;
+}
+
+.mh-agendado-date-txt {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.mh-agendado-hours-txt {
+  font-weight: 500;
+  color: #ffc107;
+  font-size: 0.95rem;
+}
+
+.mh-text-ate-split {
+  opacity: 0.5;
+  color: var(--text-color, #fff); 
+  font-size: 0.85rem;
+}
+
+.mh-agendado-meta-car {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 150px;
+  margin: 0 !important; 
+}
+
+.mh-agendado-car-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.mh-agendado-car-plate {
+  font-size: 0.85rem;
+  font-family: monospace;
+  opacity: 0.5;
+}
+
+.mh-agendado-actions-badges {
+  display: flex;
+  flex-direction: row !important;
+  gap: 10px !important;
+  margin: 0 !important;
+}
+
+.mh-badge-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 0;
+  min-width: 95px;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+body.escuro .mh-badge-pill.combustao {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ccc;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.claro .mh-badge-pill.combustao {
+  background: #6c757d;
+  color: #fff;
+}
+
+body.escuro .mh-badge-pill.eletrico {
+  background: rgba(40, 167, 69, 0.15);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+body.claro .mh-badge-pill.eletrico {
+  background: #28a745;
+  color: #fff;
+}
+
+.mh-badge-pill.conforto {
+  background: rgba(255, 193, 7, 0.12);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.mh-no-car-allocated {
+  font-size: 0.9rem;
+  opacity: 0.4;
+  font-style: italic;
+}
+
+.mh-welcome-actions-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.mh-turno-btn.schedule {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%; 
+  text-align: center;
+}
+
+.mh-turno-btn.schedule:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+

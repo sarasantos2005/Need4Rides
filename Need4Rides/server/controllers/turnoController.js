@@ -81,11 +81,6 @@ exports.novoTurno = async (req, res) => {
     const dataFim = new Date(hora_fim);
     const agora = new Date();
 
-    const turnoExistente = await Turno.findOne({ motorista: motoristaId, estado: 'Ativo' });
-    if (turnoExistente) {
-      return res.status(400).json({ message: "Já tens um turno ativo." });
-    }
-
     if (dataInicio >= dataFim) {
       return res.status(400).json({ message: "A hora de início deve ser anterior à hora de fim." });
     }
@@ -250,3 +245,20 @@ exports.atualizarPosicao = async(req, res) => {
     res.status(500).json({ err: "Erro ao atualizar posição." });
   }
 };
+
+exports.turnosFuturos = async(req, res) => {
+  try {
+    const motoristaId = req.userId;
+
+    const turnosAgendados = await Turno.find({
+      motorista: motoristaId,
+      estado: "Agendado"
+    })
+    .populate('taxi')
+    .sort({hora_inicio: 1});
+
+    res.status(200).json(turnosAgendados);
+  } catch (err) {
+    res.status(500).json({error: err.message});
+  }
+}

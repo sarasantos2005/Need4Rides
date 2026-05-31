@@ -24,29 +24,6 @@ export default function MotoristaTurno() {
     const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            navigate('/login');
-            return;
-        }
-
-        const verificarTurnoExistente = async () => {
-            try {
-                const config = { headers: { Authorization: `Bearer ${token}` } };
-                const res = await axios.get(`http://localhost:3000/api/turno/atual`, config);
-                
-                if (res.data) {
-                    navigate('/motorista');
-                }
-            } catch (err) {
-                console.error("Erro ao validar estado do turno:", err);
-            }
-        };
-
-        verificarTurnoExistente();
-    }, [navigate]);
-
-    useEffect(() => {
         document.body.className = tema;
         localStorage.setItem('tema', tema);
     }, [tema]);
@@ -75,6 +52,10 @@ export default function MotoristaTurno() {
 
         const dataInicio = new Date(horasTurno.data_hora_inicio);
         const dataFim = new Date(horasTurno.data_hora_fim);
+        const agora = new Date();
+
+        const minutoAtual = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), agora.getHours(), agora.getMinutes(), 0, 0);
+        const minutoInicio = new Date(dataInicio.getFullYear(), dataInicio.getMonth(), dataInicio.getDate(), dataInicio.getHours(), dataInicio.getMinutes(), 0, 0);
 
         if (isNaN(dataInicio.getTime()) || isNaN(dataFim.getTime())) {
             toastErro("As datas inseridas não são válidas.");
@@ -83,6 +64,11 @@ export default function MotoristaTurno() {
 
         if(dataInicio >= dataFim) {
             toastErro("A hora de início deve ser anterior à hora de fim");
+            return;
+        }
+
+        if(minutoInicio < minutoAtual || dataFim < agora) {
+            toastErro("Não é possível criar um turno no passado");
             return;
         }
 

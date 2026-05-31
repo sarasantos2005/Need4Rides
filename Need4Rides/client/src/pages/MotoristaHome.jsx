@@ -104,6 +104,17 @@ const fetchTurnoAtual = async (token, setTurnoAtivo, setTaxi, setApiStatus) => {
   }
 };
 
+const fetchTurnosAgendados = async (token, setTurnosAgendados) => {
+    try {
+      const res = await axios.get('http://localhost:3000/api/turno/futuros', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTurnosAgendados(res.data || []);
+    } catch (err) {
+      console.error("Erro ao carregar turnos agendados:", err);
+    }
+  };
+
 export default function MotoristaHome() {
   const navigate = useNavigate();
 
@@ -124,6 +135,8 @@ export default function MotoristaHome() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [turnosAgendados, setTurnosAgendados] = useState([]);
+
   const [userData, setUserData] = useState(null);
   useEffect(() => {
     const storedUser = localStorage.getItem('user_logado');
@@ -142,6 +155,7 @@ export default function MotoristaHome() {
           fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
           fetchHistorico(token, setHistorico, setApiStatus),
           fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
+          fetchTurnosAgendados(token, setTurnosAgendados),
         ]);
       }
     }
@@ -200,6 +214,7 @@ export default function MotoristaHome() {
         fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
         fetchHistorico(token, setHistorico, setApiStatus),
         fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
+        fetchTurnosAgendados(token, setTurnosAgendados),
       ]);
 
       toastSucesso("Táxi devolvido com sucesso!");
@@ -237,6 +252,7 @@ export default function MotoristaHome() {
         fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
         fetchHistorico(token, setHistorico, setApiStatus),
         fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
+        fetchTurnosAgendados(token, setTurnosAgendados),
       ]);
     } catch (err) {
       toastErro("Erro ao aceitar viagem");
@@ -268,6 +284,7 @@ export default function MotoristaHome() {
         fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
         fetchHistorico(token, setHistorico, setApiStatus),
         fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
+        fetchTurnosAgendados(token, setTurnosAgendados),
       ]);
     } catch (err) {
       toastErro("Erro ao aceitar viagem");
@@ -374,6 +391,8 @@ export default function MotoristaHome() {
         setTaxi(turnoAtualizado.taxi);
         localStorage.setItem('motoristataxi', JSON.stringify(turnoAtualizado.taxi));
       }
+
+      setTurnosAgendados(prev => prev.filter(t => t._id !== turnoAtualizado._id));
     });
 
     socket.on('novo_pedido', (pedido) => {
@@ -413,6 +432,7 @@ export default function MotoristaHome() {
             fetchViagensPendentes(token, setViagensPendentes, setApiStatus),
             fetchHistorico(token, setHistorico, setApiStatus),
             fetchTurnoAtual(token, setTurnoAtivo, setTaxi, setApiStatus),
+            fetchTurnosAgendados(token, setTurnosAgendados),
           ]);
         } catch (err) {
           toastErro("Erro ao gerar fatura no servidor.");
@@ -518,6 +538,15 @@ export default function MotoristaHome() {
           >
             {turnoAtivo ? 'Terminar Turno' : 'Iniciar Novo Turno'}
           </button>
+
+          {turnoAtivo && turnoAtivo.estado === "Ativo" && (
+            <button 
+              className="mh-turno-btn schedule"
+              onClick={() => navigate("/motorista/turno")}
+            >
+              📅 Agendar turno futuro
+            </button>
+          )}
         </div>
 
         {/* ── Stats rápidos ── */}
@@ -620,6 +649,63 @@ export default function MotoristaHome() {
           </div>
           )}
 
+        </div>
+
+        <div className="mh-card">
+          <div className="mh-historico-section" style={{ marginBottom: '20px' }}>
+            <div className="mh-historico-header">
+              <h3>Próximos Turnos Agendados</h3>
+            </div>
+            
+            <div className="mh-historico-list mh-agendados-list">
+              {turnosAgendados.length > 0 ? (
+                turnosAgendados.map(turno => (
+                  <div className="mh-pedido-card mh-agendado-card-row" key={turno._id}>
+                    
+                    <div className="mh-agendado-tempo-block">
+                      <span className="mh-agendado-date-txt">
+                        {new Date(turno.hora_inicio).toLocaleDateString('pt-PT')}
+                      </span>
+                      <div className="mh-agendado-hours-txt">
+                        <span>{new Date(turno.hora_inicio).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="mh-text-ate-split"> até </span>
+                        <span>{new Date(turno.hora_fim).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </div>
+
+                    {turno?.taxi ? (
+                      <>
+                        <div className="mh-pedido-meta mh-agendado-meta-car">
+                          <span className="mh-agendado-car-name">
+                            {getDadosMarca(turno.taxi.marca)} {turno.taxi.modelo}
+                          </span>
+                          <span className="mh-agendado-car-plate">
+                            {turno.taxi.matricula}
+                          </span>
+                        </div>
+
+                        <div className="mh-pedido-actions mh-agendado-actions-badges">
+                          <span className={`mh-badge-pill ${turno.taxi.tipo_motor === 'Elétrico' ? 'eletrico' : 'combustao'}`}>
+                            {turno.taxi.tipo_motor}
+                          </span>
+                          <span className="mh-badge-pill conforto">
+                            {turno.taxi.nivel_conforto}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="mh-pedido-meta mh-no-car-allocated">
+                        Sem veículo alocado
+                      </div>
+                    )}
+
+                  </div>
+                ))
+              ) : (
+                <p className="mh-no-data">Não tens nenhum turno agendado para os próximos tempos.</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* ── Pedidos pendentes ── */}
