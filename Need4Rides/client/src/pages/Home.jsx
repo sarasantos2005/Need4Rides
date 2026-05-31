@@ -33,21 +33,6 @@ export default function Home() {
       {/* Navbar */}
       <nav className="gb-navbar">
         <span className="gb-logo">Need4Rides</span>
-        <ul className="gb-nav-links">
-          <li>
-            <button className="gb-theme-btn" onClick={alternarTema}>
-              {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
-            </button>
-          </li>
-          <li>
-            <button
-              className="navbar-login-btn"
-              onClick={() => navigate('/login', { state: { mode: 'login' } })}
-            >
-              Login
-            </button>
-          </li>
-        </ul>
       </nav>
 
       {/* Hero */}
