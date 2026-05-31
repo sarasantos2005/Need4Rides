@@ -85,7 +85,7 @@ export default function MotoristaHistorico() {
       const token = localStorage.getItem('token');
 
       try {
-          setLoading(true);
+          setLoading(false);
 
           await axios.post(`http://localhost:3000/api/fatura/emitir`, 
             { viagemId: viagemId },
@@ -247,12 +247,12 @@ export default function MotoristaHistorico() {
                   {v.temFatura ? (
                     <span className="mh-hist-status">Concluída</span>
                     ) : (
-                      <button
+                      <span
                         className="trip-invoice-btn"
                         onClick={() => gerarFatura(v._id)}
                       >
                         Gerar Fatura
-                      </button>
+                      </span>
                     )}
                   <span className="mhist-price">{v.preco_viagem?.toFixed(2)}€</span>
                 </div>
