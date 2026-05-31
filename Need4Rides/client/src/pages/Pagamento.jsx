@@ -182,7 +182,7 @@ export default function Pagamento() {
             <h2>Pagamento Confirmado!</h2>
             <p>A tua viagem foi paga com sucesso.</p>
             <div className="pag-success-actions">
-              <button className="pag-btn-pay" onClick={() => navigate('/home')}>Voltar ao Início</button>
+              <button className="pag-btn-pay" onClick={() => navigate('/home', { state: { avaliarViagemId: viagemId } })}>Voltar ao Início</button>
             </div>
           </div>
 

@@ -880,3 +880,61 @@ exports.statusMotorista = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.avaliarMotorista = async(req, res) => {
+  try {
+    const { viagemId, rating } = req.body;
+
+    if (!rating || rating < 0 || rating > 5) {
+      return res.status(400).json({ message: "O rating deve ser um valor entre 0 e 5." });
+    }
+
+    const viagem = await Viagem.findByIdAndUpdate(
+      viagemId,
+      { rating_motorista: Number(rating) }, 
+      { new: true }
+    ).populate("turno");
+
+    if (!viagem) return res.status(404).json({ success: false, message: "Viagem não encontrada." });
+
+    const motoristaId = viagem.turno ? viagem.turno.motorista : null;
+
+    if(motoristaId) {
+      const estatisticas = await Viagem.aggregate([
+        {
+          $lookup: {
+            from: "Turnos", 
+            localField: "turno",
+            foreignField: "_id",
+            as: "turnoInfo"
+          }
+        },
+        { $unwind: "$turnoInfo" },
+        { $match: { "turnoInfo.motorista": motoristaId } },
+        {
+          $group: {
+            _id: "$turnoInfo.motorista",
+            mediaRating: { $avg: "$rating_motorista" }
+          }
+        }
+      ]);
+
+      if(estatisticas.length > 0){
+        const novaMedia = parseFloat(estatisticas[0].mediaRating.toFixed(2));
+
+        await Pessoa.findByIdAndUpdate(motoristaId, {
+          "motorista.rating": novaMedia
+        });
+      }
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: "Avaliação submetida com sucesso!" 
+    });
+
+  } catch (err) {
+    console.error("Erro ao avaliar viagem:", err);
+    res.status(500).json({error: err.message});
+  }
+}

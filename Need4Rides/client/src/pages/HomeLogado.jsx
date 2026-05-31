@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import taxiImg from '../assets/images/taxi.png';
 import heroBg from '../assets/images/LA.jpg';
 import '../css/Home.css';
@@ -147,6 +147,7 @@ function ProgressBar({ value, max, color = '#f5c518' }) {
 
 export default function HomeLogado() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({ origin: '', destination: '', passengers: '', comfort: '' });
   const [activeTrip, setActiveTrip]   = useState(null);
   const [recentTrips, setRecentTrips]  = useState([]);
@@ -155,6 +156,38 @@ export default function HomeLogado() {
   const [userData, setUserData] = useState({ nome: 'Utilizador' });
   const [userLocation, setUserLocation] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [viagemParaAvaliar, setViagemParaAvaliar] = useState(null);
+
+  useEffect(() => {
+    if(location.state?.avaliarViagemId) {
+      setViagemParaAvaliar(location.state.avaliarViagemId);
+      setShowRatingModal(true);
+
+      navigate(location.pathname, { replace: true, state: {}});
+    }
+  }, [location, navigate]);
+
+  const handleSubmeterAvaliacao = async() => {
+    try {
+      const token = localStorage.getItem('token');
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      await axios.post(`http://localhost:3000/api/viagem/avaliar`, {
+        viagemId: viagemParaAvaliar,
+        rating: rating
+      }, config);
+
+      toastSucesso("Obrigado pela avaliação!");
+      setShowRatingModal(false);
+      setRating(5);
+    } catch (err) { 
+      console.error("Erro ao submeter avaliação: ", err);
+      toastErro("Não foi possível enviar a avaliação");
+    }
+  }
 
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');
   useEffect(() => {
@@ -476,6 +509,47 @@ export default function HomeLogado() {
           onClose={() => setShowMap(null)}
           onConfirm={handleConfirmLocal}
         />
+      )}
+
+      {showRatingModal && (
+        <div className="map-modal-overlay">
+          <div className="map-modal-content" style={{ maxWidth: '400px', textAlign: 'center', padding: '2rem' }}>
+            <h3 style={{ marginBottom: '1rem' }}>Como correu a tua viagem?</h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-sub)', marginBottom: '1.5rem' }}>
+              Avalia o desempenho do teu motorista.
+            </p>
+            
+            {/* Sistema de Estrelas Simples */}
+            <div style={{ fontSize: '2rem', marginBottom: '1.5rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', gap: '8px' }}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span 
+                  key={star} 
+                  onClick={() => setRating(star)}
+                  style={{ color: star <= rating ? '#f5c518' : '#ccc', transition: 'color 0.2s' }}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button 
+                className="profile-back-btn" 
+                onClick={() => setShowRatingModal(false)}
+                style={{ margin: 0 }}
+              >
+                Ignorar
+              </button>
+              <button 
+                className="profile-save-btn" 
+                onClick={handleSubmeterAvaliacao}
+                style={{ margin: 0, backgroundColor: '#f5c518', color: '#000' }}
+              >
+                Enviar Nota
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
