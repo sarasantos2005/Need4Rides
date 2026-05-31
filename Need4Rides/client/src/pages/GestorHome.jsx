@@ -562,6 +562,19 @@ export default function GestorHome() {
               {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
             </button>
           </li>
+          <li>
+            <button className="gb-logout-btn" onClick={() => {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user_logado');
+              localStorage.removeItem('viagemAtiva');
+              localStorage.removeItem('pagamentoViagemId');
+              localStorage.removeItem('motoristataxi');
+              localStorage.removeItem('turnoId');
+              navigate('/login');
+            }}>
+              Terminar Sessão
+            </button>
+          </li>
           <li className="gb-profile-li avatarNormal">
             <div className="gb-profile-pill">
               <span className="gb-profile-pill-name">{USERNAME}</span>
