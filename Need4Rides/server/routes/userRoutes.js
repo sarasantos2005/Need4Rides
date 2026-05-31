@@ -9,8 +9,10 @@ router.post('/login', userController.login);
 router.post('/preco', userController.definirPreco);
 router.get('/sitios', auth, userController.buscarSitios);
 router.patch('/sitios', auth, userController.guardarSitios);
+router.get('/motorista/:id', userController.gestorGetMotorista);
+router.put('/motorista/:id', userController.gestorUpdateMotorista);
+router.delete('/motorista/:id', userController.gestorDeleteMotorista);
 router.delete('/:id', userController.delete);
-//router.put('/:id', userController.update);
 router.get('/:id', auth, userController.get);
 router.patch('/', auth, userController.editarPerfil);
 

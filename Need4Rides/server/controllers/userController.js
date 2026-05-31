@@ -315,6 +315,95 @@ exports.get = async(req, res) => {
   }
 }
 
+// US13: Gestor — obter motorista para edição
+exports.gestorGetMotorista = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-senha_acesso_web');
+    if (!user || user.tipo !== 'Motorista')
+      return res.status(404).json({ success: false, message: "Motorista não encontrado." });
+    res.json({ success: true, motorista: user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Erro ao procurar motorista." });
+  }
+};
+
+// US13: Gestor — atualizar motorista
+exports.gestorUpdateMotorista = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user || user.tipo !== 'Motorista')
+      return res.status(404).json({ success: false, message: "Motorista não encontrado." });
+
+    const { nome, email, genero, ano_nascimento, n_carta_conducao, nova_senha, morada, localizacao } = req.body;
+
+    const anoAtual = new Date().getFullYear();
+    if (ano_nascimento && anoAtual - Number(ano_nascimento) < 18)
+      return res.status(400).json({ success: false, message: "Motorista deve ter 18 anos ou mais." });
+
+    if (genero && !['M', 'F'].includes(genero))
+      return res.status(400).json({ success: false, message: "Género inválido." });
+
+    if (n_carta_conducao) {
+      const cartaNorm = n_carta_conducao.toUpperCase().trim();
+      if (!regexCarta.test(cartaNorm))
+        return res.status(400).json({ success: false, message: "Formato da carta inválido (Ex: ZA-12345 6)." });
+      const cartaExistente = await User.findOne({ 'motorista.n_carta_conducao': cartaNorm, _id: { $ne: req.params.id } });
+      if (cartaExistente)
+        return res.status(409).json({ success: false, message: "Já existe um motorista com este número de carta de condução." });
+    }
+
+    if (nova_senha) {
+      const regexSenha = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+      if (!regexSenha.test(nova_senha))
+        return res.status(400).json({ success: false, message: "A senha deve ter pelo menos 6 caracteres, incluindo letras e números." });
+    }
+
+    const updateData = {};
+    if (nome) updateData.nome = nome;
+    if (email) updateData.email = email.toLowerCase();
+    if (genero) updateData.genero = genero;
+    if (ano_nascimento) updateData.ano_nascimento = Number(ano_nascimento);
+    if (n_carta_conducao) updateData['motorista.n_carta_conducao'] = n_carta_conducao.toUpperCase().trim();
+    if (morada) updateData['motorista.morada.texto'] = morada;
+    if (localizacao) {
+      updateData['motorista.morada.localizacao.type'] = 'Point';
+      updateData['motorista.morada.localizacao.coordinates'] = [parseFloat(localizacao.long), parseFloat(localizacao.lat)];
+    }
+    if (nova_senha) {
+      const salt = await bcrypt.genSalt(SALT_ROUNDS);
+      updateData.senha_acesso_web = await bcrypt.hash(nova_senha, salt);
+    }
+
+    const updated = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select('-senha_acesso_web');
+
+    res.json({ success: true, message: "Motorista atualizado com sucesso.", motorista: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Erro ao atualizar motorista." });
+  }
+};
+
+// US13: Gestor — remover motorista (bloqueado se tiver turnos)
+exports.gestorDeleteMotorista = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user || user.tipo !== 'Motorista')
+      return res.status(404).json({ success: false, message: "Motorista não encontrado." });
+
+    const temTurnos = await Turno.findOne({ motorista: req.params.id });
+    if (temTurnos)
+      return res.status(403).json({ success: false, message: "A remoção só é permitida caso o motorista não tenha requisitado um turno." });
+
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Motorista removido com sucesso." });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Erro ao remover motorista." });
+  }
+};
+
 exports.buscarSitios = async(req, res) => {
    try {
     const user = await User.findById(req.userId).select('favoritos');
