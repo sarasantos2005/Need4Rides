@@ -242,7 +242,7 @@ export default function Login() {
 
               <PasswordInput
                 name="confirmPassword"
-                label="Confirmar"
+                label="Confirmar Password"
                 value={regData.confirmPassword}
                 onChange={handleRegChange}
               />
