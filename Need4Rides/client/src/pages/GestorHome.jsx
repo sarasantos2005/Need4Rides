@@ -418,7 +418,7 @@ export default function GestorHome() {
         `Motoristas (${motoristas.length})`,
         ['Nome', 'Estado', 'Viagens', 'Receita'],
         motoristas.length > 0
-          ? motoristas.map(m => [m.nome, m.estado, String(m.viagens), `€${m.ganhos}`])
+          ? motoristas.map(m => [m.nome, m.estado, String(m.viagens), `€${Number(m.ganhos).toFixed(2)}`])
           : [['—', '—', '—', '—']],
         [210, 140, 85, 80]
       );
@@ -429,7 +429,7 @@ export default function GestorHome() {
         `Viagens do Período — ${currentLabel} (${viagens.length})`,
         ['Cliente', 'Motorista', 'Origem', 'Destino', 'Data/Hora', 'Preço'],
         viagens.length > 0
-          ? viagens.map(v => [v.cliente, v.motorista, v.origem, v.destino, `${v.data} ${v.hora}`, `€${v.preco}`])
+          ? viagens.map(v => [v.cliente, v.motorista, v.origem, v.destino, `${v.data} ${v.hora}`, `€${Number(v.preco).toFixed(2)}`])
           : [['—', '—', 'Sem viagens no período', '', '', '']],
         [90, 90, 100, 100, 90, 45]
       );
@@ -449,7 +449,7 @@ export default function GestorHome() {
         doc.text(`Página ${p} de ${totalPages}`, W - M, H - 10, { align: 'right' });
       }
 
-      doc.save(`relatorio-${periodo}-${new Date().toISOString().split('T')[0]}.pdf`);
+      doc.save(`relatorio-${dataInicio}_${dataFim}.pdf`);
     } catch (error) {
       console.error('Erro na exportação:', error);
       toastErro('Falha ao gerar o PDF. Verifica a consola do navegador.');

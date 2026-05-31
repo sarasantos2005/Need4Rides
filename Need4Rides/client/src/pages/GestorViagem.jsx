@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import heroBg from '../assets/images/LA.jpg';
 import ddImg from '../assets/images/fennec.jpg';
 import '../css/MotoristaHome.css';
+import '../css/GestorHome.css';
 import '../css/global.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 
@@ -91,65 +92,61 @@ export default function GestorViagem() {
             </div>
           </div>
 
-          <button className="mh-turno-btn end" onClick={goBack}>
-            Voltar ao Dashboard
+          <button className="mh-turno-btn start" onClick={goBack}>
+            ← Voltar ao Dashboard
           </button>
         </div>
 
         <div className="mh-middle-row">
           <div className="mh-card full-width">
             <div className="mh-section-header">
-              <h3 className="mh-card-title">Dados da Viagem</h3>
-              <span className="mh-badge">{trip.status || 'Sem estado'}</span>
+              <h3 className="mh-card-title">Detalhes da Viagem</h3>
+              <span className="mh-status-badge online">● {trip.status || 'Sem estado'}</span>
             </div>
 
-            <div className="mh-pedido-card" style={{ cursor: 'default' }}>
-              <div className="mh-pedido-route" style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <strong>Cliente:</strong>
-                  <span>{trip.cliente || 'Não disponível'}</span>
+            {/* Rota */}
+            <div style={{ padding: '1rem 1.2rem 0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', paddingTop: '3px' }}>
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#f5c518', flexShrink: 0, display: 'block' }} />
+                  <span style={{ width: 2, height: 32, background: 'rgba(255,255,255,0.15)', display: 'block' }} />
+                  <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#ff6b6b', flexShrink: 0, display: 'block' }} />
                 </div>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '8px' }}>
-                  <strong>Motorista:</strong>
-                  <span>{trip.motorista || 'Não disponível'}</span>
-                </div>
-              </div>
-
-              <div className="mh-pedido-meta" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
-                <div>
-                  <strong>Origem:</strong> {trip.origem || 'Não disponível'}
-                </div>
-                <div>
-                  <strong>Destino:</strong> {trip.destino || 'Não disponível'}
-                </div>
-                <div>
-                  <strong>Data:</strong> {trip.data || 'Não disponível'}
-                </div>
-                <div>
-                  <strong>Hora:</strong> {trip.hora || 'Não disponível'}
-                </div>
-                <div>
-                  <strong>Preço:</strong> {typeof trip.preco === 'number' ? `€${trip.preco.toFixed(2)}` : (trip.preco ?? 'Não disponível')}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Origem</div>
+                    <div style={{ fontSize: '0.92rem', color: '#eee', fontWeight: 500 }}>{trip.origem || '—'}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Destino</div>
+                    <div style={{ fontSize: '0.92rem', color: '#eee', fontWeight: 500 }}>{trip.destino || '—'}</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="mh-middle-row">
-          <div className="mh-card full-width">
-            <div className="mh-section-header">
-              <h3 className="mh-card-title">Informações adicionais</h3>
-            </div>
+            <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '0.5rem 1.2rem' }} />
 
-            <div style={{ padding: '20px', color: '#ddd' }}>
-              <p><strong>ID da viagem:</strong> {trip.id}</p>
-              <p><strong>Status:</strong> {trip.status || 'Sem estado'}</p>
-              <p><strong>Origem:</strong> {trip.origem}</p>
-              <p><strong>Destino:</strong> {trip.destino}</p>
-              <p><strong>Passageiros:</strong> {trip.passageiros ?? 'Não disponível'}</p>
-              <p><strong>Nível de conforto:</strong> {trip.nivel_conforto ?? 'Não disponível'}</p>
-              <p><strong>Observações:</strong> {trip.observacoes ?? 'Nenhuma'}</p>
+            {/* Grid de campos */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem', padding: '0.8rem 1.2rem 1.2rem' }}>
+              {[
+                { label: 'Cliente',          value: trip.cliente },
+                { label: 'Motorista',        value: trip.motorista },
+                { label: 'Data',             value: trip.data },
+                { label: 'Hora',             value: trip.hora },
+                { label: 'Preço',            value: typeof trip.preco === 'number' ? `€${trip.preco.toFixed(2)}` : (trip.preco ?? null) },
+                { label: 'Passageiros',      value: trip.passageiros },
+                { label: 'Nível de Conforto',value: trip.nivel_conforto },
+                { label: 'Observações',      value: trip.observacoes || 'Nenhuma' },
+                { label: 'ID',               value: trip.id, mono: true },
+              ].map(({ label, value, mono }) => (
+                <div key={label}>
+                  <div style={{ fontSize: '0.7rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '3px' }}>{label}</div>
+                  <div style={{ fontSize: mono ? '0.75rem' : '0.9rem', color: value != null ? '#eee' : '#555', fontWeight: 500, fontFamily: mono ? 'monospace' : undefined, wordBreak: 'break-all' }}>
+                    {value ?? '—'}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

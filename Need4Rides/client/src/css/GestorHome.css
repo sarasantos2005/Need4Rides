@@ -286,11 +286,15 @@ option:hover {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.85rem 0;
+  padding: 0.85rem 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   flex-wrap: wrap;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
 }
 
+.mh-viagem-row:hover { background: rgba(245, 197, 24, 0.07); }
 .mh-viagem-row:last-child { border-bottom: none; }
 
 .mh-viagem-route {
@@ -363,11 +367,15 @@ body.claro .mh-status-badge.online {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.85rem 0;
+  padding: 0.85rem 0.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   gap: 1rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
 }
 
+.mh-motorista-row:hover { background: rgba(245, 197, 24, 0.07); }
 .mh-motorista-row:last-child { border-bottom: none; }
 
 .mh-motorista-info {
@@ -436,6 +444,16 @@ body.claro .mh-welcome-name {
 body.claro .mh-hist-row,
 body.claro .mh-pedido-card {
   border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+body.claro .mh-viagem-row,
+body.claro .mh-motorista-row {
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+body.claro .mh-viagem-row:hover,
+body.claro .mh-motorista-row:hover {
+  background: rgba(180, 140, 0, 0.08);
 }
 
 body.claro .mh-car-value {
