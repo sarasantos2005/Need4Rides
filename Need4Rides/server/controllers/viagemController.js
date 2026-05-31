@@ -115,6 +115,15 @@ exports.pedirTaxi = async (req, res) => {
       return res.status(404).json({ success: false, message: "Cliente não encontrado ou inválido." });
     }
 
+    const viagemPorPagar = await Viagem.findOne({
+      cliente: clienteId,
+      hora_final_viagem: { $ne: null },
+      pago: false
+    });
+    if (viagemPorPagar) {
+      return res.status(402).json({ success: false, message: "Tem uma viagem por pagar. Conclua o pagamento antes de pedir um novo táxi.", viagemId: viagemPorPagar._id });
+    }
+
     //RIA 18
     if (n_passageiros < 1 || n_passageiros > 4) {
       return res.status(400).json({ success: false, message: "O número de passageiros deve estar entre 1 e 4." });

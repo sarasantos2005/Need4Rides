@@ -420,7 +420,13 @@ export default function PedirTaxi() {
         navigate('/aguardar-taxi');
       }
     } catch (err) {
-      toastErro("Erro ao pedir o táxi: " + (err.response?.data?.message || "Erro desconhecido"));
+      if (err.response?.status === 402) {
+        const id = err.response.data?.viagemId;
+        if (id) localStorage.setItem('pagamentoViagemId', id);
+        navigate('/pagamento', { state: { viagemId: id, aviso: true } });
+      } else {
+        toastErro("Erro ao pedir o táxi: " + (err.response?.data?.message || "Erro desconhecido"));
+      }
     }
 
   };
