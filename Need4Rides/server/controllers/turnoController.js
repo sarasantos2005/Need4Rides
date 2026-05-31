@@ -36,14 +36,30 @@ exports.requisitarTaxiTurno = async (req, res) => {
 exports.turnoAtual = async (req, res) => {
   try{
     const id = req.userId;
+    const agora = new Date();
 
-    const turno = await Turno.findOne({ 
+    let turno = await Turno.findOne({ 
       motorista: id, 
       estado: 'Ativo' 
     }).populate('taxi');
 
     if (!turno) {
-      return res.status(200).json(null); 
+      const turnoAgendadoJaIniciou = await Turno.findOne({
+        motorista: id,
+        estado: 'Agendado',
+        hora_inicio: { $lte: agora } 
+      });
+
+      if (turnoAgendadoJaIniciou) {
+        turnoAgendadoJaIniciou.estado = 'Ativo';
+        await turnoAgendadoJaIniciou.save();
+        
+        turno = await Turno.findById(turnoAgendadoJaIniciou._id).populate('taxi');
+      }
+    }
+
+    if(!turno) {
+      return res.status(200).json(null);
     }
 
     res.status(200).json(turno);
@@ -56,12 +72,14 @@ exports.novoTurno = async (req, res) => {
   try {
     const motoristaId = req.userId;
     const { hora_inicio, hora_fim, taxiId } = req.body;
+
     if (!hora_inicio || !hora_fim || !taxiId) {
       return res.status(400).json({ message: "Faltam dados obrigatórios: início, fim ou veículo." });
     }
 
     const dataInicio = new Date(hora_inicio);
     const dataFim = new Date(hora_fim);
+    const agora = new Date();
 
     const turnoExistente = await Turno.findOne({ motorista: motoristaId, estado: 'Ativo' });
     if (turnoExistente) {
@@ -69,11 +87,11 @@ exports.novoTurno = async (req, res) => {
     }
 
     if (dataInicio >= dataFim) {
-      return res.status(400).json({ message: "Restrição 1: A hora de início deve ser anterior à hora de fim." });
+      return res.status(400).json({ message: "A hora de início deve ser anterior à hora de fim." });
     }
     const diffHoras = (dataFim - dataInicio) / (1000 * 60 * 60);
     if (diffHoras > 8) {
-      return res.status(400).json({ message: "Restrição 2: O turno não pode ter uma duração superior a 8 horas." });
+      return res.status(400).json({ message: "O turno não pode ter uma duração superior a 8 horas." });
     }
 
     const motoristaOcupado = await Turno.findOne({
@@ -99,7 +117,7 @@ exports.novoTurno = async (req, res) => {
       return res.status(400).json({ message: "Este veículo já foi requisitado por outro motorista para este período." });
     }
 
-    const estadoTurno = new Date() >= dataInicio ? "Ativo" : "Agendado";
+    const estadoTurno = agora >= dataInicio ? "Ativo" : "Agendado";
 
     const turno = await Turno.create({
       motorista: motoristaId,
@@ -108,6 +126,27 @@ exports.novoTurno = async (req, res) => {
       hora_fim: dataFim,
       estado: estadoTurno,
     });
+
+    if (estadoTurno === "Agendado") {
+      const msParaComecar = dataInicio.getTime() - agora.getTime();
+
+      setTimeout(async () => {
+        try {
+          const turnoAtivado = await Turno.findByIdAndUpdate(
+            turno._id,
+            { estado: "Ativo" },
+            { new: true }
+          ).populate('taxi');
+
+          const io = req.app.get('io'); 
+          if (io) {
+            io.to(`user_motorista_${motoristaId}`).emit('turno_iniciado_automatico', turnoAtivado);
+          }
+        } catch (err) {
+          console.error("Erro ao ativar turno agendado via socket:", err);
+        }
+      }, msParaComecar);
+    }
 
     res.status(201).json(turno);
   } catch (error) {
@@ -149,17 +188,22 @@ exports.terminarTurno = async (req, res) => {
     }
 
     const turnoOriginal = await Turno.findById(turnoId);
+    
+    if (!turnoOriginal) {
+      return res.status(404).json({ message: "Turno não encontrado na base de dados." });
+    }
 
     if(agora <= turnoOriginal.hora_inicio){
       return res.status(400).json({ message: "Não pode terminar antes de começar." });
     }
     
-    await Turno.findByIdAndUpdate(
+    const turnoAtualizado = await Turno.findByIdAndUpdate(
       turnoId,
       {
         hora_fim: agora,
         estado: "Terminado"
-      }
+      },
+      { new: true }
     )
 
     res.status(200).json({ message: "Turno terminado com sucesso", turno: turnoAtualizado });

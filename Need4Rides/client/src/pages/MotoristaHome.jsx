@@ -274,24 +274,6 @@ export default function MotoristaHome() {
     }
   };
 
-  const iniciarTurno = async (e) => {
-    e.preventDefault();
-
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:3000/api/turno', {}, { headers: { Authorization: `Bearer ${token}` } });
-
-      setTurnoAtivo(res.data);
-      toastSucesso("Turno criado com sucesso!");
-      navigate('')
-    } catch(err) {
-      toastErro("Erro ao iniciar turno: " + err.response?.data?.message || err.message); 
-    } finally {
-      setLoading(false);
-    }
-  }
-
   const handleAlterarTurno = async() => {
     try {
       const token = localStorage.getItem('token');
@@ -314,12 +296,9 @@ export default function MotoristaHome() {
           setTurnoAtivo(null);
           devolverTaxi();
           setViagensPendentes([]);
-          setEmTurno(false);
           localStorage.removeItem('motoristataxi');
         
           toastSucesso("Turno encerrado com sucesso. Bom descanso!");
-
-          setLoading(true);
         } catch (err) {
           console.error("Erro ao finalizar turno:", err);
           toastErro("Erro ao encerrar o turno no servidor.");
@@ -347,16 +326,54 @@ export default function MotoristaHome() {
   useEffect(() => {
     const t = setInterval(() => setAgora(minutosAgora()), 60000);
     return () => clearInterval(t);
-  }, []);
+  });
+
+  useEffect(() => {
+    if (!turnoAtivo || !restanteMs) return;
+
+    if (restanteMs <= 0) {
+      localStorage.removeItem('motoristataxi');
+      setTaxi(null);
+      setTurnoAtivo(null);
+      setViagensPendentes([]);
+      toastAviso("O teu turno expirou. Bom descanso!");
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      localStorage.removeItem('motoristataxi');
+      setTaxi(null);
+      setTurnoAtivo(null);
+      setViagensPendentes([]);
+      toastAviso("O teu turno terminou automaticamente. Bom descanso!");
+    }, restanteMs);
+
+    return () => clearTimeout(timer);
+  }, [turnoAtivo, restanteMs]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token || !turnoAtivo?._id) return;
+    if (!token || !userData) return;
 
     const socket = io('http://localhost:3000', { auth: { token } });
 
     socket.on('connect', () => {
+      const userId = userData._id || userData.id;
+
+      socket.emit('registar_motorista_user', userId);
+    });
+
+    if (turnoAtivo?._id) {
       socket.emit('entrar_motorista', turnoAtivo._id);
+    }
+
+    socket.on('turno_iniciado_automatico', (turnoAtualizado) => {
+      toastSucesso("O teu turno agendado começou! Estás em serviço.");
+      setTurnoAtivo(turnoAtualizado);
+      if (turnoAtualizado.taxi) {
+        setTaxi(turnoAtualizado.taxi);
+        localStorage.setItem('motoristataxi', JSON.stringify(turnoAtualizado.taxi));
+      }
     });
 
     socket.on('novo_pedido', (pedido) => {
@@ -372,7 +389,7 @@ export default function MotoristaHome() {
     });
 
     return () => socket.disconnect();
-  }, [turnoAtivo?._id]);
+  }, [turnoAtivo?._id, userData]);
 
   //Encontrar os dados da marca (id no marcasEModelos = marca na BD)
   const getDadosMarca = (idBD) => {
@@ -630,7 +647,7 @@ export default function MotoristaHome() {
                 <div className="mh-pedido-meta">
                   <span>{p.dist}</span>
                   <span>{p.n_passageiros} pax</span>
-                  <span className="mh-pedido-wait">⏱ {p.duracao_calculada} min</span>
+                  <span className="mh-pedido-wait">{p.duracao_calculada && "⏱ " + p.duracao_calculada + " min"}</span>
                   <span className="mh-pedido-price">{p.preco_viagem?.toFixed(2)}</span>
                 </div>
                 <div className="mh-pedido-actions">
@@ -670,12 +687,12 @@ export default function MotoristaHome() {
                   {v.temFatura ? (
                     <span className="mh-hist-status">Concluída</span>
                   ) : (
-                    <button
+                    <span
                       className="trip-invoice-btn"
                       onClick={() => gerarFatura(v._id)}
                     >
                       Gerar Fatura
-                    </button>
+                    </span>
                   )}
                   <span className="mh-hist-price">{v.preco_viagem?.toFixed(2)}€</span>
                 </div>

@@ -56,6 +56,11 @@ io.on('connection', (socket) => {
     socket.join(`motorista_${turnoId}`);
     console.log(`Motorista ${turnoId} na sala`);
   });
+
+  socket.on('registar_motorista_user', (userId) => {
+    socket.join(`user_motorista_${userId}`);
+    console.log(`Motorista conectado à sua sala pessoal: user_motorista_${userId}`);
+  });
 });
 
 // Middlewares existentes
