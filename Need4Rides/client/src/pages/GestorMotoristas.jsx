@@ -5,27 +5,50 @@ import '../css/GestorMotoristas.css';
 import { useState, useEffect } from 'react';
 import useMinLoading from '../hooks/useMinLoading';
 import '../css/global.css';
+import { toastSucesso, toastErro } from '../components/toast.js';
 
 export default function GestorMotoristas() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [motoristas, setMotoristas] = useState([]);
-  const [loading, setLoading] = useMinLoading();
+  const [loading, setLoading] = useMinLoading(400);
   const [sortCol, setSortCol] = useState(null);
   const [sortDir, setSortDir] = useState(1);
+  const [motoristaParaRemover, setMotoristaParaRemover] = useState(null);
+  const [removendo, setRemovendo] = useState(false);
 
-  useEffect(() => {
+  const fetchMotoristas = () => {
+    setLoading(true);
     fetch('http://localhost:3000/api/user')
       .then(res => res.json())
       .then(data => {
         const apenasMotoristas = data
           .filter(u => u.tipo === 'Motorista')
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
         setMotoristas(apenasMotoristas);
       })
       .catch(err => console.error('Erro ao carregar motoristas:', err))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  const confirmarRemover = async () => {
+    if (!motoristaParaRemover) return;
+    setRemovendo(true);
+    try {
+      const res = await fetch(`http://localhost:3000/api/user/motorista/${motoristaParaRemover._id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) { toastErro(data.message || 'Erro ao remover motorista.'); return; }
+      toastSucesso('Motorista removido com sucesso.');
+      setMotoristaParaRemover(null);
+      fetchMotoristas();
+    } catch {
+      toastErro('Não foi possível ligar ao servidor.');
+    } finally {
+      setRemovendo(false);
+    }
+  };
+
+  useEffect(() => { fetchMotoristas(); }, []);
 
   const [tema, setTema] = useState(() => {
     return localStorage.getItem('tema') || 'escuro';
@@ -77,6 +100,22 @@ export default function GestorMotoristas() {
   return (
     <div className="gm-page" style={{ backgroundImage: `url(${heroBg})` }}>
       <div className="grm-overlay" />
+
+      {/* MODAL DE CONFIRMAÇÃO DE REMOÇÃO */}
+      {motoristaParaRemover && (
+        <div className="gt-modal-overlay" onClick={() => setMotoristaParaRemover(null)}>
+          <div className="gt-modal" onClick={e => e.stopPropagation()}>
+            <h3>Remover motorista</h3>
+            <p>Tens a certeza que queres remover o motorista <strong>{motoristaParaRemover.nome}</strong>?<br />Esta ação não pode ser desfeita.</p>
+            <div className="gt-modal-actions">
+              <button className="gt-btn-editar" onClick={() => setMotoristaParaRemover(null)} disabled={removendo}>Cancelar</button>
+              <button className="gt-btn-remover" onClick={confirmarRemover} disabled={removendo}>
+                {removendo ? 'A remover...' : 'Remover'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* NAVBAR */}
       <nav className="gb-navbar">
@@ -159,10 +198,16 @@ export default function GestorMotoristas() {
                   <th>Estado</th>
                   <th>Viagens</th>
                   <th>Ganhos</th>
+                  <th>Editar</th>
+                  <th>Remover</th>
                 </tr>
               </thead>
               <tbody>
-                {sorted.map(m => (
+                {loading ? (
+                  <tr><td colSpan={10} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>A carregar motoristas...</td></tr>
+                ) : sorted.length === 0 ? (
+                  <tr><td colSpan={10} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Nenhum motorista registado.</td></tr>
+                ) : sorted.map(m => (
                   <tr key={m._id} onClick={() => navigate(`/gestor/motoristas/${m._id}`)} style={{ cursor: 'pointer' }} className="gm-table-row-clickable">
                     <td className="gm-nome">{m.nome}</td>
                     <td className="gm-muted">{m.nif}</td>
@@ -174,6 +219,16 @@ export default function GestorMotoristas() {
                     <td><span className="gm-estado offline">○ —</span></td>
                     <td className="gm-muted">—</td>
                     <td className="gm-ganhos">—</td>
+                    <td>
+                      <button className="gt-btn-editar" onClick={e => { e.stopPropagation(); navigate(`/gestor/editar-motorista/${m._id}`); }}>
+                        Editar
+                      </button>
+                    </td>
+                    <td>
+                      <button className="gt-btn-remover" onClick={e => { e.stopPropagation(); setMotoristaParaRemover(m); }}>
+                        Remover
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -182,7 +237,11 @@ export default function GestorMotoristas() {
 
           {/* CARDS — mobile */}
           <div className="gm-mobile-list">
-            {sorted.map(m => (
+            {loading ? (
+              <p style={{ textAlign: 'center', color: '#888', padding: '2rem' }}>A carregar motoristas...</p>
+            ) : sorted.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#888', padding: '2rem' }}>Nenhum motorista registado.</p>
+            ) : sorted.map(m => (
               <div key={m._id} className="gm-m-card" onClick={() => navigate(`/gestor/motoristas/${m._id}`)} style={{ cursor: 'pointer' }}>
                 <div className="gm-m-header">
                   <span className="gm-nome">{m.nome}</span>
@@ -213,6 +272,10 @@ export default function GestorMotoristas() {
                 <div className="gm-m-row">
                   <span className="gm-m-label">Ganhos</span>
                   <span className="gm-ganhos">—</span>
+                </div>
+                <div className="gm-m-row" style={{ marginTop: '0.5rem', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                  <button className="gt-btn-editar" onClick={e => { e.stopPropagation(); navigate(`/gestor/editar-motorista/${m._id}`); }}>Editar</button>
+                  <button className="gt-btn-remover" onClick={e => { e.stopPropagation(); setMotoristaParaRemover(m); }}>Remover</button>
                 </div>
               </div>
             ))}

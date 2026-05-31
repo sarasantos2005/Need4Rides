@@ -7,7 +7,7 @@ const getToast = () =>
     toast: true,
     position: 'top-right',
     showConfirmButton: false,
-    timer: 3000,
+    timer: 2000,
     timerProgressBar: true,
     customClass: {
       popup: `swal-toast-${getTema()}`,
