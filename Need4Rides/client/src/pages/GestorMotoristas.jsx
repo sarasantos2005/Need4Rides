@@ -197,18 +197,15 @@ export default function GestorMotoristas() {
                   <th className={getSortClass('localidade')} onClick={() => handleSort('localidade')}>
                     Localidade <SortIcon col="localidade" />
                   </th>
-                  <th>Estado</th>
-                  <th>Viagens</th>
-                  <th>Ganhos</th>
                   <th>Editar</th>
                   <th>Remover</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={10} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>A carregar motoristas...</td></tr>
+                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>A carregar motoristas...</td></tr>
                 ) : sorted.length === 0 ? (
-                  <tr><td colSpan={10} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Nenhum motorista registado.</td></tr>
+                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Nenhum motorista registado.</td></tr>
                 ) : sorted.map(m => (
                   <tr key={m._id} onClick={() => navigate(`/gestor/motoristas/${m._id}`)} style={{ cursor: 'pointer' }} className="gm-table-row-clickable">
                     <td className="gm-nome">{m.nome}</td>
@@ -218,9 +215,6 @@ export default function GestorMotoristas() {
                       {m.genero === 'M' ? 'Masculino' : m.genero === 'F' ? 'Feminino' : m.genero ?? '—'}
                     </td>
                     <td className="gm-muted">{m.motorista?.morada?.texto ?? '—'}</td>
-                    <td><span className="gm-estado offline">○ —</span></td>
-                    <td className="gm-muted">—</td>
-                    <td className="gm-ganhos">—</td>
                     <td>
                       <button className="gt-btn-editar" onClick={e => { e.stopPropagation(); navigate(`/gestor/editar-motorista/${m._id}`); }}>
                         Editar
@@ -247,7 +241,6 @@ export default function GestorMotoristas() {
               <div key={m._id} className="gm-m-card" onClick={() => navigate(`/gestor/motoristas/${m._id}`)} style={{ cursor: 'pointer' }}>
                 <div className="gm-m-header">
                   <span className="gm-nome">{m.nome}</span>
-                  <span className="gm-estado offline">○ —</span>
                 </div>
                 <div className="gm-m-row">
                   <span className="gm-m-label">NIF</span>
@@ -267,15 +260,7 @@ export default function GestorMotoristas() {
                   <span className="gm-m-label">Localidade</span>
                   <span className="gm-muted">{m.motorista?.morada?.texto ?? '—'}</span>
                 </div>
-                <div className="gm-m-row">
-                  <span className="gm-m-label">Viagens</span>
-                  <span className="gm-muted">—</span>
-                </div>
-                <div className="gm-m-row">
-                  <span className="gm-m-label">Ganhos</span>
-                  <span className="gm-ganhos">—</span>
-                </div>
-                <div className="gm-m-row" style={{ marginTop: '0.5rem', gap: '0.5rem', justifyContent: 'flex-end' }}>
+<div className="gm-m-row" style={{ marginTop: '0.5rem', gap: '0.5rem', justifyContent: 'flex-end' }}>
                   <button className="gt-btn-editar" onClick={e => { e.stopPropagation(); navigate(`/gestor/editar-motorista/${m._id}`); }}>Editar</button>
                   <button className="gt-btn-remover" onClick={e => { e.stopPropagation(); setMotoristaParaRemover(m); }}>Remover</button>
                 </div>
