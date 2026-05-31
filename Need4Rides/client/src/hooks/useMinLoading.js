@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 
-export default function useMinLoading(minMs = 8100) {
+export default function useMinLoading(minMs = 0) {
   const [loading, setLoadingState] = useState(true);
   const startRef = useRef(Date.now());
   const timerRef = useRef(null);
