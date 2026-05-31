@@ -99,11 +99,30 @@
 /* ─── Actions (voltar) ──────────────────────────────────── */
 .profile-actions {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
   margin-left: auto;
   flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.profile-logout-btn {
+  background: rgba(220, 50, 50, 0.15);
+  border: 1px solid rgba(220, 50, 50, 0.4);
+  color: #ff6b6b;
+  padding: 0.45rem 1.1rem;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.profile-logout-btn:hover {
+  background: rgba(220, 50, 50, 0.28);
+  color: #ff4444;
 }
 
 .profile-back-btn {

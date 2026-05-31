@@ -158,6 +158,18 @@ export default function Profile() {
               <button className="gb-theme-btn" onClick={alternarTema}>
                 {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
               </button>
+
+              <button className="profile-logout-btn" onClick={async () => {
+                const result = await confirmar('Terminar Sessão', 'Tem a certeza que quer terminar sessão?');
+                if (!result.isConfirmed) return;
+                localStorage.removeItem('token');
+                localStorage.removeItem('user_logado');
+                localStorage.removeItem('viagemAtiva');
+                localStorage.removeItem('pagamentoViagemId');
+                navigate('/login');
+              }}>
+                Terminar Sessão
+              </button>
             </div>
             
             </div>

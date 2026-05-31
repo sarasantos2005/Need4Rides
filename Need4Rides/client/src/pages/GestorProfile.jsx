@@ -5,6 +5,7 @@ import '../css/Profile.css';
 import { useState, useEffect } from 'react';
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
+import { confirmar } from '../components/toast';
 
 const mockAtividade = [
   { id: 1, acao: 'Motorista registado', detalhe: 'Carlos Mendes adicionado à plataforma', data: '31 Mar 2026', hora: '10:12' },
@@ -47,11 +48,20 @@ export default function GestorProfile() {
               </div>
             </div>
             <div className="profile-actions">
+              <button className="profile-back-btn" onClick={() => navigate('/gestor')}>
+                ← Voltar
+              </button>
               <button className="gb-theme-btn" onClick={alternarTema}>
                 {tema === 'escuro' ? '☀️ Claro' : '🌙 Escuro'}
               </button>
-              <button className="profile-back-btn" onClick={() => navigate('/gestor')}>
-                ← Voltar
+              <button className="profile-logout-btn" onClick={async () => {
+                const result = await confirmar('Terminar Sessão', 'Tem a certeza que quer terminar sessão?');
+                if (!result.isConfirmed) return;
+                localStorage.removeItem('token');
+                localStorage.removeItem('user_logado');
+                navigate('/login');
+              }}>
+                Terminar Sessão
               </button>
             </div>
           </div>
