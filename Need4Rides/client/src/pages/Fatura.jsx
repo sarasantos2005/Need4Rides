@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import axios from 'axios';
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
+import { toastSucesso, toastErro } from '../components/toast';
 
 export default function Fatura() {
   useAuthGuard();
@@ -86,12 +87,28 @@ Obrigado por viajar com Need4Rides!
     URL.revokeObjectURL(url);
   };
 
-  const handleEmail = () => {
-    const subject = encodeURIComponent(`Fatura Need4Rides — ${invoiceNumber}`);
-    const body = encodeURIComponent(
-      `Olá,\n\nSegue em anexo a fatura referente à sua viagem:\n\nNº Fatura: ${invoiceNumber}\nData: ${trip.date} às ${trip.time}\nOrigem: ${trip.from}\nDestino: ${trip.to}\nMétodo de Pagamento: ${trip.payment}\nTotal: ${trip.price}\n\nObrigado por viajar com Need4Rides!`
-    );
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  const [enviandoEmail, setEnviandoEmail] = useState(false);
+
+  const handleEmail = async () => {
+    setEnviandoEmail(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:3000/api/fatura/enviar-email', {
+        invoiceNumber,
+        data: new Date(trip.hora_inicial_viagem).toLocaleDateString('pt-PT'),
+        hora: new Date(trip.hora_inicial_viagem).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }),
+        origem: trip.morada_inicial_viagem?.morada ?? '—',
+        destino: trip.morada_final_viagem?.morada ?? '—',
+        preco: trip.preco_viagem?.toFixed(2) ?? '—',
+        cliente: client,
+        motorista: trip.turno?.motorista?.nome ?? '—',
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      toastSucesso('Fatura enviada para o seu email.');
+    } catch (err) {
+      toastErro('Erro ao enviar email: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setEnviandoEmail(false);
+    }
   };
 
   return (
@@ -176,9 +193,6 @@ Obrigado por viajar com Need4Rides!
           <div className="fatura-actions">
             <button className="fatura-btn secondary" onClick={() => navigate('/profile')}>
               ← Voltar
-            </button>
-            <button className="fatura-btn email" onClick={handleEmail}>
-              ✉ Enviar por Email
             </button>
             <button className="fatura-btn download" onClick={handleDownload}>
               ↓ Download

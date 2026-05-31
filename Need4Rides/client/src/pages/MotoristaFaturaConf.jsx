@@ -5,6 +5,7 @@ import '../css/MotoristaFaturaConf.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
+import { toastSucesso, toastErro, toastAviso } from '../components/toast';
 
 function formatDuracao(s) {
   if (!s) return '—';
@@ -41,7 +42,31 @@ export default function MotoristaFaturaConf() {
   const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
   const faturaNr = `N4R-2026`;
 
+  const [faturaGerada, setFaturaGerada] = useState(false);
+  const [gerando, setGerando] = useState(false);
+
+  const handleGerarFatura = async () => {
+    setGerando(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:3000/api/fatura/emitir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ viagemId: trip.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setFaturaGerada(true);
+      toastSucesso('Fatura gerada e enviada para o email do cliente.');
+    } catch (err) {
+      toastErro('Erro ao gerar fatura: ' + err.message);
+    } finally {
+      setGerando(false);
+    }
+  };
+
   const handleFinalize = () => {
+    if (!faturaGerada) toastAviso('A viagem foi concluída sem gerar fatura.');
     localStorage.removeItem('viagemAtivaMotorista');
     navigate('/motorista', { replace: true });
   };
@@ -144,11 +169,18 @@ export default function MotoristaFaturaConf() {
 
         {/* Actions */}
         <div className="mfc-actions">
-          <button className="mfc-btn confirm" onClick={handleFinalize}>
-            &nbsp; Confirmar e concluir
+          <button
+            className="mfc-btn confirm"
+            onClick={handleGerarFatura}
+            disabled={gerando || faturaGerada}
+          >
+            {gerando ? 'A gerar...' : faturaGerada ? '✓ Fatura Gerada' : '📄 Gerar Fatura'}
+          </button>
+          <button className="mfc-btn confirm" onClick={handleFinalize} style={{ background: 'rgba(255,255,255,0.08)', color: '#ddd' }}>
+            Concluir
           </button>
           <button className="mfc-btn problem" onClick={() => navigate('/motorista/suporte')}>
-            ⚠&nbsp; Reportar Problema com a Fatura
+            ⚠&nbsp; Reportar Problema
           </button>
         </div>
 
