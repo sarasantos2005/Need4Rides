@@ -64,9 +64,9 @@
 }
 
 .mvg-status-pill.em_curso {
-  background: rgba(67, 233, 123, 0.12);
-  border: 1px solid rgba(67, 233, 123, 0.35);
-  color: #43e97b;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
 }
 
 /* ─── Layout ────────────────────────────────────────────── */
@@ -328,7 +328,7 @@ body.claro .mvg-page {
 
 /* wrapper */
 body.claro .mvg-wrapper {
-  color: #111;
+  color: #ffffff;
 }
 
 /* títulos */
@@ -342,9 +342,9 @@ body.claro .mvg-status-pill.pendente {
 }
 
 body.claro .mvg-status-pill.em_curso {
-  background: rgba(67, 233, 123, 0.15);
-  border: 1px solid rgba(67, 233, 123, 0.35);
-  color: #1a7f3c;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #ffffff;
 }
 
 /* cards */
