@@ -405,14 +405,22 @@ export default function GestorHome() {
 
       // ── VIAGENS EM CURSO ─────────────────────────────────────────────────
       const viagensEmCurso = relatoriosData.viagensEmCurso ?? [];
-      drawTable(
-        `Viagens em Curso (${viagensEmCurso.length})`,
-        ['Cliente', 'Motorista', 'Origem', 'Destino', 'Estado'],
-        viagensEmCurso.length > 0
-          ? viagensEmCurso.map(v => [v.cliente, v.motorista, v.origem, v.destino, v.status])
-          : [['—', '—', 'Nenhuma viagem em curso', '', '']],
-        [103, 108, 115, 115, 74]
-      );
+      if (viagensEmCurso.length > 0) {
+        drawTable(
+          `Viagens em Curso (${viagensEmCurso.length})`,
+          ['Cliente', 'Motorista', 'Origem', 'Destino', 'Estado'],
+          viagensEmCurso.map(v => [v.cliente, v.motorista, v.origem, v.destino, v.status]),
+          [103, 108, 115, 115, 74]
+        );
+      } else {
+        y = checkY(y, 40);
+        y = sectionTitle('Viagens em Curso (0)', y);
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(9);
+        doc.setTextColor(150, 150, 160);
+        doc.text('Sem viagens em curso no momento da geração do relatório.', M + 8, y);
+        y += 24;
+      }
 
       // ── MOTORISTAS ───────────────────────────────────────────────────────
       const motoristas = relatoriosData.motoristas ?? [];

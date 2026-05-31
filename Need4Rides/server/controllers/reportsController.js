@@ -66,21 +66,22 @@ exports.getRelatorios = async (req, res) => {
     const totalTaxis = await Taxi.countDocuments();
 
     // 5. VIAGENS EM CURSO DETALHADAS
-    const viagensEmCursoDetalhadas = await Promise.all(
+    const viagensEmCursoDetalhadas = (await Promise.all(
       viagensEmCursoAtuais.map(async (viagem) => {
         const turno = viagem.turno
           ? (viagem.turno._id ? viagem.turno : await Turno.findById(viagem.turno).populate('motorista').populate('taxi'))
           : null;
+        if (!viagem.cliente?.nome || !turno?.motorista?.nome) return null;
         return {
           id: viagem._id,
-          cliente: viagem.cliente?.nome || 'Cliente',
-          motorista: turno?.motorista?.nome || 'Motorista',
-          origem: viagem.morada_inicial_viagem?.morada || 'Origem',
-          destino: viagem.morada_final_viagem?.morada || 'Destino',
+          cliente: viagem.cliente.nome,
+          motorista: turno.motorista.nome,
+          origem: viagem.morada_inicial_viagem?.morada || '—',
+          destino: viagem.morada_final_viagem?.morada || '—',
           status: 'Em curso'
         };
       })
-    );
+    )).filter(v => v !== null);
 
     // 6. MOTORISTAS COM ESTATÍSTICAS
     const motoristas = await Pessoa.find({ tipo: 'Motorista' });
@@ -131,12 +132,13 @@ exports.getRelatorios = async (req, res) => {
           return null;
         }
 
+        if (!viagem.cliente?.nome || !turno?.motorista?.nome) return null;
         return {
           id: viagem._id,
-          cliente: viagem.cliente?.nome || 'Cliente',
-          motorista: turno?.motorista?.nome || 'Motorista',
-          origem: viagem.morada_inicial_viagem?.morada || 'Origem',
-          destino: viagem.morada_final_viagem?.morada || 'Destino',
+          cliente: viagem.cliente.nome,
+          motorista: turno.motorista.nome,
+          origem: viagem.morada_inicial_viagem?.morada || '—',
+          destino: viagem.morada_final_viagem?.morada || '—',
           preco: viagem.preco_viagem || 0,
           data: dataViagem.toLocaleDateString('pt-PT'),
           hora: dataViagem.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
