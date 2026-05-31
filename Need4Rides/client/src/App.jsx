@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useEffect, useRef } from 'react';
+import { toastAviso, toastAvisoLongo } from './components/toast';
 import { MotoristaViagemProvider } from './components/MotoristaViagemContext';
 import { setupAxiosInterceptor } from './components/axiosInterceptor';
 
@@ -146,8 +147,8 @@ function ViagemPoller() {
 
       socket.on('viagem_cancelada', () => {
         localStorage.removeItem('viagemAtiva');
-        
         socket.disconnect();
+        toastAvisoLongo('O motorista cancelou a viagem. Por favor peça um novo táxi.');
         navigate('/pedir-taxi');
       });
 

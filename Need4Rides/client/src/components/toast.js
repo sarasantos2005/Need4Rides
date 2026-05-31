@@ -30,6 +30,9 @@ export const toastAviso = (mensagem) =>
 export const toastInfo = (mensagem) =>
   getToast().fire({ icon: 'info', title: mensagem });
 
+export const toastAvisoLongo = (mensagem) =>
+  getToast().fire({ icon: 'warning', title: mensagem, timer: 6000 });
+
 export const confirmar = (titulo, texto) =>
   Swal.fire({
     title: titulo,
