@@ -10,8 +10,6 @@ import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet/dist/leaflet.css';
@@ -125,6 +123,7 @@ function MapSelector({ coordsIniciais, moradaInicial, onConfirm, onClose }) {
 
 
 export default function MotoristaProfile() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [historico, setHistorico] = useState([]);

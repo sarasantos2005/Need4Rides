@@ -8,8 +8,6 @@ import { toastAviso, toastErro } from '../components/toast.js';
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 const MARCAS = VEICULOS?.marcas ?? [];
 
 const anoAtual = new Date().getFullYear();
@@ -17,6 +15,7 @@ const anoAtual = new Date().getFullYear();
 const regexMatricula = /^(?=.*[A-Z])(?=.*\d)[A-Z0-9]{2}-[A-Z0-9]{2}-[A-Z0-9]{2}$/;
 
 export default function GestorRegistarTaxi() {
+  useAuthGuard();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({

@@ -13,8 +13,6 @@ import { io } from 'socket.io-client';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 function minutosAgora() {
   const now = new Date();
   return now.getHours() * 60 + now.getMinutes();
@@ -119,6 +117,7 @@ const fetchTurnosAgendados = async (token, setTurnosAgendados) => {
   };
 
 export default function MotoristaHome() {
+  useAuthGuard();
   const navigate = useNavigate();
 
   const [viagensPendentes, setViagensPendentes] = useState([]);

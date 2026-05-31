@@ -8,8 +8,6 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet/dist/leaflet.css';
@@ -149,6 +147,7 @@ function ProgressBar({ value, max, color = '#f5c518' }) {
 }
 
 export default function HomeLogado() {
+  useAuthGuard();
   const navigate = useNavigate();
   const location = useLocation();
   const [form, setForm] = useState({ origin: '', destination: '', passengers: '', comfort: '' });

@@ -6,8 +6,6 @@ import '../css/MotoristaSuporte.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 const TOPICOS = [
   {
     id: 'turno',
@@ -165,6 +163,7 @@ function FaqItem({ faq }) {
 }
 
 export default function MotoristaSuporte() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [topico, setTopico] = useState(null);
   const [query, setQuery] = useState('');

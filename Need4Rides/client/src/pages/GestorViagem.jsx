@@ -8,9 +8,8 @@ import '../css/global.css';
 import AvatarDropdown from '../components/AvatarDropdown';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 export default function GestorViagem() {
+  useAuthGuard();
   const navigate = useNavigate();
   const { state } = useLocation();
   const trip = state?.trip;

@@ -9,9 +9,8 @@ import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 export default function Profile() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [historico, setHistorico] = useState([]);

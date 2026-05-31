@@ -8,8 +8,6 @@ import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 function calcularCusto(horaInicio, horaFim, valorMinuto, acrescimoNoturno) {
   const [hI, mI] = horaInicio.split(':').map(Number);
   const [hF, mF] = horaFim.split(':').map(Number);
@@ -27,6 +25,7 @@ function calcularCusto(horaInicio, horaFim, valorMinuto, acrescimoNoturno) {
 }
 
 export default function GestorPrecos() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');

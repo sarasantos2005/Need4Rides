@@ -11,9 +11,8 @@ import AvatarDropdown from '../components/AvatarDropdown';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 export default function GestorMotoristaProfile() {
+  useAuthGuard();
   const navigate = useNavigate();
   const { motorista_id } = useParams();
   const [userData, setUserData] = useState(null);

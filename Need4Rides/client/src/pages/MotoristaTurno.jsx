@@ -8,9 +8,8 @@ import '../css/MotoristaTurno.css';
 import VEICULOS from "../../../server/data/marcasEmodelos";
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 export default function MotoristaTurno() {
+    useAuthGuard();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [loadingTaxis, setLoadingTaxis] = useState(false);

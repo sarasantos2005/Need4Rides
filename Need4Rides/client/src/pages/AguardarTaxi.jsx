@@ -8,8 +8,6 @@ import axios from "axios";
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 const DOTS = [
   'A procurar motoristas',
   'A procurar motoristas.',
@@ -18,6 +16,7 @@ const DOTS = [
 ];
 
 export default function AguardarTaxi() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [viagemId, setViagemId] = useState(null);
 

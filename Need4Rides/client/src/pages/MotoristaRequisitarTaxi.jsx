@@ -11,9 +11,8 @@ import VEICULOS from "../../../server/data/marcasEmodelos";
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 export default function MotoristaRequisitarTaxi() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [taxis, setTaxis] = useState([]);
   const [selecionado, setSelecionado] = useState(null);

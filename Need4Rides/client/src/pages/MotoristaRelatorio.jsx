@@ -11,8 +11,6 @@ import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 const todayStr = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -25,6 +23,7 @@ const fmtDate = (str) => {
 };
 
 export default function MotoristaRelatorio() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen]     = useState(false);
   const [dados, setDados]           = useState(null);

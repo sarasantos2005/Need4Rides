@@ -7,9 +7,8 @@ import { toastAviso, toastErro, toastSucesso } from '../components/toast.js';
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 export default function GestorEditarMotorista() {
+  useAuthGuard();
   const navigate = useNavigate();
   const { id } = useParams();
 

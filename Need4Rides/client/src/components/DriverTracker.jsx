@@ -17,7 +17,7 @@ export default function DriverTracker() {
   const isSendingRef = useRef(false);
   const turnoIdRef = useRef(null);
 
-  const sendLocationViaSocket = useCallback((lat, long) => {
+  const sendLocationViaSocket = useCallback((lat, lng) => {
     if(!socketRef.current?.connected) return;
     if(isNaN(lat) || isNaN(lng)) {
       console.warn('[DriverTracker] Coordenadas inválidas:', lat, lng);
@@ -102,8 +102,7 @@ export default function DriverTracker() {
       const turnoId = res.data?._id;
       if(!turnoId) return false;
 
-      localStorage.setItem('turnoId', turnoId);
-      turnoId.current = turnoId;
+      turnoIdRef.current = turnoId;
       connectSocket(token, turnoId);
       return true;
     } catch (error) {
@@ -115,6 +114,13 @@ export default function DriverTracker() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.role !== 'motorista' && payload.tipo !== 'Motorista') return;
+    } catch {
+      return;
+    }
 
     fetchTurno(token).then((found) => {
       if(!found) {

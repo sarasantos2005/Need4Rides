@@ -10,8 +10,6 @@ import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 const formatarDataHora = (isoString) => {
   if (!isoString) return { data: '---', hora: '---' };
   const d = new Date(isoString);
@@ -22,6 +20,7 @@ const formatarDataHora = (isoString) => {
 };
 
 export default function MotoristaHistorico() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [filtro, setFiltro] = useState('todas');
   const [historico, setHistorico] = useState([]);

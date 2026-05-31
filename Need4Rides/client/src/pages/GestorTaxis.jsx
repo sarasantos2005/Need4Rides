@@ -8,8 +8,6 @@ import { useState, useEffect } from 'react';
 import { toastSucesso, toastErro } from '../components/toast.js';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 const estadoClass = estado => {
   if (estado === 'Em serviço')  return 'servico';
   if (estado === 'Disponível')  return 'disponivel';
@@ -17,6 +15,7 @@ const estadoClass = estado => {
 };
 
 export default function GestorTaxis() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [sortCol, setSortCol] = useState(null);

@@ -6,8 +6,6 @@ import { useState, useEffect } from 'react';
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 const mockAtividade = [
   { id: 1, acao: 'Motorista registado', detalhe: 'Carlos Mendes adicionado à plataforma', data: '31 Mar 2026', hora: '10:12' },
   { id: 2, acao: 'Táxi adicionado',     detalhe: 'Toyota Corolla · AA-00-BB',             data: '30 Mar 2026', hora: '15:47' },
@@ -15,6 +13,7 @@ const mockAtividade = [
 ];
 
 export default function GestorProfile() {
+  useAuthGuard();
   const navigate = useNavigate();
 
   const [tema, setTema] = useState(() => localStorage.getItem('tema') || 'escuro');

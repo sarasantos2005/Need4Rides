@@ -8,9 +8,8 @@ import '../css/global.css';
 import { toastSucesso, toastErro } from '../components/toast.js';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 export default function GestorMotoristas() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [motoristas, setMotoristas] = useState([]);

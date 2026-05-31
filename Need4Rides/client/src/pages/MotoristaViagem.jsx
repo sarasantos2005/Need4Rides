@@ -12,8 +12,6 @@ import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 const STAGES = ['A aguardar motorista', 'Motorista a caminho', 'Em viagem', 'Concluída'];
 
 const getDadosMarca = (idBD) => {
@@ -98,6 +96,7 @@ function formatTime(s) {
 
 
 export default function MotoristaViagem() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [estado, setEstado] = useState('aguardandoInicio'); 
   const [segundos, setSegundos] = useState(0);

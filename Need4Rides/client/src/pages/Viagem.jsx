@@ -10,8 +10,6 @@ import React from 'react';
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 import L from "leaflet";
 import "leaflet-routing-machine";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
@@ -91,6 +89,7 @@ const StaticMap = React.memo(({origin, destination}) => {
 });
 
 export default function Viagem() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [stage, setStage] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);

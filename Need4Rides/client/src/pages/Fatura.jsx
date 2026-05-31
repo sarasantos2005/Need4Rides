@@ -6,9 +6,8 @@ import axios from 'axios';
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 export default function Fatura() {
+  useAuthGuard();
   const { state } = useLocation();
   const navigate = useNavigate();
   const [fatura, setFaturaDados] = useState([]);

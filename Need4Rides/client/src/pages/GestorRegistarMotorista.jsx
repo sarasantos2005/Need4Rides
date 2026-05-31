@@ -7,9 +7,8 @@ import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 export default function GestorRegistarMotorista() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [form, setForm] = useState({
     nome: '', email: '', ano_nascimento: '', nif: '', genero: '',

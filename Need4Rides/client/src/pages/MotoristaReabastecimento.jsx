@@ -8,8 +8,6 @@ import axios from 'axios';
 import VEICULOS from "../../../server/data/marcasEmodelos";
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet/dist/leaflet.css';
@@ -242,6 +240,7 @@ function FormFinalizar({ reab, tipoMotor, onFinalizado, onCancelar }) {
 }
 
 export default function MotoristaReabastecimento() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [form, setForm] = useState({ litros: '', kWh: '', valor: '', inicio: '', fim: '', posto: '', obs: '', quilometragem: '' });
   const [submitted, setSubmitted] = useState(false);

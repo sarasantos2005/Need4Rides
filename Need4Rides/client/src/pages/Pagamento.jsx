@@ -10,8 +10,6 @@ import '../css/Pagamento.css';
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 // ── Formulário real do Stripe ────────────────────────────────────────────────
@@ -81,6 +79,7 @@ function CheckoutForm({ viagemId, preco, onSuccess }) {
 
 // ── Página principal ─────────────────────────────────────────────────────────
 export default function Pagamento() {
+  useAuthGuard();
   const navigate  = useNavigate();
   const location  = useLocation();
   const [menuOpen, setMenuOpen]       = useState(false);

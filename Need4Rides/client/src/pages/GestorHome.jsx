@@ -11,9 +11,8 @@ import '../css/global.css';
 import { toastSucesso, toastErro, toastAviso, toastInfo, confirmar } from '../components/toast';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 export default function GestorHome() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userData, setUserData] = useState({ nome: 'Utilizador' });

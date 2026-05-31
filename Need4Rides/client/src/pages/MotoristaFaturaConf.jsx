@@ -6,8 +6,6 @@ import AvatarDropdown from '../components/AvatarDropdown';
 import '../css/global.css';
 import useAuthGuard from '../hooks/authGuard';
 
-useAuthGuard();
-
 function formatDuracao(s) {
   if (!s) return '—';
   const m = Math.floor(s / 60);
@@ -16,6 +14,7 @@ function formatDuracao(s) {
 }
 
 export default function MotoristaFaturaConf() {
+  useAuthGuard();
   const navigate = useNavigate();
   const { state } = useLocation();
   const trip = state?.trip;
