@@ -1,0 +1,2004 @@
+openapi: 3.0.0
+info:
+  title: Need4Rides API
+  version: 1.0.0
+  description: Documentação da API RESTful — Need4Rides
+
+servers:
+  - url: /api
+    description: Servidor de Desenvolvimento
+
+# ======================================
+# SEGURANÇA
+# ======================================
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    # ---- USER ----
+    UserCreate:
+      type: object
+      required: [tipo, email, nome, genero, nif, senha_acesso_web, ano_nascimento]
+      properties:
+        tipo:
+          type: string
+          enum: [Cliente, Motorista, Gestor]
+        email:
+          type: string
+          format: email
+        nome:
+          type: string
+        genero:
+          type: string
+          enum: [M, F]
+        nif:
+          type: string
+          minLength: 9
+          maxLength: 9
+          description: Exatamente 9 dígitos
+        senha_acesso_web:
+          type: string
+          format: password
+          minLength: 6
+          description: Mínimo 6 caracteres com letras e números obrigatórios
+        ano_nascimento:
+          type: integer
+        n_carta_conducao:
+          type: string
+          description: Obrigatório se tipo=Motorista. Formato ZA-12345 6
+        morada:
+          type: string
+          description: Obrigatório se tipo=Motorista
+        localizacao:
+          type: object
+          description: Obrigatório se tipo=Motorista
+          properties:
+            lat: { type: number }
+            long: { type: number }
+
+    UserCreateResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string, example: "Registo criado com sucesso." }
+        user:
+          type: object
+          properties:
+            id: { type: string }
+            nome: { type: string }
+            tipo: { type: string }
+        token: { type: string, description: JWT de sessão }
+
+    LoginRequest:
+      type: object
+      required: [role, nif, senha_acesso_web]
+      properties:
+        role:
+          type: string
+          enum: [Cliente, Motorista, Gestor]
+        nif:
+          type: string
+          minLength: 9
+          maxLength: 9
+        senha_acesso_web:
+          type: string
+          format: password
+
+    LoginResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        message: { type: string, example: "Login bem sucedido." }
+        user:
+          type: object
+          properties:
+            id: { type: string }
+            nome: { type: string }
+            tipo: { type: string }
+        token: { type: string }
+
+    UserEditarPerfil:
+      type: object
+      description: Todos os campos opcionais (PATCH parcial)
+      properties:
+        nome: { type: string }
+        email: { type: string, format: email }
+        genero: { type: string, enum: [M, F] }
+        senha_acesso_web: { type: string, format: password, minLength: 6 }
+        ano_nascimento: { type: integer }
+        n_carta_conducao: { type: string, description: Apenas Motorista }
+        morada: { type: string, description: Apenas Motorista }
+        localizacao:
+          type: array
+          items: { type: number }
+          description: "[lat, lng] — apenas Motorista"
+
+    SitioFavorito:
+      type: object
+      required: [label, address, lat, lng]
+      properties:
+        label: { type: string, enum: [Casa, Trabalho] }
+        address: { type: string }
+        lat: { type: number }
+        lng: { type: number }
+
+    DefinirPreco:
+      type: object
+      required: [nivel_conforto, valor_minuto]
+      properties:
+        nivel_conforto:
+          type: string
+          enum: [Básico, Luxuoso]
+        valor_minuto:
+          type: number
+          minimum: 0.01
+          description: Deve ser positivo (RIA 20)
+        acrescimo_noturno:
+          type: number
+          description: Percentagem de agravamento noturno (ex. 20 para 20%)
+
+    # ---- TAXI ----
+    TaxiCreate:
+      type: object
+      required: [matricula, marca, modelo, tipo_motor, ano_compra, nivel_conforto, cor]
+      properties:
+        matricula:
+          type: string
+          description: Formato XX-XX-XX (ex. AB-12-CD)
+        marca: { type: string }
+        modelo: { type: string }
+        tipo_motor:
+          type: string
+          enum: [Combustão, Elétrico]
+        ano_compra:
+          type: integer
+          description: Não pode ser posterior ao ano atual (RIA 5)
+        nivel_conforto:
+          type: string
+          enum: [Básico, Luxuoso]
+        cor:
+          type: string
+          description: Código HEX (ex. #FFFFFF)
+        nivel_combustivel_carga:
+          type: number
+          minimum: 0
+          maximum: 100
+          default: 100
+        autonomia_maxima:
+          type: number
+          default: 0
+
+    TaxiResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        taxi:
+          type: object
+          properties:
+            _id: { type: string }
+            matricula: { type: string }
+            marca: { type: string }
+            modelo: { type: string }
+            tipo_motor: { type: string }
+            ano_compra: { type: integer }
+            nivel_conforto: { type: string }
+            cor: { type: string }
+            nivel_combustivel_carga: { type: number }
+            autonomia_maxima: { type: number }
+            createdAt: { type: string, format: date-time }
+            updatedAt: { type: string, format: date-time }
+
+    # ---- TURNO ----
+    RequisitarTaxi:
+      type: object
+      required: [turnoId, taxiId]
+      properties:
+        turnoId: { type: string, description: ObjectId do turno }
+        taxiId: { type: string, description: ObjectId do táxi }
+
+    DevolverTaxi:
+      type: object
+      required: [turnoId]
+      properties:
+        turnoId: { type: string }
+
+    FinalizarTurno:
+      type: object
+      required: [turnoId]
+      properties:
+        turnoId: { type: string }
+
+    AtualizarPosicao:
+      type: object
+      required: [lat, lng]
+      properties:
+        lat: { type: number }
+        lng: { type: number }
+
+    TurnoResponse:
+      type: object
+      properties:
+        _id: { type: string }
+        hora_inicio: { type: string, format: date-time }
+        hora_fim: { type: string, format: date-time }
+        estado:
+          type: string
+          enum: [Agendado, Ativo, Terminado, Cancelado]
+        motorista: { type: string, description: ObjectId do motorista }
+        taxi:
+          type: object
+          description: Populado com dados do táxi
+        localizacao_atual:
+          type: object
+          properties:
+            type: { type: string, example: Point }
+            coordinates:
+              type: array
+              items: { type: number }
+              description: "[longitude, latitude]"
+        last_updated: { type: string, format: date-time }
+
+    # ---- VIAGEM ----
+    PontoGeo:
+      type: object
+      required: [morada, localizacao]
+      properties:
+        morada: { type: string }
+        localizacao:
+          type: object
+          required: [coordinates]
+          properties:
+            coordinates:
+              type: array
+              items: { type: number }
+              description: "[longitude, latitude]"
+
+    PedirTaxi:
+      type: object
+      required: [n_passageiros, nivel_conforto, origem, destino]
+      properties:
+        n_passageiros:
+          type: integer
+          minimum: 1
+          maximum: 4
+          description: RIA 18
+        nivel_conforto:
+          type: string
+          enum: [Básico, Luxuoso]
+        origem:
+          $ref: '#/components/schemas/PontoGeo'
+        destino:
+          $ref: '#/components/schemas/PontoGeo'
+        preco_estimado:
+          type: number
+          description: Opcional — enviado pelo cliente como estimativa
+
+    PedirTaxiResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        pedido:
+          type: object
+          properties:
+            id: { type: string }
+            cliente: { type: string }
+            custo_estimado: { type: number }
+
+    IniciarViagem:
+      type: object
+      required: [viagemId]
+      properties:
+        viagemId: { type: string }
+
+    FinalizarViagem:
+      type: object
+      required: [viagemId, destino]
+      properties:
+        viagemId: { type: string }
+        destino:
+          type: object
+          required: [morada, lat, long]
+          properties:
+            morada: { type: string }
+            lat: { type: number }
+            long: { type: number }
+
+    ConfirmacaoCliente:
+      type: object
+      required: [viagemId, confirma, motoristaId]
+      properties:
+        viagemId: { type: string }
+        confirma:
+          type: boolean
+          description: true=aceita o motorista, false=rejeita
+        motoristaId:
+          type: string
+          description: ObjectId do turno do motorista proposto
+
+    CancelarAceitacaoMotorista:
+      type: object
+      required: [viagemId, turnoId]
+      properties:
+        viagemId: { type: string }
+        turnoId: { type: string }
+
+    AceitarPedido:
+      type: object
+      required: [viagemId, turnoId]
+      properties:
+        viagemId: { type: string }
+        turnoId: { type: string, description: ObjectId do turno ativo do motorista }
+
+    RecusarCliente:
+      type: object
+      required: [viagemId]
+      properties:
+        viagemId: { type: string }
+
+    CancelarViagem:
+      type: object
+      required: [viagemId]
+      properties:
+        viagemId: { type: string }
+
+    ViagemStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [procurando, aguardandoConfirmacao, aguardandoInicio, emCurso, finalizada]
+        motorista:
+          type: object
+          nullable: true
+        info:
+          type: object
+          nullable: true
+          properties:
+            nome: { type: string }
+            email: { type: string }
+            marca: { type: string }
+            modelo: { type: string }
+            matricula: { type: string }
+
+    TempoEsperaResponse:
+      type: object
+      properties:
+        tempoEspera:
+          type: integer
+          description: Tempo mínimo em minutos (motorista mais próximo)
+        media:
+          type: integer
+          description: Média dos tempos dos motoristas num raio de 10km
+
+    # ---- FATURA ----
+    EmitirFatura:
+      type: object
+      required: [viagemId]
+      properties:
+        viagemId: { type: string, description: ObjectId da viagem }
+
+    FaturaResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        fatura:
+          type: object
+          properties:
+            _id: { type: string }
+            n_sequencial: { type: integer }
+            ano: { type: integer }
+            data_emissao: { type: string, format: date-time }
+            viagem: { type: object, description: Populado com viagem, turno e motorista.nome }
+            numeroFormatado:
+              type: string
+              example: "N4R-2025/001"
+              description: "N4R-{ano}/{n_sequencial padded 3 dígitos}"
+
+    # ---- REABASTECIMENTO ----
+    RegistarReabastecimento:
+      type: object
+      required: [turnoId, quilometragem, valor_pago, inicio, fim]
+      properties:
+        turnoId:
+          type: string
+          description: ObjectId do turno — determina o táxi e tipo_motor automaticamente
+        quilometragem:
+          type: number
+          minimum: 0.01
+          description: Positivo (RIA 25) e superior ao último registo (RIA 26)
+        valor_pago:
+          type: number
+          minimum: 0.01
+          description: Deve ser positivo (RIA 24)
+        inicio:
+          type: string
+          format: date-time
+          description: >
+            Combustão: deve estar dentro do turno (RIA 9).
+            Elétrico: apenas o início precisa de estar dentro do turno (RIA 10).
+        fim:
+          type: string
+          format: date-time
+        litros:
+          type: number
+          description: Obrigatório para táxi de Combustão (RIA 22)
+        kWh:
+          type: number
+          description: Obrigatório para táxi Elétrico (RIA 23)
+        estado:
+          type: string
+          enum: [Em curso, Concluído, Cancelado]
+
+    # ---- RELATÓRIO ----
+    RelatorioResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        periodo:
+          type: object
+          properties:
+            filtro: { type: string }
+            inicio: { type: string, format: date-time }
+            fim: { type: string, format: date-time }
+        resumo:
+          type: object
+          properties:
+            viagensHoje: { type: integer }
+            receitaHoje: { type: string, example: "123.45" }
+            motoristasAtivos: { type: string, example: "3 / 10" }
+            taxisEmServico: { type: string, example: "3 / 8" }
+        viagensEmCurso:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              cliente: { type: string }
+              motorista: { type: string }
+              origem: { type: string }
+              destino: { type: string }
+              status: { type: string }
+        motoristas:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              nome: { type: string }
+              estado: { type: string, enum: [Em turno, Fora de turno] }
+              viagens: { type: integer }
+              ganhos: { type: string, example: "45.60" }
+        viagensUltimaSemana:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              cliente: { type: string }
+              motorista: { type: string }
+              origem: { type: string }
+              destino: { type: string }
+              preco: { type: number }
+              data: { type: string }
+              hora: { type: string }
+        statsAdicionais:
+          type: object
+          properties:
+            taxis:
+              type: object
+              properties:
+                total: { type: integer }
+                emServico: { type: integer }
+                disponiveis: { type: integer }
+                porTipo: { type: array, items: { type: object } }
+                porConforto: { type: array, items: { type: object } }
+            motoristas:
+              type: object
+              properties:
+                total: { type: integer }
+                ativos: { type: integer }
+                inativos: { type: integer }
+                topPerformers: { type: array, items: { type: object } }
+            viagens:
+              type: object
+              properties:
+                total: { type: integer }
+                ativas: { type: integer }
+                completadas: { type: integer }
+                mediaPreco: { type: string }
+
+    RelatorioReabastecimentosResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        periodo:
+          type: object
+          properties:
+            inicio: { type: string, format: date-time }
+            fim: { type: string, format: date-time }
+        totais:
+          type: object
+          properties:
+            euros:
+              type: number
+              format: float
+              example: 320.50
+            horas:
+              type: number
+              format: float
+              example: 4.75
+        subtotais:
+          type: array
+          items:
+            type: object
+            properties:
+              tipo:
+                type: string
+                enum: [Combustão, Elétrico, Desconhecido]
+              euros:
+                type: number
+                format: float
+                example: 200.00
+              horas:
+                type: number
+                format: float
+                example: 3.00
+              taxis:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string, description: ObjectId do táxi }
+                    matricula: { type: string, example: "AB-12-CD" }
+                    marca: { type: string }
+                    modelo: { type: string }
+                    tipo_motor: { type: string, enum: [Combustão, Elétrico] }
+                    euros: { type: number, format: float }
+                    horas: { type: number, format: float }
+                    registos:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id: { type: string, description: ObjectId do reabastecimento }
+                          data: { type: string, example: "01/06/2025" }
+                          hora: { type: string, example: "14:30" }
+                          posto: { type: string, example: "Rua das Flores, 12" }
+                          valor: { type: number, format: float }
+                          litros:
+                            type: number
+                            nullable: true
+                            description: Preenchido apenas para táxis de Combustão
+                          kWh:
+                            type: number
+                            nullable: true
+                            description: Preenchido apenas para táxis Elétricos
+                          duracao:
+                            type: string
+                            nullable: true
+                            example: "1.25"
+                            description: Duração em horas (2 casas decimais)
+
+    ErrorResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string }
+
+paths:
+
+# ======================================
+# USER — /api/user
+# ======================================
+
+  /user:
+    get:
+      tags: [User]
+      summary: Listar todos os utilizadores
+      responses:
+        '200':
+          description: Array de utilizadores (inclui senha hash — usar com cuidado)
+        '500':
+          description: Erro interno
+
+    post:
+      tags: [User]
+      summary: Criar utilizador — Cliente, Motorista ou Gestor (US2 / US17)
+      description: >
+        Motorista requer adicionalmente n_carta_conducao, morada e localizacao.
+        Retorna token JWT imediatamente após criação.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: Utilizador criado com token JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreateResponse'
+        '400':
+          description: >
+            NIF inválido | motorista menor de 18 anos |
+            senha inválida | dados de motorista incompletos | carta inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email associado a outro NIF | NIF já registado | carta já existe
+
+    patch:
+      tags: [User]
+      summary: Editar o próprio perfil (US13)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserEditarPerfil'
+      responses:
+        '200':
+          description: Perfil atualizado; retorna user sem senha_acesso_web
+        '400':
+          description: Género inválido | senha inválida | motorista menor de 18 | carta inválida
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Utilizador não encontrado
+
+  /user/login:
+    post:
+      tags: [User]
+      summary: Login de Cliente, Motorista ou Gestor (US4 / US18)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              role: Motorista
+              nif: "123456789"
+              senha_acesso_web: "abc123"
+      responses:
+        '200':
+          description: Login bem-sucedido; retorna user + token JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Credenciais inválidas
+
+  /user/preco:
+    post:
+      tags: [User]
+      summary: Gestor define preço por minuto por nível de conforto (US3)
+      description: >
+        Cria um novo documento de preço. O mais recente por nivel_conforto
+        é o que fica ativo (consultado via /api/preco).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DefinirPreco'
+      responses:
+        '201':
+          description: Preço criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  preco: { type: object }
+        '400':
+          description: valor_minuto não é positivo (RIA 20)
+
+  /user/sitios:
+    get:
+      tags: [User]
+      summary: Obter sítios favoritos (Casa / Trabalho) do utilizador autenticado
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Array de favoritos (pode ser vazio)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SitioFavorito'
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Utilizador não encontrado
+
+    patch:
+      tags: [User]
+      summary: Adicionar ou atualizar sítio favorito (Casa ou Trabalho)
+      description: >
+        Se o label já existe no array, atualiza. Caso contrário, adiciona.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SitioFavorito'
+      responses:
+        '200':
+          description: Local guardado; retorna array favoritos atualizado
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Utilizador não encontrado
+
+  /user/{id}:
+    get:
+      tags: [User]
+      summary: Obter dados de um utilizador por ID (sem senha_acesso_web)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Dados do utilizador
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Utilizador não encontrado
+
+    delete:
+      tags: [User]
+      summary: Remover utilizador por ID (US13)
+      description: >
+        Requer token no header Authorization.
+        Um utilizador não pode remover outro (403).
+        Motorista com turnos associados não pode ser removido (403).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Removido com sucesso
+        '401':
+          description: Token ausente ou inválido
+        '403':
+          description: Não pode remover outro utilizador | motorista com turno associado
+        '404':
+          description: Utilizador não encontrado
+
+  /user/motorista/{id}:
+    get:
+      tags: [User]
+      summary: Gestor obtém dados de um motorista por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Dados do motorista
+        '404':
+          description: Motorista não encontrado
+
+    put:
+      tags: [User]
+      summary: Gestor atualiza dados de um motorista por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserEditarPerfil'
+      responses:
+        '200':
+          description: Motorista atualizado com sucesso
+        '400':
+          description: Dados inválidos
+        '404':
+          description: Motorista não encontrado
+
+    delete:
+      tags: [User]
+      summary: Gestor remove um motorista por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Motorista removido com sucesso
+        '403':
+          description: Motorista com turno associado não pode ser removido
+        '404':
+          description: Motorista não encontrado
+
+# ======================================
+# PREÇO — /api/preco
+# ======================================
+
+  /preco:
+    get:
+      tags: [Preco]
+      summary: Obter os preços mais recentes por nível de conforto
+      description: >
+        Agrega por nivel_conforto e retorna o documento mais recente de cada um.
+        Resultado é um mapa indexado por "Básico" e "Luxuoso".
+      responses:
+        '200':
+          description: Mapa de preços atuais
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    _id: { type: string }
+                    nivel_conforto: { type: string, enum: [Básico, Luxuoso] }
+                    valor_minuto: { type: number }
+                    acrescimo_noturno: { type: number }
+                    data_definicao: { type: string, format: date-time }
+                    gestor: { type: string }
+        '500':
+          description: Erro ao obter preço
+
+    post:
+      tags: [Preco]
+      summary: Gestor define preço por minuto por nível de conforto
+      description: >
+        Cria um novo documento de preço. O mais recente por nivel_conforto
+        é o que fica ativo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DefinirPreco'
+      responses:
+        '201':
+          description: Preço criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  preco: { type: object }
+        '400':
+          description: valor_minuto não é positivo (RIA 20)
+
+# ======================================
+# TAXI — /api/taxi
+# ======================================
+
+  /taxi:
+    post:
+      tags: [Taxi]
+      summary: Registar um novo táxi (US1)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaxiCreate'
+      responses:
+        '201':
+          description: Táxi registado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxiResponse'
+        '400':
+          description: Ano de compra posterior ao atual (RIA 5) | matrícula com formato inválido
+        '409':
+          description: Matrícula já existe (índice unique no modelo)
+
+    get:
+      tags: [Taxi]
+      summary: Listar táxis disponíveis (sem turno Ativo ou Agendado)
+      responses:
+        '200':
+          description: Array de táxis disponíveis
+
+  /taxi/all:
+    get:
+      tags: [Taxi]
+      summary: Listar todos os táxis incluindo os ocupados
+      responses:
+        '200':
+          description: Array completo ordenado por createdAt desc
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  taxis:
+                    type: array
+                    items: { type: object }
+
+  /taxi/{id}:
+    get:
+      tags: [Taxi]
+      summary: Obter um táxi pelo seu ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Dados do táxi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxiResponse'
+        '404':
+          description: Táxi não encontrado
+
+    put:
+      tags: [Taxi]
+      summary: Atualizar dados de um táxi
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaxiCreate'
+      responses:
+        '200':
+          description: Táxi atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxiResponse'
+        '400':
+          description: Dados inválidos
+        '404':
+          description: Táxi não encontrado
+
+    delete:
+      tags: [Taxi]
+      summary: Eliminar táxi — apenas se nunca foi requisitado para turno (US12)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Táxi removido com sucesso
+        '403':
+          description: Táxi já foi requisitado para um turno
+        '404':
+          description: Táxi não encontrado
+
+# ======================================
+# TURNO — /api/turno
+# ======================================
+
+  /turno:
+    post:
+      tags: [Turno]
+      summary: Criar novo turno
+      security:
+        - BearerAuth: []
+      description: >
+        ⚠️ Implementação pendente — o controller `novoTurno` está marcado como
+        "AINDA TEM DE SER ALTERADO NA TOTALIDADE" e retorna resposta vazia.
+      responses:
+        '201':
+          description: Turno criado (implementação pendente)
+        '401':
+          description: Token ausente ou inválido
+
+  /turno/atual:
+    get:
+      tags: [Turno]
+      summary: Obter turno Ativo do motorista autenticado (táxi populado)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Turno ativo ou `null` se não houver nenhum
+          content:
+            application/json:
+              schema:
+                nullable: true
+                oneOf:
+                  - $ref: '#/components/schemas/TurnoResponse'
+                  - type: 'null'
+        '401':
+          description: Token ausente ou inválido
+
+  /turno/requisitar:
+    patch:
+      tags: [Turno]
+      summary: Associar táxi a um turno (US5)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequisitarTaxi'
+      responses:
+        '200':
+          description: Turno atualizado com o táxi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TurnoResponse'
+        '404':
+          description: Turno não encontrado | Táxi não existe
+
+  /turno/devolver:
+    patch:
+      tags: [Turno]
+      summary: Remover o táxi do turno (taxi fica null)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevolverTaxi'
+      responses:
+        '200':
+          description: Táxi devolvido com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  turno:
+                    $ref: '#/components/schemas/TurnoResponse'
+        '404':
+          description: Turno não encontrado
+
+  /turno/finalizar:
+    patch:
+      tags: [Turno]
+      summary: Terminar turno — hora_fim=agora, estado=Terminado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalizarTurno'
+      responses:
+        '200':
+          description: Turno terminado com sucesso
+        '400':
+          description: hora_inicio ainda não passou (não pode terminar antes de começar)
+        '404':
+          description: Turno não encontrado
+
+  /turno/posicao:
+    post:
+      tags: [Turno]
+      summary: Atualizar coordenadas GPS do motorista no turno Ativo
+      description: >
+        Atualiza `localizacao_atual` (GeoJSON Point) e `last_updated` no turno Ativo
+        do motorista autenticado. Usado para cálculo de distâncias e tempo de espera.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AtualizarPosicao'
+      responses:
+        '200':
+          description: Posição atualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+        '400':
+          description: Coordenadas inválidas (não são números)
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Nenhum turno Ativo para este motorista
+
+  /turno/futuros:
+    get:
+      tags: [Turno]
+      summary: Listar turnos futuros do motorista autenticado
+      description: >
+        Retorna turnos com estado Agendado e hora_inicio no futuro,
+        pertencentes ao motorista autenticado.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Array de turnos futuros
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TurnoResponse'
+        '401':
+          description: Token ausente ou inválido
+
+# ======================================
+# VIAGEM — /api/viagem
+# ======================================
+
+  /viagem/pedir:
+    post:
+      tags: [Viagem]
+      summary: Cliente cria pedido de táxi (US6)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedirTaxi'
+      responses:
+        '201':
+          description: Pedido registado; aguarda aceitação de motorista
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedirTaxiResponse'
+        '400':
+          description: n_passageiros fora de 1-4 (RIA 18) | nivel_conforto inválido
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Utilizador não é Cliente
+
+  /viagem/iniciar:
+    post:
+      tags: [Viagem]
+      summary: Motorista inicia a viagem — hora_inicial_viagem = agora (US8)
+      description: >
+        Valida que agora está dentro do período do turno (RIA 3).
+        Não exige auth no router.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IniciarViagem'
+      responses:
+        '200':
+          description: Viagem iniciada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  viagem: { type: object }
+        '400':
+          description: Hora atual fora do período do turno (RIA 3)
+
+  /viagem/finalizar:
+    post:
+      tags: [Viagem]
+      summary: Motorista finaliza a viagem — calcula km (OSRM) e preço (US8)
+      description: >
+        Calcula km via OSRM entre morada_inicial e destino (RIA 19).
+        Calcula preço por minuto com agravamento noturno 21h–6h (RIA 20).
+        Faz unset de motorista_proposto e motoristas_rejeitados.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalizarViagem'
+      responses:
+        '200':
+          description: Viagem finalizada com km_percorridos e preco_viagem calculados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  viagem: { type: object }
+        '400':
+          description: hora_fim não é posterior a hora_inicio (RIA 1)
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Viagem não encontrada
+
+  /viagem/confirmar:
+    post:
+      tags: [Viagem]
+      summary: Cliente aceita ou rejeita motorista proposto (US6/US7)
+      description: >
+        confirma=true → turno fica associado à viagem, motorista_proposto removido.
+        confirma=false → motorista adicionado a motoristas_rejeitados, pedido volta disponível.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmacaoCliente'
+      responses:
+        '200':
+          description: Motorista confirmado | Motorista rejeitado e pedido continua pendente
+        '404':
+          description: Turno não encontrado
+
+  /viagem/cancelar-aceitacao:
+    post:
+      tags: [Viagem]
+      summary: Motorista cancela a sua própria aceitação (US7)
+      description: >
+        Só o motorista cujo turnoId corresponde a motorista_proposto pode cancelar.
+        Remove motorista_proposto — pedido volta a estar disponível para todos.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelarAceitacaoMotorista'
+      responses:
+        '200':
+          description: Aceitação cancelada; pedido disponível novamente
+        '403':
+          description: Não tem permissão para cancelar a aceitação de outro motorista
+        '404':
+          description: Pedido não encontrado
+
+  /viagem/disponiveis:
+    get:
+      tags: [Viagem]
+      summary: Listar pedidos disponíveis perto do motorista autenticado (US7)
+      description: >
+        Filtra viagens sem turno, sem motorista_proposto, com o mesmo nivel_conforto
+        do táxi do turno ativo, num raio de 10km (2dsphere). Exclui pedidos onde
+        o motorista está em motoristas_rejeitados. Filtra ainda pedidos que não
+        cabem no tempo restante do turno (via OSRM). Campo extra por pedido:
+        `duracao_calculada` (min) e `pode` (boolean).
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: lat
+          in: query
+          required: false
+          schema: { type: number }
+          description: Sobrepõe a morada do motorista para efeitos de proximidade
+        - name: lng
+          in: query
+          required: false
+          schema: { type: number }
+      responses:
+        '200':
+          description: Array de pedidos filtrados com duracao_calculada e pode
+        '401':
+          description: Token ausente ou inválido
+        '403':
+          description: Motorista não tem turno Ativo
+        '404':
+          description: Localização do motorista não encontrada
+
+  /viagem/aceitar:
+    patch:
+      tags: [Viagem]
+      summary: Motorista aceita pedido — define motorista_proposto (US7)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AceitarPedido'
+      responses:
+        '200':
+          description: Aceitação enviada ao cliente; retorna motorista_proposto populado
+        '400':
+          description: Pedido já tem turno ou motorista_proposto (não está disponível)
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Pedido não encontrado
+
+  /viagem/motorista/ativa:
+    get:
+      tags: [Viagem]
+      summary: Status da viagem em curso do motorista autenticado
+      description: >
+        Procura turno Ativo → viagem sem hora_final_viagem.
+        Retorna `{ viagemId: null }` se não houver viagem ativa.
+        status pode ser emCurso (hora_inicial definida) ou aguardandoInicio.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: "Info da viagem ativa ou { viagemId: null }"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  viagemId: { type: string, nullable: true }
+                  status: { type: string, enum: [emCurso, aguardandoInicio] }
+                  viagem:
+                    type: object
+                    properties:
+                      _id: { type: string }
+                      origem: { type: object }
+                      destino: { type: object }
+                      km: { type: number, nullable: true }
+                      preco: { type: number, nullable: true }
+                      passageiros: { type: integer }
+                  cliente:
+                    type: object
+                    nullable: true
+                    properties:
+                      nome: { type: string }
+                  info:
+                    type: object
+                    nullable: true
+                    properties:
+                      marca: { type: string }
+                      modelo: { type: string }
+                      matricula: { type: string }
+        '401':
+          description: Token ausente ou inválido
+
+  /viagem/motorista:
+    get:
+      tags: [Viagem]
+      summary: Histórico de viagens finalizadas do motorista autenticado
+      description: >
+        Retorna viagens com hora_final_viagem dos turnos do motorista,
+        ordenadas por hora_inicial_viagem desc. Inclui campo extra `temFatura` (boolean).
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Array de viagens com cliente.nome, turno.taxi.matricula e temFatura
+        '401':
+          description: Token ausente ou inválido
+
+  /viagem/recusar:
+    patch:
+      tags: [Viagem]
+      summary: Motorista ignora/recusa um pedido — adiciona-se a motoristas_rejeitados
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecusarCliente'
+      responses:
+        '200':
+          description: Pedido ignorado com sucesso
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Viagem não encontrada
+
+  /viagem/historico/cliente:
+    get:
+      tags: [Viagem]
+      summary: Histórico de viagens finalizadas do cliente autenticado
+      description: >
+        Retorna viagens com hora_final_viagem do cliente autenticado,
+        ordenadas por hora_inicial_viagem desc. Inclui campo extra `temFatura` (boolean)
+        e turno.motorista.nome.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Array de viagens com temFatura e nome do motorista
+        '401':
+          description: Token ausente ou inválido
+
+  /viagem/status/{viagemId}:
+    get:
+      tags: [Viagem]
+      summary: Estado detalhado de uma viagem específica
+      description: >
+        status calculado a partir do documento:
+        finalizada (hora_final existe) → emCurso (turno+hora_inicial) →
+        aguardandoInicio (turno sem hora_inicial) →
+        aguardandoConfirmacao (motorista_proposto) → procurando.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: viagemId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Status e info do motorista/táxi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ViagemStatusResponse'
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Viagem não encontrada
+
+  /viagem/espera:
+    get:
+      tags: [Viagem]
+      summary: Estimar tempo de espera para a localização do cliente
+      description: >
+        Encontra turnos Ativos num raio de 10km (2dsphere) e usa OSRM Matrix
+        para calcular tempos. Retorna o mínimo e a média em minutos.
+        Fallback `{ tempoEspera: 15, media: 15 }` se não houver motoristas.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema: { type: number }
+        - name: lng
+          in: query
+          required: true
+          schema: { type: number }
+      responses:
+        '200':
+          description: Tempo de espera estimado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TempoEsperaResponse'
+        '400':
+          description: Coordenadas em falta (lat ou lng ausentes)
+        '401':
+          description: Token ausente ou inválido
+
+  /viagem/cancelar:
+    post:
+      tags: [Viagem]
+      summary: Cliente cancela o pedido de viagem (elimina o documento)
+      description: >
+        Apenas clientes autenticados. Elimina o documento de viagem com findByIdAndDelete.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelarViagem'
+      responses:
+        '200':
+          description: Pedido cancelado com sucesso
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Cliente não encontrado ou inválido
+
+  /viagem/motorista/abandonar:
+    post:
+      tags: [Viagem]
+      summary: Motorista abandona a viagem em curso
+      description: >
+        O motorista desiste da viagem que tem atualmente atribuída.
+        A viagem fica disponível novamente ou é marcada como cancelada.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [viagemId]
+              properties:
+                viagemId: { type: string, description: ObjectId da viagem }
+      responses:
+        '200':
+          description: Viagem abandonada com sucesso
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Viagem não encontrada
+
+  /viagem/avaliar:
+    post:
+      tags: [Viagem]
+      summary: Cliente avalia o motorista após a viagem
+      description: >
+        Apenas o cliente da viagem pode avaliar. A avaliação é registada
+        na viagem finalizada.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [viagemId, classificacao]
+              properties:
+                viagemId: { type: string, description: ObjectId da viagem }
+                classificacao:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                  description: Classificação de 1 a 5 estrelas
+                comentario: { type: string }
+      responses:
+        '200':
+          description: Avaliação registada com sucesso
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Viagem não encontrada
+
+# ======================================
+# FATURA — /api/fatura
+# ======================================
+
+  /fatura/emitir:
+    post:
+      tags: [Fatura]
+      summary: Emitir fatura para uma viagem (US10)
+      description: >
+        Gera n_sequencial automático (1..N por ano, RIA 21).
+        Devolve 400 se já existir fatura para esta viagem.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmitirFatura'
+      responses:
+        '201':
+          description: Fatura emitida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id: { type: string }
+                  n_sequencial: { type: integer }
+                  ano: { type: integer }
+                  data_emissao: { type: string, format: date-time }
+                  viagem: { type: string }
+        '400':
+          description: Fatura já emitida para esta viagem (US10)
+
+  /fatura/enviar-email:
+    post:
+      tags: [Fatura]
+      summary: Enviar fatura por e-mail ao cliente
+      description: >
+        Envia a fatura da viagem indicada para o e-mail do cliente autenticado.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [viagemId]
+              properties:
+                viagemId: { type: string, description: ObjectId da viagem }
+      responses:
+        '200':
+          description: E-mail enviado com sucesso
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Fatura não encontrada para esta viagem
+
+  /fatura/{viagemId}:
+    get:
+      tags: [Fatura]
+      summary: Obter fatura de uma viagem (populada com turno e motorista.nome)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: viagemId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Fatura com campo extra numeroFormatado (N4R-{ano}/{seq 3 dígitos})
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaturaResponse'
+        '400':
+          description: ID da viagem não fornecido
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Fatura ainda não emitida para esta viagem
+
+# ======================================
+# REABASTECIMENTO — /api/reabastecimento
+# ======================================
+
+  /reabastecimento:
+    post:
+      tags: [Reabastecimento]
+      summary: Registar reabastecimento de um táxi (US11)
+      description: >
+        O táxi e tipo_motor são obtidos via turnoId.populate('taxi').
+        Combustão (RIA 9): período completo dentro do turno; litros obrigatório (RIA 22).
+        Elétrico (RIA 10): apenas inicio dentro do turno; kWh obrigatório (RIA 23).
+        Quilometragem positiva (RIA 25) e crescente face ao último registo (RIA 26).
+        Valor pago positivo (RIA 24).
+        Estado calculado automaticamente (Em curso / Concluído); aceita "Cancelado" no body.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistarReabastecimento'
+      responses:
+        '201':
+          description: Reabastecimento registado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  registo: { type: object }
+        '400':
+          description: >
+            Período fora do turno (RIA 9/10) |
+            Quilometragem decrescente (RIA 26) |
+            Quilometragem não positiva (RIA 25) |
+            Valor pago não positivo (RIA 24)
+        '404':
+          description: Turno não encontrado
+
+  /reabastecimento/{id}:
+    get:
+      tags: [Reabastecimento]
+      summary: Listar reabastecimentos de um táxi
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          description: ObjectId do táxi
+      responses:
+        '200':
+          description: Array de reabastecimentos do táxi
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { type: object }
+        '404':
+          description: Táxi não encontrado
+
+    patch:
+      tags: [Reabastecimento]
+      summary: Finalizar reabastecimento em curso
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          description: ObjectId do reabastecimento
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fim:
+                  type: string
+                  format: date-time
+                  description: Data/hora de conclusão (se não fornecida, usa o momento atual)
+      responses:
+        '200':
+          description: Reabastecimento finalizado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  registo: { type: object }
+        '404':
+          description: Reabastecimento não encontrado
+
+# ======================================
+# PAGAMENTO — /api/pagamento
+# ======================================
+
+  /pagamento/criar-intent:
+    post:
+      tags: [Pagamento]
+      summary: Criar Payment Intent para uma viagem (Stripe)
+      description: >
+        Cria um Payment Intent no Stripe com o valor calculado da viagem.
+        Devolve o clientSecret necessário para confirmar o pagamento no frontend.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [viagemId]
+              properties:
+                viagemId: { type: string, description: ObjectId da viagem }
+      responses:
+        '200':
+          description: Payment Intent criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientSecret: { type: string, description: Segredo do Payment Intent }
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Viagem não encontrada
+
+  /pagamento/confirmar:
+    post:
+      tags: [Pagamento]
+      summary: Confirmar pagamento de uma viagem
+      description: >
+        Confirma o pagamento após o cliente completar o fluxo Stripe no frontend.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [viagemId, paymentIntentId]
+              properties:
+                viagemId: { type: string }
+                paymentIntentId: { type: string, description: ID do Payment Intent do Stripe }
+      responses:
+        '200':
+          description: Pagamento confirmado com sucesso
+        '401':
+          description: Token ausente ou inválido
+        '404':
+          description: Viagem não encontrada
+
+# ======================================
+# RELATÓRIOS — /api/relatorios
+# ======================================
+
+  /relatorios/motorista:
+    get:
+      tags: [Relatorio]
+      summary: Relatório de desempenho do motorista autenticado
+      description: >
+        Retorna estatísticas de viagens, ganhos e avaliações do motorista autenticado,
+        filtradas pelo período indicado.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: periodo
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [hoje, semana, mes, ano]
+            default: hoje
+      responses:
+        '200':
+          description: Relatório do motorista
+        '401':
+          description: Token ausente ou inválido
+
+  /relatorios/taxis-motoristas:
+    get:
+      tags: [Relatorio]
+      summary: Relatório completo de táxis, motoristas e viagens (US14)
+      description: >
+        periodo (query): hoje | semana | mes | ano (default: hoje).
+        Retorna resumo agregado, viagens em curso, estatísticas por motorista,
+        últimas 20 viagens do período e statsAdicionais (breakdown por tipo_motor,
+        por conforto, top 5 performers por ganhos).
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: periodo
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [hoje, semana, mes, ano]
+            default: hoje
+      responses:
+        '200':
+          description: Objeto de relatório completo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelatorioResponse'
+        '401':
+          description: Token ausente ou inválido
+
+  /relatorios/exportar-pdf:
+    get:
+      tags: [Relatorio]
+      summary: Exportar relatório em PDF (US14)
+      description: >
+        Aceita `?periodo=hoje|semana|mes|ano` (default: hoje).
+        Gera HTML via `gerarHTMLRelatorio` e converte com `html-pdf`.
+        Content-Disposition: attachment; filename=relatorio-{periodo}-{data}.pdf
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: periodo
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [hoje, semana, mes, ano]
+            default: hoje
+      responses:
+        '200':
+          description: PDF gerado como attachment
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Token ausente ou inválido
+        '500':
+          description: Erro ao gerar PDF
+
+  /relatorios/reabastecimentos:
+    get:
+      tags: [Relatorio]
+      summary: Relatório de reabastecimentos concluídos (US16)
+      description: >
+        Retorna todos os reabastecimentos com estado "Concluído" dentro do
+        intervalo de datas indicado, com totais globais (€ e horas) e
+        subtotais agrupados por tipo de motor (Combustão / Elétrico).
+        Cada subtotal inclui o detalhe por táxi e os registos individuais.
+        Se dataInicio ou dataFim forem omitidos, assume o dia de hoje.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: dataInicio
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-06-01"
+          description: >
+            Data de início do período (YYYY-MM-DD).
+            Se omitida, usa o dia corrente.
+        - name: dataFim
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2025-06-30"
+          description: >
+            Data de fim do período (YYYY-MM-DD).
+            Se omitida, usa o dia corrente.
+      responses:
+        '200':
+          description: Relatório de reabastecimentos gerado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelatorioReabastecimentosResponse'
+              example:
+                success: true
+                periodo:
+                  inicio: "2025-06-01T00:00:00.000Z"
+                  fim: "2025-06-30T23:59:59.999Z"
+                totais:
+                  euros: 320.50
+                  horas: 4.75
+                subtotais:
+                  - tipo: Combustão
+                    euros: 200.00
+                    horas: 3.00
+                    taxis:
+                      - id: "664f1a2b3c4d5e6f7a8b9c0d"
+                        matricula: "AB-12-CD"
+                        marca: Toyota
+                        modelo: Corolla
+                        tipo_motor: Combustão
+                        euros: 200.00
+                        horas: 3.00
+                        registos:
+                          - id: "664f1a2b3c4d5e6f7a8b9c0e"
+                            data: "15/06/2025"
+                            hora: "14:30"
+                            posto: "Rua das Flores, 12"
+                            valor: 200.00
+                            litros: 45.0
+                            kWh: null
+                            duracao: "3.00"
+                  - tipo: Elétrico
+                    euros: 120.50
+                    horas: 1.75
+                    taxis:
+                      - id: "664f1a2b3c4d5e6f7a8b9c1a"
+                        matricula: "EL-99-ZZ"
+                        marca: Tesla
+                        modelo: Model 3
+                        tipo_motor: Elétrico
+                        euros: 120.50
+                        horas: 1.75
+                        registos:
+                          - id: "664f1a2b3c4d5e6f7a8b9c1b"
+                            data: "20/06/2025"
+                            hora: "09:15"
+                            posto: "—"
+                            valor: 120.50
+                            litros: null
+                            kWh: 60.0
+                            duracao: "1.75"
+        '401':
+          description: Token ausente ou inválido
+        '500':
+          description: Erro interno ao gerar o relatório
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
