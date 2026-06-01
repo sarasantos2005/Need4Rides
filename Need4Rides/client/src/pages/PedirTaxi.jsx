@@ -549,16 +549,18 @@ export default function PedirTaxi() {
               <label>Conforto do Carro</label>
               <div className="pt-passengers">
                 {[
-                  { value: 'Básico', label: 'Básico' },
-                  { value: 'Luxuoso', label: 'Luxuoso' },
+                  { value: 'Básico',  label: 'Básico',  desc: 'Viatura standard, económica e confortável.' },
+                  { value: 'Luxuoso', label: 'Luxuoso', desc: 'Viatura premium com maior conforto.' },
                 ].map(opt => (
                   <button
                     type="button"
                     key={opt.value}
                     className={`pt-pass-btn ${form.comfort === opt.value ? 'active' : ''}`}
                     onClick={() => { setForm(f => ({ ...f, comfort: opt.value })); setConfirmed(false); }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: '3px', height: 'auto', padding: '0.6rem 1rem' }}
                   >
-                    {opt.label}
+                    <span style={{ fontWeight: 700 }}>{opt.label}</span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 400, opacity: 0.75, whiteSpace: 'normal', textAlign: 'center' }}>{opt.desc}</span>
                   </button>
                 ))}
               </div>
