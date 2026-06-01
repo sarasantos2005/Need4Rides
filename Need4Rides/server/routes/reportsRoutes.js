@@ -7,6 +7,7 @@ const router = express.Router();
 // US14 - Relatórios táxis e motoristas
 router.get('/taxis-motoristas', auth, reportsController.getRelatorios);
 router.get('/motorista', auth, reportsController.getRelatoriosMotorista);
+router.get('/reabastecimentos', auth, reportsController.getRelatoriosReabastecimentos);
 router.get('/exportar-pdf', auth, reportsController.exportarPDF);
 
 module.exports = router;

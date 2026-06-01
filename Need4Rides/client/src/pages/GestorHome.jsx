@@ -35,6 +35,32 @@ export default function GestorHome() {
   });
   const firstRenderRef = useRef(true);
 
+  // US14 — Drill-down viagens/horas/km
+  const [ddExpanded, setDdExpanded] = useState(null); // 'viagens'|'horas'|'km'
+  const [ddSubType, setDdSubType] = useState(null);   // 'motoristas'|'taxis'
+  const [ddItemExp, setDdItemExp] = useState(null);   // id do motorista/táxi expandido
+
+  // US15 — Drill-down faturação por cliente
+  const [fatExpanded, setFatExpanded] = useState(false);
+  const [fatClienteExp, setFatClienteExp] = useState(null);
+
+  // US16 — Reabastecimentos
+  const [reabData, setReabData] = useState(null);
+  const [reabExpanded, setReabExpanded] = useState(null); // 'euros' | 'horas'
+  const [reabSubExpanded, setReabSubExpanded] = useState(null); // tipo motor
+  const [reabTaxiExpanded, setReabTaxiExpanded] = useState(null); // taxiId
+
+  const fetchReabastecimentos = async (di, df) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:3000/api/relatorios/reabastecimentos?dataInicio=${di}&dataFim=${df}`, {
+        headers: { Authorization: `Bearer ${token}` }, cache: 'no-store'
+      });
+      const data = await res.json();
+      if (data.success) setReabData(data);
+    } catch (e) { console.error('Erro reabastecimentos:', e); }
+  };
+
   // Carregamento inicial — mostra o ecrã de loading completo
   useEffect(() => {
     const storedUser = localStorage.getItem('user_logado');
@@ -44,6 +70,7 @@ export default function GestorHome() {
     } else {
       setUserData(JSON.parse(storedUser));
       fetchRelatorios(dataInicio, dataFim, true);
+      fetchReabastecimentos(dataInicio, dataFim);
     }
   }, [navigate]);
 
@@ -54,7 +81,10 @@ export default function GestorHome() {
       return;
     }
     console.log('[dateEffect] dataInicio:', dataInicio, 'dataFim:', dataFim);
-    if (dataInicio <= dataFim) fetchRelatorios(dataInicio, dataFim, false);
+    if (dataInicio <= dataFim) {
+      fetchRelatorios(dataInicio, dataFim, false);
+      fetchReabastecimentos(dataInicio, dataFim);
+    }
   }, [dataInicio, dataFim]);
 
   const fmtDate = (str) => {
@@ -444,6 +474,53 @@ export default function GestorHome() {
         [90, 90, 100, 100, 90, 45]
       );
 
+      // ── REABASTECIMENTOS ─────────────────────────────────────────────────
+      if (reabData) {
+        y = checkY(y, 50);
+        y = sectionTitle(`Reabastecimentos — ${currentLabel}`, y);
+
+        // Totais
+        const rTotW = (CW - 10) / 2;
+        [
+          { label: 'Total Pago', value: `€${reabData.totais.euros.toFixed(2)}`, color: [245, 197, 24] },
+          { label: 'Total Horas', value: `${reabData.totais.horas.toFixed(2)}h`, color: [67, 233, 123] },
+        ].forEach((s, i) => {
+          const cx = M + i * (rTotW + 10);
+          doc.setFillColor(248, 249, 251);
+          doc.roundedRect(cx, y, rTotW, 44, 4, 4, 'F');
+          doc.setFillColor(...s.color);
+          doc.roundedRect(cx, y, rTotW, 3, 2, 2, 'F');
+          doc.setFontSize(7.5); doc.setFont('helvetica', 'normal'); doc.setTextColor(110, 110, 120);
+          doc.text(s.label.toUpperCase(), cx + rTotW / 2, y + 16, { align: 'center' });
+          doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(20, 20, 30);
+          doc.text(s.value, cx + rTotW / 2, y + 35, { align: 'center' });
+        });
+        y += 54;
+
+        if (reabData.subtotais.length === 0) {
+          doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(150, 150, 160);
+          doc.text('Sem reabastecimentos no período selecionado.', M + 8, y);
+          y += 20;
+        } else {
+          reabData.subtotais.forEach(sub => {
+            y = checkY(y, 30);
+            doc.setFillColor(230, 232, 240);
+            doc.rect(M, y, CW, 18, 'F');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(30, 30, 40);
+            doc.text(sub.tipo, M + 6, y + 12);
+            doc.text(`€${sub.euros.toFixed(2)}   ${sub.horas.toFixed(2)}h`, M + CW - 6, y + 12, { align: 'right' });
+            y += 18;
+
+            drawTable(
+              '',
+              ['Matrícula', 'Marca / Modelo', 'Total Pago', 'Total Horas'],
+              sub.taxis.map(t => [t.matricula, `${t.marca} ${t.modelo}`, `€${t.euros.toFixed(2)}`, `${t.horas.toFixed(2)}h`]),
+              [100, 220, 100, 95]
+            );
+          });
+        }
+      }
+
       // ── FOOTER em todas as páginas ───────────────────────────────────────
       const totalPages = doc.getNumberOfPages();
       for (let p = 1; p <= totalPages; p++) {
@@ -669,26 +746,168 @@ export default function GestorHome() {
 
         {/* STATS */}
         <div className="mh-stats-row" style={{ opacity: filtering ? 0.5 : 1, transition: 'opacity 0.2s' }}>
-          <div className="mh-stat-card">
-            <span className="mh-stat-label">Viagens no período</span>
-            <span className="mh-stat-value">{relatoriosData?.resumo?.viagensPeriodo || 0}</span>
-          </div>
-
-          <div className="mh-stat-card accent">
-            <span className="mh-stat-label">Receita no período</span>
-            <span className="mh-stat-value">€{relatoriosData?.resumo?.receitaPeriodo || '0.00'}</span>
-          </div>
-
-          <div className="mh-stat-card">
-            <span className="mh-stat-label">Motoristas ativos</span>
-            <span className="mh-stat-value">{relatoriosData?.resumo?.motoristasAtivos || '0 / 0'}</span>
-          </div>
-
-          <div className="mh-stat-card">
-            <span className="mh-stat-label">Táxis em serviço</span>
-            <span className="mh-stat-value">{relatoriosData?.resumo?.taxisEmServico || '0 / 0'}</span>
-          </div>
+          {[
+            { key: 'viagens', label: 'Viagens no período', value: relatoriosData?.resumo?.viagensPeriodo ?? 0, accent: false },
+            { key: 'horas',   label: 'Horas em viagens',  value: `${relatoriosData?.resumo?.horasPeriodo ?? '0.00'}h`, accent: false },
+            { key: 'km',      label: 'Km percorridos',    value: `${relatoriosData?.resumo?.kmPeriodo ?? '0.00'} km`, accent: false },
+            { key: 'receita', label: 'Receita no período',value: `€${relatoriosData?.resumo?.receitaPeriodo ?? '0.00'}`, accent: true },
+            { key: null,      label: 'Motoristas ativos', value: relatoriosData?.resumo?.motoristasAtivos ?? '0 / 0', accent: false },
+            { key: null,      label: 'Táxis em serviço',  value: relatoriosData?.resumo?.taxisEmServico ?? '0 / 0', accent: false },
+          ].map(({ key, label, value, accent }) => (
+            <div key={label}
+              className={`mh-stat-card${accent ? ' accent' : ''}${key ? ' mh-viagem-row' : ''}`}
+              style={key ? { cursor: 'pointer' } : {}}
+              onClick={() => {
+                if (!key) return;
+                if (key === 'receita') { setFatExpanded(f => !f); setFatClienteExp(null); }
+                else { setDdExpanded(ddExpanded === key ? null : key); setDdSubType(null); setDdItemExp(null); }
+              }}
+            >
+              <span className="mh-stat-label">{label}</span>
+              <span className="mh-stat-value">{String(value)}</span>
+              {key && key !== 'receita' && <span style={{ fontSize: '0.7rem', color: '#888', marginTop: 2 }}>{ddExpanded === key ? '▲ ocultar' : '▼ drill-down'}</span>}
+              {key === 'receita' && <span style={{ fontSize: '0.7rem', color: '#888', marginTop: 2 }}>{fatExpanded ? '▲ ocultar' : '▼ por cliente'}</span>}
+            </div>
+          ))}
         </div>
+
+        {/* US14 DRILL-DOWN */}
+        {ddExpanded && relatoriosData?.drillDown && (
+          <div className="mh-middle-row" style={{ opacity: filtering ? 0.5 : 1, transition: 'opacity 0.2s' }}>
+            <div className="mh-card full-width">
+              <div className="mh-section-header">
+                <h3 className="mh-card-title">
+                  {ddExpanded === 'viagens' ? 'Total de Viagens' : ddExpanded === 'horas' ? 'Total de Horas' : 'Total de Km'} — {currentLabel}
+                </h3>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  {['motoristas', 'taxis'].map(t => (
+                    <button key={t}
+                      onClick={() => { setDdSubType(t); setDdItemExp(null); }}
+                      style={{ fontSize: '0.78rem', padding: '4px 12px', borderRadius: 20, cursor: 'pointer', background: ddSubType === t ? '#f5c518' : 'rgba(255,255,255,0.08)', color: ddSubType === t ? '#111' : '#ddd', border: '1px solid rgba(255,255,255,0.15)' }}
+                    >
+                      Por {t === 'motoristas' ? 'Motorista' : 'Táxi'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {ddSubType && (
+                <div style={{ padding: '0 1.2rem 1.2rem' }}>
+                  {[...(relatoriosData.drillDown[ddSubType] || [])]
+                    .sort((a, b) => (b[ddExpanded] ?? 0) - (a[ddExpanded] ?? 0))
+                    .map(item => {
+                      const itemId = item.id.toString();
+                      const val = ddExpanded === 'viagens' ? item.viagens
+                                : ddExpanded === 'horas'   ? `${item.horas.toFixed(2)}h`
+                                : `${item.km.toFixed(2)} km`;
+                      const label = ddSubType === 'motoristas' ? item.nome : `${item.matricula} · ${item.marca} ${item.modelo}`;
+                      return (
+                        <div key={itemId}>
+                          <div
+                            className="mh-motorista-row"
+                            onClick={() => setDdItemExp(ddItemExp === itemId ? null : itemId)}
+                          >
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                              <span style={{ fontWeight: 600 }}>{label}</span>
+                              {ddSubType === 'taxis' && <span style={{ fontSize: '0.75rem', color: '#888' }}>{item.tipo_motor}</span>}
+                            </div>
+                            <div style={{ display: 'flex', gap: '1.2rem', alignItems: 'center' }}>
+                              <span style={{ color: '#f5c518', fontWeight: 700 }}>{val}</span>
+                              {ddSubType === 'motoristas' && (
+                                <button onClick={e => { e.stopPropagation(); navigate(`/gestor/motoristas/${item.id}`); }}
+                                  style={{ fontSize: '0.72rem', background: 'rgba(245,197,24,0.1)', border: '1px solid rgba(245,197,24,0.3)', color: '#f5c518', borderRadius: 6, padding: '2px 8px', cursor: 'pointer' }}>
+                                  Ver perfil
+                                </button>
+                              )}
+                              {ddSubType === 'taxis' && (
+                                <button onClick={e => { e.stopPropagation(); navigate(`/gestor/editar-taxi/${item.id}`); }}
+                                  style={{ fontSize: '0.72rem', background: 'rgba(245,197,24,0.1)', border: '1px solid rgba(245,197,24,0.3)', color: '#f5c518', borderRadius: 6, padding: '2px 8px', cursor: 'pointer' }}>
+                                  Ver táxi
+                                </button>
+                              )}
+                              <span style={{ color: '#666', fontSize: '0.75rem' }}>{ddItemExp === itemId ? '▲' : '▼'}</span>
+                            </div>
+                          </div>
+
+                          {ddItemExp === itemId && (
+                            <div style={{ marginLeft: '1rem', marginBottom: '0.5rem' }}>
+                              {[...item.detalhes]
+                                .sort((a, b) => (b[ddExpanded === 'viagens' ? 'km' : ddExpanded] ?? 0) - (a[ddExpanded === 'viagens' ? 'km' : ddExpanded] ?? 0))
+                                .map((d, i) => (
+                                  <div key={i}
+                                    onClick={() => navigate('/gestor/viagem', { state: { trip: { id: d.id, origem: d.origem, destino: d.destino, motorista: d.motorista ?? item.nome, cliente: '—', status: 'Concluída', data: d.fim?.split(',')[0], hora: d.fim?.split(',')[1]?.trim(), km: d.km, horas: d.horas } } })}
+                                    style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto', gap: '0.5rem', padding: '0.4rem 0.8rem', background: 'rgba(255,255,255,0.02)', borderRadius: 5, marginBottom: 2, fontSize: '0.8rem', color: '#bbb', cursor: 'pointer', alignItems: 'center' }}
+                                  >
+                                    <span>{d.origem}</span>
+                                    <span>{d.destino}</span>
+                                    <span style={{ color: '#aaa' }}>{d.inicio}</span>
+                                    <span style={{ color: '#aaa' }}>{d.fim}</span>
+                                    <span style={{ color: '#f5c518' }}>{d.horas.toFixed(2)}h · {d.km} km</span>
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* US15 FATURAÇÃO POR CLIENTE */}
+        {fatExpanded && relatoriosData?.faturacaoPorCliente && (
+          <div className="mh-middle-row" style={{ opacity: filtering ? 0.5 : 1, transition: 'opacity 0.2s' }}>
+            <div className="mh-card full-width">
+              <div className="mh-section-header">
+                <h3 className="mh-card-title">Faturação por Cliente — {currentLabel}</h3>
+                <span className="mh-badge">{relatoriosData.faturacaoPorCliente.length}</span>
+              </div>
+
+              {relatoriosData.faturacaoPorCliente.length === 0 ? (
+                <div style={{ padding: '20px', textAlign: 'center', color: tema === 'claro' ? '#444' : '#888' }}>
+                  Nenhuma faturação no período selecionado.
+                </div>
+              ) : (
+                <div style={{ padding: '0 1.2rem 1.2rem' }}>
+                  {relatoriosData.faturacaoPorCliente.map(cliente => (
+                    <div key={cliente.id}>
+                      <div
+                        className="mh-motorista-row"
+                        onClick={() => setFatClienteExp(fatClienteExp === cliente.id ? null : cliente.id)}
+                      >
+                        <span style={{ fontWeight: 600 }}>{cliente.nome}</span>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                          <span style={{ color: '#f5c518', fontWeight: 700 }}>€{cliente.euros.toFixed(2)}</span>
+                          <span style={{ color: '#888', fontSize: '0.82rem' }}>{cliente.viagens.length} viagem(ns)</span>
+                          <span style={{ color: '#666', fontSize: '0.75rem' }}>{fatClienteExp === cliente.id ? '▲' : '▼'}</span>
+                        </div>
+                      </div>
+
+                      {fatClienteExp === cliente.id && (
+                        <div style={{ marginLeft: '1rem', marginBottom: '0.5rem' }}>
+                          {cliente.viagens.map((v, i) => (
+                            <div key={i}
+                              onClick={() => navigate('/gestor/viagem', { state: { trip: { id: v.id, origem: v.origem, destino: v.destino, motorista: v.motorista, cliente: cliente.nome, status: 'Concluída', data: v.fim?.split(',')[0], hora: v.fim?.split(',')[1]?.trim(), preco: v.preco } } })}
+                              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto', gap: '0.5rem', padding: '0.4rem 0.8rem', background: 'rgba(255,255,255,0.02)', borderRadius: 5, marginBottom: 2, fontSize: '0.8rem', color: '#bbb', cursor: 'pointer', alignItems: 'center' }}
+                            >
+                              <span>{v.origem}</span>
+                              <span>{v.destino}</span>
+                              <span style={{ color: '#aaa' }}>{v.inicio}</span>
+                              <span style={{ color: '#aaa' }}>{v.fim}</span>
+                              <span style={{ color: '#f5c518', fontWeight: 700 }}>€{v.preco.toFixed(2)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* CONTEÚDO */}
         <div className="mh-middle-row" style={{ opacity: filtering ? 0.5 : 1, transition: 'opacity 0.2s', gridTemplateColumns: '1fr' }}>
@@ -844,6 +1063,110 @@ export default function GestorHome() {
             ) : (
               <div style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
                 Nenhuma viagem no período selecionado
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── US16 REABASTECIMENTOS ─────────────────────────────── */}
+        <div className="mh-middle-row" style={{ opacity: filtering ? 0.5 : 1, transition: 'opacity 0.2s' }}>
+          <div className="mh-card full-width">
+            <div className="mh-section-header">
+              <h3 className="mh-card-title">Reabastecimentos — {currentLabel}</h3>
+            </div>
+
+            {!reabData ? (
+              <div style={{ padding: '20px', color: '#666', textAlign: 'center' }}>A carregar...</div>
+            ) : (
+              <div style={{ padding: '1rem 1.2rem' }}>
+
+                {/* Totais */}
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                  {[
+                    { key: 'euros', label: 'Total Pago', value: `€${reabData.totais.euros.toFixed(2)}`, color: '#f5c518' },
+                    { key: 'horas', label: 'Total Horas', value: `${reabData.totais.horas.toFixed(2)}h`, color: '#43e97b' },
+                  ].map(({ key, label, value, color }) => (
+                    <div key={key}
+                      onClick={() => setReabExpanded(reabExpanded === key ? null : key)}
+                      style={{ flex: 1, minWidth: 160, background: 'rgba(255,255,255,0.05)', border: `1px solid ${reabExpanded === key ? color : 'rgba(255,255,255,0.1)'}`, borderRadius: 10, padding: '0.9rem 1.2rem', cursor: 'pointer', transition: 'border-color 0.2s' }}
+                    >
+                      <div style={{ fontSize: '0.72rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</div>
+                      <div style={{ fontSize: '1.4rem', fontWeight: 800, color, marginTop: 4 }}>{value}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#666', marginTop: 4 }}>{reabExpanded === key ? '▲ ocultar subtotais' : '▼ ver subtotais'}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Subtotais */}
+                {reabExpanded && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem', textTransform: 'uppercase' }}>
+                      Por tipo de motor
+                    </div>
+                    {reabData.subtotais.length === 0 ? (
+                      <div style={{ color: '#555', fontSize: '0.85rem' }}>Sem reabastecimentos no período.</div>
+                    ) : reabData.subtotais.map(sub => (
+                      <div key={sub.tipo}>
+                        <div
+                          onClick={() => setReabSubExpanded(reabSubExpanded === sub.tipo ? null : sub.tipo)}
+                          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.65rem 0.9rem', background: 'rgba(255,255,255,0.04)', borderRadius: 8, marginBottom: 4, cursor: 'pointer', border: `1px solid ${reabSubExpanded === sub.tipo ? 'rgba(245,197,24,0.4)' : 'rgba(255,255,255,0.07)'}` }}
+                        >
+                          <span style={{ fontWeight: 600 }}>{sub.tipo}</span>
+                          <span style={{ color: '#aaa', fontSize: '0.85rem' }}>
+                            {reabExpanded === 'euros' ? `€${sub.euros.toFixed(2)}` : `${sub.horas.toFixed(2)}h`}
+                            &nbsp;·&nbsp;{reabSubExpanded === sub.tipo ? '▲' : '▼'}
+                          </span>
+                        </div>
+
+                        {/* Táxis do subtipo */}
+                        {reabSubExpanded === sub.tipo && (
+                          <div style={{ marginLeft: '1rem', marginBottom: '0.5rem' }}>
+                            {sub.taxis.map(t => (
+                              <div key={t.id}>
+                                <div
+                                  onClick={() => setReabTaxiExpanded(reabTaxiExpanded === t.id ? null : t.id)}
+                                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: 6, marginBottom: 3, cursor: 'pointer', border: '1px solid rgba(255,255,255,0.05)' }}
+                                >
+                                  <div>
+                                    <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>{t.matricula}</span>
+                                    <span style={{ color: '#888', fontSize: '0.8rem', marginLeft: 8 }}>{t.marca} {t.modelo}</span>
+                                  </div>
+                                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                    <span style={{ color: '#f5c518', fontSize: '0.85rem' }}>€{t.euros.toFixed(2)}</span>
+                                    <span style={{ color: '#43e97b', fontSize: '0.85rem' }}>{t.horas.toFixed(2)}h</span>
+                                    <button
+                                      onClick={e => { e.stopPropagation(); navigate(`/gestor/editar-taxi/${t.id}`); }}
+                                      style={{ fontSize: '0.72rem', background: 'rgba(245,197,24,0.1)', border: '1px solid rgba(245,197,24,0.3)', color: '#f5c518', borderRadius: 6, padding: '2px 8px', cursor: 'pointer' }}
+                                    >
+                                      Ver táxi
+                                    </button>
+                                    <span style={{ color: '#666', fontSize: '0.75rem' }}>{reabTaxiExpanded === t.id ? '▲' : '▼'}</span>
+                                  </div>
+                                </div>
+
+                                {/* Detalhes do táxi */}
+                                {reabTaxiExpanded === t.id && (
+                                  <div style={{ marginLeft: '1rem', marginBottom: '0.5rem' }}>
+                                    {t.registos.map((r, i) => (
+                                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0.8rem', background: 'rgba(255,255,255,0.02)', borderRadius: 5, marginBottom: 2, fontSize: '0.82rem', color: '#bbb' }}>
+                                        <span>{r.data} {r.hora}</span>
+                                        <span>{r.posto}</span>
+                                        <span style={{ color: '#f5c518' }}>€{r.valor.toFixed(2)}</span>
+                                        <span style={{ color: '#43e97b' }}>{r.duracao}h</span>
+                                        {r.litros && <span>{r.litros}L</span>}
+                                        {r.kWh && <span>{r.kWh}kWh</span>}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

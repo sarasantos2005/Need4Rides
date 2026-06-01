@@ -2,6 +2,7 @@ const Viagem = require('../models/viagemModel');
 const Turno = require('../models/turnoModel');
 const Taxi = require('../models/taxiModel');
 const Pessoa = require('../models/userModel');
+const Reabastecimento = require('../models/reabastecimentoModel');
 const pdf = require('html-pdf');
 const fs = require('fs');
 const path = require('path');
@@ -32,7 +33,7 @@ exports.getRelatorios = async (req, res) => {
     // 1. VIAGENS NO PERÍODO
     const viagensNoPeriodo = await Viagem.find({
       createdAt: { $gte: dataInicio, $lte: dataFim }
-    }).populate('turno').populate('cliente');
+    }).populate({ path: 'turno', populate: [{ path: 'motorista' }, { path: 'taxi' }] }).populate('cliente');
 
     console.log('[relatorios] viagensNoPeriodo:', viagensNoPeriodo.length);
     if (viagensNoPeriodo.length > 0) {
@@ -46,7 +47,7 @@ exports.getRelatorios = async (req, res) => {
     const viagensEmCursoAtuais = await Viagem.find({
       hora_final_viagem: null,
       hora_inicial_viagem: { $lte: agora }
-    }).populate('turno').populate('cliente');
+    }).populate({ path: 'turno', populate: [{ path: 'motorista' }, { path: 'taxi' }] }).populate('cliente');
 
     // 3. RECEITA TOTAL DO PERÍODO
     const receitaTotal = viagensPeriodoCompletadas.reduce((total, v) => total + (v.preco_viagem || 0), 0);
@@ -68,9 +69,10 @@ exports.getRelatorios = async (req, res) => {
     // 5. VIAGENS EM CURSO DETALHADAS
     const viagensEmCursoDetalhadas = (await Promise.all(
       viagensEmCursoAtuais.map(async (viagem) => {
-        const turno = viagem.turno
-          ? (viagem.turno._id ? viagem.turno : await Turno.findById(viagem.turno).populate('motorista').populate('taxi'))
-          : null;
+        let turno = viagem.turno?._id ? viagem.turno : null;
+        if (turno && !turno.motorista?.nome) {
+          turno = await Turno.findById(turno._id).populate('motorista').populate('taxi');
+        }
         if (!viagem.cliente?.nome || !turno?.motorista?.nome) return null;
         return {
           id: viagem._id,
@@ -115,36 +117,114 @@ exports.getRelatorios = async (req, res) => {
       })
     );
 
-    // 8. VIAGENS DO PERÍODO SELECIONADO
+    // 8. VIAGENS DO PERÍODO SELECIONADAS + TOTAIS HORAS/KM + DRILL-DOWN
     const viagensPeriodoSelecionadas = [...viagensPeriodoCompletadas]
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      .sort((a, b) => new Date(b.hora_final_viagem) - new Date(a.hora_final_viagem));
 
-    const viagensPeriodoDetalhadas = await Promise.all(
+    // Populate turno para todas as viagens completadas
+    const viagensPopuladas = await Promise.all(
       viagensPeriodoSelecionadas.map(async (viagem) => {
-        const turno = viagem.turno
-          ? (viagem.turno._id ? viagem.turno : await Turno.findById(viagem.turno).populate('motorista').populate('taxi'))
-          : null;
-        const rawDate = viagem.createdAt || viagem.hora_final_viagem || viagem.hora_inicial_viagem || new Date();
-        const dataViagem = rawDate instanceof Date ? rawDate : new Date(rawDate);
-
-        if (isNaN(dataViagem.getTime())) {
-          console.error('Erro: dataViagem inválida para viagem:', viagem._id, rawDate);
-          return null;
+        let turno = viagem.turno?._id ? viagem.turno : null;
+        if (turno && !turno.motorista?.nome) {
+          turno = await Turno.findById(turno._id).populate('motorista').populate('taxi');
         }
-
-        if (!viagem.cliente?.nome || !turno?.motorista?.nome) return null;
-        return {
-          id: viagem._id,
-          cliente: viagem.cliente.nome,
-          motorista: turno.motorista.nome,
-          origem: viagem.morada_inicial_viagem?.morada || '—',
-          destino: viagem.morada_final_viagem?.morada || '—',
-          preco: viagem.preco_viagem || 0,
-          data: dataViagem.toLocaleDateString('pt-PT'),
-          hora: dataViagem.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })
-        };
+        if (!turno?.motorista?.nome) return null;
+        const horas = viagem.hora_final_viagem && viagem.hora_inicial_viagem
+          ? parseFloat(((new Date(viagem.hora_final_viagem) - new Date(viagem.hora_inicial_viagem)) / 3600000).toFixed(4))
+          : 0;
+        return { viagem, turno, horas };
       })
-    ).then(results => results.filter(r => r !== null));
+    ).then(r => r.filter(Boolean));
+
+    const totalHoras = parseFloat(viagensPopuladas.reduce((s, { horas }) => s + horas, 0).toFixed(2));
+    const totalKm    = parseFloat(viagensPopuladas.reduce((s, { viagem }) => s + (viagem.km_percorridos || 0), 0).toFixed(2));
+
+    const viagensPeriodoDetalhadas = viagensPopuladas
+      .filter(({ viagem }) => viagem.cliente?.nome)
+      .map(({ viagem, turno, horas }) => ({
+        id: viagem._id,
+        cliente: viagem.cliente?.nome || '—',
+        motorista: turno.motorista.nome,
+        motoristaId: turno.motorista._id,
+        taxiId: turno.taxi?._id,
+        taxi: turno.taxi ? `${turno.taxi.matricula} ${turno.taxi.marca} ${turno.taxi.modelo}` : '—',
+        origem: viagem.morada_inicial_viagem?.morada || '—',
+        destino: viagem.morada_final_viagem?.morada || '—',
+        preco: viagem.preco_viagem || 0,
+        km: viagem.km_percorridos || 0,
+        horas,
+        inicio: viagem.hora_inicial_viagem ? new Date(viagem.hora_inicial_viagem).toLocaleString('pt-PT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—',
+        fim:    viagem.hora_final_viagem   ? new Date(viagem.hora_final_viagem).toLocaleString('pt-PT',   { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—',
+        data: new Date(viagem.hora_final_viagem || viagem.createdAt).toLocaleDateString('pt-PT'),
+        hora: new Date(viagem.hora_final_viagem || viagem.createdAt).toLocaleTimeString('pt-PT', { hour:'2-digit', minute:'2-digit' }),
+      }));
+
+    // Drill-down por motorista
+    const porMotorista = {};
+    for (const { viagem, turno, horas } of viagensPopuladas) {
+      const id = turno.motorista._id.toString();
+      if (!porMotorista[id]) porMotorista[id] = { id, nome: turno.motorista.nome, viagens: 0, horas: 0, km: 0, detalhes: [] };
+      porMotorista[id].viagens++;
+      porMotorista[id].horas = parseFloat((porMotorista[id].horas + horas).toFixed(4));
+      porMotorista[id].km    = parseFloat((porMotorista[id].km + (viagem.km_percorridos || 0)).toFixed(2));
+      porMotorista[id].detalhes.push({
+        id: viagem._id,
+        origem: viagem.morada_inicial_viagem?.morada || '—',
+        destino: viagem.morada_final_viagem?.morada || '—',
+        km: viagem.km_percorridos || 0,
+        horas,
+        inicio: viagem.hora_inicial_viagem ? new Date(viagem.hora_inicial_viagem).toLocaleString('pt-PT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—',
+        fim:    viagem.hora_final_viagem   ? new Date(viagem.hora_final_viagem).toLocaleString('pt-PT',   { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—',
+      });
+    }
+
+    // Drill-down por táxi
+    const porTaxi = {};
+    for (const { viagem, turno, horas } of viagensPopuladas) {
+      if (!turno.taxi) continue;
+      const id = turno.taxi._id.toString();
+      if (!porTaxi[id]) porTaxi[id] = { id, matricula: turno.taxi.matricula, marca: turno.taxi.marca, modelo: turno.taxi.modelo, tipo_motor: turno.taxi.tipo_motor, viagens: 0, horas: 0, km: 0, detalhes: [] };
+      porTaxi[id].viagens++;
+      porTaxi[id].horas = parseFloat((porTaxi[id].horas + horas).toFixed(4));
+      porTaxi[id].km    = parseFloat((porTaxi[id].km + (viagem.km_percorridos || 0)).toFixed(2));
+      porTaxi[id].detalhes.push({
+        id: viagem._id,
+        motorista: turno.motorista.nome,
+        origem: viagem.morada_inicial_viagem?.morada || '—',
+        destino: viagem.morada_final_viagem?.morada || '—',
+        km: viagem.km_percorridos || 0,
+        horas,
+        inicio: viagem.hora_inicial_viagem ? new Date(viagem.hora_inicial_viagem).toLocaleString('pt-PT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—',
+        fim:    viagem.hora_final_viagem   ? new Date(viagem.hora_final_viagem).toLocaleString('pt-PT',   { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—',
+      });
+    }
+
+    const drillDown = {
+      motoristas: Object.values(porMotorista).sort((a, b) => b.viagens - a.viagens),
+      taxis: Object.values(porTaxi).sort((a, b) => b.viagens - a.viagens),
+    };
+
+    // US15 — Drill-down faturação por cliente
+    const porCliente = {};
+    for (const { viagem, turno } of viagensPopuladas) {
+      if (!viagem.cliente?.nome) continue;
+      const id = viagem.cliente._id.toString();
+      if (!porCliente[id]) porCliente[id] = { id, nome: viagem.cliente.nome, euros: 0, viagens: [] };
+      porCliente[id].euros += viagem.preco_viagem || 0;
+      porCliente[id].viagens.push({
+        id: viagem._id,
+        origem: viagem.morada_inicial_viagem?.morada || '—',
+        destino: viagem.morada_final_viagem?.morada || '—',
+        preco: viagem.preco_viagem || 0,
+        inicio: viagem.hora_inicial_viagem ? new Date(viagem.hora_inicial_viagem).toLocaleString('pt-PT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—',
+        fim:    viagem.hora_final_viagem   ? new Date(viagem.hora_final_viagem).toLocaleString('pt-PT',   { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—',
+        motorista: turno.motorista.nome,
+      });
+    }
+
+    const faturacaoPorCliente = Object.values(porCliente)
+      .map(c => ({ ...c, euros: parseFloat(c.euros.toFixed(2)), viagens: c.viagens.sort((a, b) => b.preco - a.preco) }))
+      .sort((a, b) => b.euros - a.euros);
 
     // 7. ESTATÍSTICAS ADICIONAIS PARA RELATÓRIOS
     const statsAdicionais = {
@@ -180,7 +260,9 @@ exports.getRelatorios = async (req, res) => {
       success: true,
       periodo: { inicio: dataInicio, fim: dataFim },
       resumo: {
-        viagensPeriodo: viagensNoPeriodo.length,
+        viagensPeriodo: viagensPeriodoCompletadas.length,
+        horasPeriodo: totalHoras,
+        kmPeriodo: totalKm,
         receitaPeriodo: receitaTotal.toFixed(2),
         motoristasAtivos: `${motoristasAtivos} / ${totalMotoristas}`,
         taxisEmServico: `${taxisEmServico} / ${totalTaxis}`
@@ -189,6 +271,8 @@ exports.getRelatorios = async (req, res) => {
       motoristas: motoristasComStats,
       viagensPeriodo: viagensPeriodoDetalhadas,
       viagensUltimaSemana: viagensPeriodoDetalhadas,
+      drillDown,
+      faturacaoPorCliente,
       statsAdicionais
     });
 
@@ -269,6 +353,91 @@ exports.getRelatoriosMotorista = async (req, res) => {
     });
   } catch (error) {
     console.error('Erro ao gerar relatório do motorista:', error);
+    res.status(500).json({ success: false, message: 'Erro ao gerar relatório.', error: error.message });
+  }
+};
+
+// US16 - Relatório de reabastecimentos
+exports.getRelatoriosReabastecimentos = async (req, res) => {
+  try {
+    const agora = new Date();
+    const hojeStr = `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`;
+    const di = req.query.dataInicio || hojeStr;
+    const df = req.query.dataFim   || hojeStr;
+    const dataInicio = parseDia(di, false);
+    const dataFim    = parseDia(df, true);
+
+    const reabastecimentos = await Reabastecimento.find({
+      estado: 'Concluído',
+      inicio_abastecimento: { $gte: dataInicio, $lte: dataFim }
+    }).populate('taxi');
+
+    const totalEuros = reabastecimentos.reduce((s, r) => s + (r.valor_pago || 0), 0);
+    const totalHoras = reabastecimentos.reduce((s, r) => {
+      if (!r.fim_abastecimento || !r.inicio_abastecimento) return s;
+      return s + (new Date(r.fim_abastecimento) - new Date(r.inicio_abastecimento)) / 3600000;
+    }, 0);
+
+    // Subtotais por tipo de motor
+    const porTipo = {};
+    for (const r of reabastecimentos) {
+      const tipo = r.taxi?.tipo_motor || 'Desconhecido';
+      if (!porTipo[tipo]) porTipo[tipo] = { euros: 0, horas: 0, taxis: {} };
+      porTipo[tipo].euros += r.valor_pago || 0;
+      if (r.fim_abastecimento && r.inicio_abastecimento) {
+        porTipo[tipo].horas += (new Date(r.fim_abastecimento) - new Date(r.inicio_abastecimento)) / 3600000;
+      }
+      const taxiId = r.taxi?._id?.toString();
+      if (taxiId) {
+        if (!porTipo[tipo].taxis[taxiId]) {
+          porTipo[tipo].taxis[taxiId] = {
+            id: taxiId,
+            matricula: r.taxi.matricula,
+            marca: r.taxi.marca,
+            modelo: r.taxi.modelo,
+            tipo_motor: r.taxi.tipo_motor,
+            euros: 0,
+            horas: 0,
+            registos: []
+          };
+        }
+        porTipo[tipo].taxis[taxiId].euros += r.valor_pago || 0;
+        if (r.fim_abastecimento && r.inicio_abastecimento) {
+          porTipo[tipo].taxis[taxiId].horas += (new Date(r.fim_abastecimento) - new Date(r.inicio_abastecimento)) / 3600000;
+        }
+        porTipo[tipo].taxis[taxiId].registos.push({
+          id: r._id,
+          data: new Date(r.inicio_abastecimento).toLocaleDateString('pt-PT'),
+          hora: new Date(r.inicio_abastecimento).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }),
+          posto: r.posto?.morada || '—',
+          valor: r.valor_pago || 0,
+          litros: r.litros || null,
+          kWh: r.kWh || null,
+          duracao: r.fim_abastecimento ? ((new Date(r.fim_abastecimento) - new Date(r.inicio_abastecimento)) / 3600000).toFixed(2) : null
+        });
+      }
+    }
+
+    const subtotais = Object.entries(porTipo).map(([tipo, dados]) => ({
+      tipo,
+      euros: parseFloat(dados.euros.toFixed(2)),
+      horas: parseFloat(dados.horas.toFixed(2)),
+      taxis: Object.values(dados.taxis)
+        .map(t => ({ ...t, euros: parseFloat(t.euros.toFixed(2)), horas: parseFloat(t.horas.toFixed(2)) }))
+        .sort((a, b) => b.euros - a.euros)
+    }));
+
+    res.status(200).json({
+      success: true,
+      periodo: { inicio: dataInicio, fim: dataFim },
+      totais: {
+        euros: parseFloat(totalEuros.toFixed(2)),
+        horas: parseFloat(totalHoras.toFixed(2)),
+      },
+      subtotais
+    });
+  } catch (error) {
+    console.error('Erro ao gerar relatório de reabastecimentos:', error);
     res.status(500).json({ success: false, message: 'Erro ao gerar relatório.', error: error.message });
   }
 };
